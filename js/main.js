@@ -84,15 +84,6 @@ var Place = function(name, latlng, info, id){
 var ViewModel = function(places){
     var self = this;
 
-    // Collection of places , check todo-mvc for how they arrange localStorage this way
-    this.places = ko.observableArray(places.map(function(place){
-        return new Place(place.name, place.latlng, place.info. place.id);
-    }));
-
-    this.selectedPlace = ko.observable(this.places()[0]);
-
-    this.markers = ko.observableArray([]);
-
     this.createLocation = function(){
         var location = {
             lat: map.getCenter().lat(),
@@ -100,8 +91,8 @@ var ViewModel = function(places){
         }
         var place = new Place("kaas", location, "some information about this spot", this.places().length);
         this.places.push(place);
-        this.selectedPlace(this.places()[this.places().length-1]);
-        this.createMarker(place);
+        this.markers().push(this.createMarker(place));
+        
     };
 
     this.createMarker = function(place) {
@@ -117,7 +108,7 @@ var ViewModel = function(places){
             self.populateInfowindow(marker);
         });
         marker.addListener('dragend', function(){self.updateLocation(marker, place)});
-        this.markers().push(marker);
+        return marker;
     };
 
     this.setSelectedPlace = function(place){
@@ -148,25 +139,45 @@ var ViewModel = function(places){
         }
         place.latlng(newLocation);
     };
+
+    // Collection of places, create a new Place object with observable properties for each of these places. 
+    this.places = ko.observableArray(places.map(function(place){
+        return new Place(place.name, place.latlng, place.info, place.id);
+    }));
+
+    this.selectedPlace = ko.observable(this.places()[0]);
+
+    this.markers = ko.observableArray(this.places().map(function(place){
+        self.createMarker(place);
+    }));
+
+		// internal computed observable that fires whenever anything changes in our places
+    // plagiarism: got this from todo-mvc
+		ko.computed(function () {
+			// store a clean copy to local storage, which also creates a dependency on
+			// the observableArray and all observables in each item
+			localStorage.setItem('session-places', ko.toJSON(this.places));
+		}.bind(this)).extend({
+			rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' }
+		}); // save at most twice per second
 };
 
 
 
 function initMap(){
-    var geocoder = new google.maps.Geocoder();
     //show world with center on Belgium
     var mapOptions = {
         zoom: 2, 
         center: {lat: 51.5051449, lng: 6.408124099999999}
     };
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
-    var bounds = new google.maps.LatLngBounds();
     infoWindow = new google.maps.InfoWindow();
+
+    // check local storage for places 
+    var places = ko.utils.parseJson(localStorage.getItem('session-places'));
+    ko.applyBindings(new ViewModel(places || []));
 };
 
-// check local storage for places 
-var places = ko.utils.parseJson(localStorage.getItem('session-places'));
-ko.applyBindings(new ViewModel(places || []));
 
 // Make an observable array of markers , and add a filter function to the viewmodel that sets the map `null` for any marker that doesn't fit the filter. 
 // Geocode the data first time and save in localstorage, then from then on use localstorage
