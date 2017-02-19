@@ -89,7 +89,7 @@ var ViewModel = function(places){
         return new Place(place.name, place.latlng, place.info. place.id);
     }));
 
-    this.currentPlace = ko.observable(this.places()[0]);
+    this.selectedPlace = ko.observable(this.places()[0]);
 
     this.markers = ko.observableArray([]);
 
@@ -100,7 +100,7 @@ var ViewModel = function(places){
         }
         var place = new Place("kaas", location, "some information about this spot", this.places().length);
         this.places.push(place);
-        this.currentPlace(this.places()[this.places().length-1]);
+        this.selectedPlace(this.places()[this.places().length-1]);
         this.createMarker(place);
     };
 
@@ -112,18 +112,29 @@ var ViewModel = function(places){
             animation: google.maps.Animation.DROP,
             title: place.name()
         });
-        marker.addListener('click', function(){self.populateInfowindow(marker, place)});
+        marker.addListener('click', function(){
+            self.setSelectedPlace(place);
+            self.populateInfowindow(marker);
+        });
         marker.addListener('dragend', function(){self.updateLocation(marker, place)});
         this.markers().push(marker);
     };
 
-    this.populateInfowindow = function(marker, place){
+    this.setSelectedPlace = function(place){
+        this.selectedPlace(place);
+    }
+
+    this.populateInfowindow = function(marker){
         if(infoWindow.marker != marker){
           infoWindow.marker = marker;
-          infoWindow.setContent("<h2 data-bind='text: $root.currentPlace().name'></h2>"+
-                  "lat: " + "<span data-bind='text: $root.currentPlace().latlng().lat'>"</span>"+
-                  "<p>lng: "+ place.latlng().lng +"</p>");
           infoWindow.open(map, marker);
+          var contentHTML = "<div id='infoWindow'>" + 
+              "<h2 data-bind='text: $root.selectedPlace().name'></h2>"+
+              "lat: " + "<span data-bind='text: $root.selectedPlace().latlng().lat'></span>"+
+              "lng: " + "<span data-bind='text: $root.selectedPlace().latlng().lng'></span>"+
+              "</div>";
+          infoWindow.setContent(contentHTML);
+          ko.applyBindings(self, document.getElementById('infoWindow'));
           infoWindow.addListener('closeclick', function(){
                   infoWindow.marker = null;
               });
