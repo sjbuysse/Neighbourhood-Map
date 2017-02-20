@@ -1,1 +1,3 @@
 is it okay to initiate the viewmodel in the `initMap` function?
+
+Is there a way to create some sort of dependency between markers and places? Like, could marker be a computed observable of a place

@@ -98,10 +98,11 @@ var ViewModel = function(places){
     this.createMarker = function(place) {
         var marker = new google.maps.Marker({
             position: place.latlng(),
+            title: place.name(),
+            id: place.id,
             map: map,
             draggable: true, 
-            animation: google.maps.Animation.DROP,
-            title: place.name()
+            animation: google.maps.Animation.DROP
         });
         marker.addListener('click', function(){
             self.setSelectedPlace(place);
@@ -113,16 +114,28 @@ var ViewModel = function(places){
 
     this.setSelectedPlace = function(place){
         this.selectedPlace(place);
-    }
+    };
+
+    this.removeLocation = function(place){
+        var i = self.markers().findIndex(function(marker){
+            return marker.id == place.id;
+        });
+        self.markers()[i].setVisible(false);
+        infoWindow.close();
+        infoWindow.marker = null;
+        self.markers.splice(i);
+        self.places.remove(place);
+    };
 
     this.populateInfowindow = function(marker){
         if(infoWindow.marker != marker){
           infoWindow.marker = marker;
           infoWindow.open(map, marker);
-          var contentHTML = "<div id='infoWindow'>" + 
-              "<h2 data-bind='text: $root.selectedPlace().name'></h2>"+
-              "lat: " + "<span data-bind='text: $root.selectedPlace().latlng().lat'></span>"+
-              "lng: " + "<span data-bind='text: $root.selectedPlace().latlng().lng'></span>"+
+          var contentHTML = "<div id='infoWindow' data-bind='with: $root.selectedPlace()'>" + 
+              "<h2 data-bind='text: name'></h2>" +
+              "lat: " + "<span data-bind='text: latlng().lat'></span>" +
+              "lng: " + "<span data-bind='text: latlng().lng'></span>" +
+              "<button data-bind='click: $parent.removeLocation'>Remove spot</button>" +
               "</div>";
           infoWindow.setContent(contentHTML);
           ko.applyBindings(self, document.getElementById('infoWindow'));
@@ -148,7 +161,7 @@ var ViewModel = function(places){
     this.selectedPlace = ko.observable(this.places()[0]);
 
     this.markers = ko.observableArray(this.places().map(function(place){
-        self.createMarker(place);
+        return self.createMarker(place);
     }));
 
 		// internal computed observable that fires whenever anything changes in our places
