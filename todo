@@ -2,3 +2,4 @@
 -start with world map and add locations by markers, save this data in localstorage, figure out a way to export this data and then a way to use this data as initial data for udacity coaches
 -Make function to export locations to json
 -use a fun style on your map, also different marker. something opaque? 
+-when adding a new location, the button 'add location' should not work untill half a second after the marker is displayed. Maybe even add a loading sign or something like that.

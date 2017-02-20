@@ -1,75 +1,3 @@
-// Data array of JSon objects representing places
-var placeList = [{
-        name: 'Piha',
-        country: 'New Zealand',
-        region: 'Auckland', 
-    },{
-        name: 'Robin hood Bay',
-        country: 'New Zealand',
-        region: 'Marlborough'
-    },{
-        name: 'Shingles Beach',
-        country: 'New Zealand',
-        region: 'West Coast'
-    },{
-        name: 'New Brighton',
-        country: 'New Zealand',
-        region: 'Canterburry'
-    },{
-        name: 'St Clair',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Karitane bar',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Tomahawk',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Brighton',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Blackhead',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Campbells Bay',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'All Day Bay',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Shag Beach',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Katiki Point',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Aramoana Spit',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Warrington',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Aramoana Spit',
-        country: 'New Zealand',
-        region: 'Otago'
-    },{
-        name: 'Moeraki',
-        country: 'New Zealand',
-        region: 'Otago'
-    }
-];
-
 var map; 
 var infoWindow;
 
@@ -153,6 +81,10 @@ var ViewModel = function(places){
         place.latlng(newLocation);
     };
 
+    this.exportLocations = function() {
+        console.save(localStorage['session-places'], 'sessions');
+    };
+
     // Collection of places, create a new Place object with observable properties for each of these places. 
     this.places = ko.observableArray(places.map(function(place){
         return new Place(place.name, place.latlng, place.info, place.id);
@@ -188,7 +120,8 @@ function initMap(){
 
     // check local storage for places 
     var places = ko.utils.parseJson(localStorage.getItem('session-places'));
-    ko.applyBindings(new ViewModel(places || []));
+    var placesFromServer = ko.utils.parseJson(placeList);
+    ko.applyBindings(new ViewModel(places || placeList));
 };
 
 

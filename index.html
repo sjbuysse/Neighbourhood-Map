@@ -15,6 +15,7 @@
     <body>
         <div id="map"></div>
         <button id="create-location" data-bind="click: createLocation" >Add Location</button>
+        <button id="export-locations" data-bind="click: exportLocations" >Export locations</button>
         </div>
         <script type="text/template" id="info-window-template">
             "<h2 data-bind='text: name'></h2>"+
@@ -25,6 +26,8 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
         <script src="js/plugins.js"></script>
         <script src="bower_components/knockout/dist/knockout.js"></script>
+        <script src="js/session-places.js"></script>
+        <script src="js/console-save.js"></script>
         <script src="js/main.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=initMap"
         async defer></script>
