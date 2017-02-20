@@ -7,6 +7,7 @@ var Place = function(name, latlng, info, id){
     this.latlng = ko.observable(latlng);
     this.info = ko.observable(info);
     this.id = id;
+    this.editing = ko.observable(false);
 };
 
 var ViewModel = function(places){
@@ -60,10 +61,14 @@ var ViewModel = function(places){
           infoWindow.marker = marker;
           infoWindow.open(map, marker);
           var contentHTML = "<div id='infoWindow' data-bind='with: $root.selectedPlace()'>" + 
-              "<h2 data-bind='text: name'></h2>" +
+              "<label class='info-window__title' data-bind='text: name, visible: !editing(), " + 
+              "event: { dblclick: $root.setEditing }'></label>" +
+              "<input class='info-window__title--edit' data-bind='value: name, " + 
+              "visible: editing, enterKey: $root.saveEditing'>" +
               "lat: " + "<span data-bind='text: latlng().lat'></span>" +
               "lng: " + "<span data-bind='text: latlng().lng'></span>" +
-              "<button data-bind='click: $parent.removeLocation'>Remove spot</button>" +
+              "<button data-bind='click: $parent.removeLocation, visible: !editing()'>Remove spot</button>" +
+              "<button data-bind='click: $parent.saveEditing, visible: editing()'>Update spot</button>" +
               "</div>";
           infoWindow.setContent(contentHTML);
           ko.applyBindings(self, document.getElementById('infoWindow'));
@@ -73,12 +78,31 @@ var ViewModel = function(places){
         }
     };
 
+    this.saveEditing = function(place){
+        console.log("kaas");
+        place.editing(false);
+    }
+
+    this.updatePlace = function(place){
+        var newLocation = {
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng()
+        }
+        place.latlng(newLocation);
+    };
+
     this.updateLocation = function(marker, place){
         var newLocation = {
             lat: marker.getPosition().lat(),
             lng: marker.getPosition().lng()
         }
         place.latlng(newLocation);
+    };
+
+    this.setEditing = function(place){
+        place.editing(true);
+        this.previousTitle = place.title;
+        this.previousInfo = place.info;
     };
 
     this.exportLocations = function() {
