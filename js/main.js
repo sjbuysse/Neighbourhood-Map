@@ -110,10 +110,13 @@ var ViewModel = function(places){
 
 
 function initMap(){
-    //show world with center on Belgium
+    //show world with center on New Zealand
     var mapOptions = {
-        zoom: 2, 
-        center: {lat: 51.5051449, lng: 6.408124099999999}
+        zoom: 5, 
+        center: {
+           lat: -40.900557,
+           lng : 174.885971
+        }
     };
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
     infoWindow = new google.maps.InfoWindow();
