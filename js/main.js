@@ -17,7 +17,7 @@ var ViewModel = function(places){
         var location = {
             lat: map.getCenter().lat(),
             lng: map.getCenter().lng()
-        }
+        };
         var place = new Place("kaas", location, "some information about this spot", this.places().length);
         this.places.push(place);
         this.markers().push(this.createMarker(place));
@@ -37,7 +37,7 @@ var ViewModel = function(places){
             self.setSelectedPlace(place);
             self.populateInfowindow(marker);
         });
-        marker.addListener('dragend', function(){self.updateLocation(marker, place)});
+        marker.addListener('dragend', function(){self.updateLocation(marker, place);});
         return marker;
     };
 
@@ -82,19 +82,19 @@ var ViewModel = function(places){
 
     this.saveEditing = function(place){
         place.editing(false);
-    }
+    };
 
     this.undoEditing = function(place){
         place.editing(false);
         place.name(place.previousName);
         place.info(place.previousInfo);
-    }
+    };
 
     this.updatePlace = function(place){
         var newLocation = {
             lat: marker.getPosition().lat(),
             lng: marker.getPosition().lng()
-        }
+        };
         place.latlng(newLocation);
     };
 
@@ -102,7 +102,7 @@ var ViewModel = function(places){
         var newLocation = {
             lat: marker.getPosition().lat(),
             lng: marker.getPosition().lng()
-        }
+        };
         place.latlng(newLocation);
     };
 
@@ -170,7 +170,7 @@ function initMap(){
     var places = ko.utils.parseJson(localStorage.getItem('session-places'));
     var placesFromServer = ko.utils.parseJson(placeList);
     ko.applyBindings(new ViewModel(places || placeList));
-};
+}
 
 
 // Make an observable array of markers , and add a filter function to the viewmodel that sets the map `null` for any marker that doesn't fit the filter. 
