@@ -21,6 +21,7 @@ var ViewModel = function(places){
         var place = new Place("kaas", location, "some information about this spot", this.places().length);
         this.places.push(place);
         this.markers().push(this.createMarker(place));
+        this.setSelectedPlace(place);
         
     };
 
@@ -61,11 +62,11 @@ var ViewModel = function(places){
           infoWindow.marker = marker;
           infoWindow.open(map, marker);
           var contentHTML = "<div id='infoWindow' data-bind='with: $root.selectedPlace()'>" + 
-              "<label class='info-window__title' data-bind='text: name, visible: !editing(), " + 
+              "<label class='info-window__name' data-bind='text: name, visible: !editing(), " + 
               "event: { dblclick: $root.setEditing }'></label>" +
-              "<input class='info-window__title--edit' data-bind='value: name, " + 
+              "<input class='info-window__name--edit' data-bind='value: name, " + 
               "valueUpdate: &quot;afterkeydown&quot;, " + 
-              "visible: editing, enterKey: $root.saveEditing, escapeKey: $root.undoEditing'>" +
+              "visible: editing, enterKey: $root.saveEditing, escapeKey: $root.undoEditing'></input>" +
               "lat: " + "<span data-bind='text: latlng().lat'></span>" +
               "lng: " + "<span data-bind='text: latlng().lng'></span>" +
               "<button>Show all info</button>" +

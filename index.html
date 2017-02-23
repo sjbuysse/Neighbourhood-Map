@@ -15,16 +15,23 @@
     </head>
     <body>
         <header></header>
-        <nav class="drawer">
+        <nav id="drawer" class="drawer">
             <i id="drawer__toggle" class="fa fa-bars" aria-hidden="true"></i>
+            <div class="drawer--create-location">
+                <button id="create-location" data-bind="click: createLocation">Add Location</button>
+            </div>
+            <ul data-bind="foreach: places" class="drawer__list">
+                <li data-bind="text: name()"></li>
+            </ul>
         </nav>
         <div id="map"></div>
         <!--<button id="create-location" data-bind="click: createLocation" >Add Location</button>-->
         <!--<button id="export-locations" data-bind="click: exportLocations" >Export locations</button>-->
         </div>
-        <div class="large-info-window" data-bind="with: selectedPlace()">
+        <div id="large-info-window"  class="large-info-window" data-bind="with: selectedPlace()">
             <button class="large-info-window__toggle" id="large-info-window__toggle"></button>
-            <label class="large-info-window__name" data-bind='text: name'></label> 
+            <label class="large-info-window__name" data-bind='text: name, visible: !editing(),event: { dblclick: $root.setEditing }, doubleTap: $root.setEditing'></label> 
+            <input class='large-info-window__name--edit' data-bind="value: name, visible: editing,  valueUpdate: 'afterkeydown', enterKey: $root.saveEditing, escapeKey: $root.undoEditing"></input>
             <label class="large-info-window__latlng">lat: <span data-bind='text: latlng().lat'></span></label> 
             <label class="large-info-window__latlng">lng: <span data-bind='text: latlng().lng'></span> </label>
         </div>
@@ -39,6 +46,7 @@
         <script src="bower_components/knockout/dist/knockout.js"></script>
         <script src="js/session-places.js"></script>
         <script src="js/keyhandling.js"></script>
+        <script src="js/doubletap.js"></script>
         <script src="js/console-save.js"></script>
         <script src="js/main.js"></script>
         <script src="js/ui.js"></script>

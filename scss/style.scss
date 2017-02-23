@@ -12,10 +12,20 @@ html, body{
 }
 
 #create-location {
-    position: absolute;
-    right: 0;
-    top: 0; 
+    text-align: left;
+    text-transform: uppercase;
+    line-height: 2rem;
+    width: 100%;
     height: 2rem;
+    background-color: $mirage;
+    border: none;
+    outline: none;
+    &:after {
+        position: absolute;
+        right: 1rem;
+        font-size: 1.7rem;
+        content: '+';
+    }
 }
 
 #export-locations {
@@ -25,7 +35,7 @@ html, body{
     height: 2rem;
 }
 
-.info-window__title--edit, .info-window__title {
+.info-window__name--edit, .info-window__name {
     display: block;
 }
 
@@ -59,7 +69,7 @@ html, body{
         transform: translate(0, 0);
         transition: transform 0.3s ease-out;
     }
-    &__name,  &_latlng {
+    &__name,  &__latlng {
         display: block;
     }
     &__name {
@@ -81,6 +91,8 @@ header {
 }
 
 .drawer {
+    text-align: left;
+    color: #EEE;
     height: 100%;
     width: 200px;
     background-color: $mirage;
@@ -93,11 +105,18 @@ header {
         font-size: 1.5rem;
         line-height: 2rem;
         position: absolute;
-        color: white;
+        color: #FFF;
         right: -30px;
+    }
+    &__list{
+        list-style: none;
+        padding: 0;
     }
     &--open{
         transform: translate(0);
         transition: transform 0.3s ease-out;
+        .fa-bars{
+            transform: rotate(90deg);
+        }
     }
 }
