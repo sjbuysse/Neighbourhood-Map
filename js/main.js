@@ -64,9 +64,11 @@ var ViewModel = function(places){
               "<label class='info-window__title' data-bind='text: name, visible: !editing(), " + 
               "event: { dblclick: $root.setEditing }'></label>" +
               "<input class='info-window__title--edit' data-bind='value: name, " + 
-              "visible: editing, enterKey: $root.saveEditing'>" +
+              "valueUpdate: &quot;afterkeydown&quot;, " + 
+              "visible: editing, enterKey: $root.saveEditing, escapeKey: $root.undoEditing'>" +
               "lat: " + "<span data-bind='text: latlng().lat'></span>" +
               "lng: " + "<span data-bind='text: latlng().lng'></span>" +
+              "<button>Show all info</button>" +
               "<button data-bind='click: $parent.removeLocation, visible: !editing()'>Remove spot</button>" +
               "<button data-bind='click: $parent.saveEditing, visible: editing()'>Update spot</button>" +
               "</div>";
@@ -79,8 +81,13 @@ var ViewModel = function(places){
     };
 
     this.saveEditing = function(place){
-        console.log("kaas");
         place.editing(false);
+    }
+
+    this.undoEditing = function(place){
+        place.editing(false);
+        place.name(place.previousName);
+        place.info(place.previousInfo);
     }
 
     this.updatePlace = function(place){
@@ -101,8 +108,8 @@ var ViewModel = function(places){
 
     this.setEditing = function(place){
         place.editing(true);
-        this.previousTitle = place.title;
-        this.previousInfo = place.info;
+        place.previousName = place.name();
+        place.previousInfo = place.info();
     };
 
     this.exportLocations = function() {
@@ -140,7 +147,21 @@ function initMap(){
         center: {
            lat: -40.900557,
            lng : 174.885971
-        }
+        },
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: google.maps.ControlPosition.TOP_CENTER
+        },
+        zoomControl: true,
+        zoomControlOptions: {
+            position: google.maps.ControlPosition.LEFT_TOP
+        },
+        scaleControl: true,
+        streetViewControl: true,
+        streetViewControlOptions: {
+            position: google.maps.ControlPosition.LEFT_TOP
+        },
     };
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
     infoWindow = new google.maps.InfoWindow();
