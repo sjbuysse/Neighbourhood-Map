@@ -1,5 +1,7 @@
 html, body{
-    height: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
 }
 
 #map {
@@ -22,4 +24,46 @@ html, body{
 
 .info-window__title--edit, .info-window__title {
     display: block;
+}
+
+.large-info-window {
+    background-color: white;
+    height: 5rem;
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    transform: translate(0, 3rem);
+    transition: transform 0.3s ease-out;
+}
+.large-info-window--open {
+    transform: translate(0, 0);
+    transition: transform 0.3s ease-out;
+}
+
+#large-info-window__toggle{
+    background: none;
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+    border: none;
+    outline: none;
+    position: absolute;
+    right: 10px;
+}
+
+#large-info-window__toggle:after {
+    font-size: 1.2rem;
+    content: "\00BB";
+    text-shadow: 0 -1px 0 #bfbfbf;
+}
+
+.large-info-window__name,  .large-info-window__latlng {
+    display: block;
+}
+
+.large-info-window__name {
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    padding: 0rem;
+    margin: 0.4rem 0;
+    font-weight: bold;
 }
