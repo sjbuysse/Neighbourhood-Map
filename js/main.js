@@ -42,7 +42,6 @@ var ViewModel = function(places){
         //Set up a new place for the next location creation.
         self.newPlace = new Place("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
         self.toggleCreatingPlace();
-        return false;
     };
 
     this.createMarker = function(place) {
