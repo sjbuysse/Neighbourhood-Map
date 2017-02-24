@@ -23,4 +23,4 @@ ko.bindingHandlers.doubleTap = {
         // call the real event binding's init function
         ko.bindingHandlers.event.init(element, newValueAccessor, allBindingsAccessor, data, bindingContext);
     }
-}
+};

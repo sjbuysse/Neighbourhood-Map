@@ -1,5 +1,6 @@
 var $drawer = $('#drawer');
 var $largeInfoWindow = $('#large-info-window');
+var $map = $('#map');
 
 $largeInfoWindow.on('click', '#large-info-window__toggle', function(){
     $largeInfoWindow.toggleClass('large-info-window--open');
@@ -15,3 +16,4 @@ $createLocationBtn.click(function(){
     $largeInfoWindow.addClass('large-info-window--open');
     $drawer.removeClass('drawer--open');
 });
+

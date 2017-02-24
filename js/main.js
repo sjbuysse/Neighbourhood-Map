@@ -13,16 +13,36 @@ var Place = function(name, latlng, info, id){
 var ViewModel = function(places){
     var self = this;
 
-    this.createLocation = function(){
-        var location = {
-            lat: map.getCenter().lat(),
-            lng: map.getCenter().lng()
-        };
-        var place = new Place("kaas", location, "some information about this spot", this.places().length);
-        this.places.push(place);
-        this.markers().push(this.createMarker(place));
-        this.setSelectedPlace(place);
-        
+    //Observables to toggle classes to open and close these parts of the UI
+    this.showDrawer = ko.observable(false);
+    this.showLargeInfoWindow = ko.observable(false);
+    this.creatingPlace = ko.observable(false);
+
+    this.toggleShowDrawer = function(){
+        self.showDrawer(!self.showDrawer());
+    };
+
+    this.toggleCreatingPlace = function(){
+        self.creatingPlace(!self.creatingPlace());
+    };
+
+    this.toggleShowLargeInfoWindow = function(){
+        self.showLargeInfoWindow(!self.showLargeInfoWindow());
+    };
+
+    this.addLocation = function(){
+        var name = newPlace.name();
+        var latlng = newPlace.latlng();
+        var info = newPlace.info();
+        var id = newPlace.id;
+        var addedPlace = new Place(name, latlng, info, id);
+        self.places.push(addedPlace);
+        self.markers().push(self.createMarker(addedPlace));
+        self.setSelectedPlace(addedPlace);
+        //Set up a new place for the next location creation.
+        self.newPlace = new Place("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
+        self.toggleCreatingPlace();
+        return false;
     };
 
     this.createMarker = function(place) {
@@ -69,7 +89,7 @@ var ViewModel = function(places){
               "visible: editing, enterKey: $root.saveEditing, escapeKey: $root.undoEditing'></input>" +
               "lat: " + "<span data-bind='text: latlng().lat'></span>" +
               "lng: " + "<span data-bind='text: latlng().lng'></span>" +
-              "<button>Show all info</button>" +
+              "<button id='showLargeInfo'>Show all info</button>" +
               "<button data-bind='click: $parent.removeLocation, visible: !editing()'>Remove spot</button>" +
               "<button data-bind='click: $parent.saveEditing, visible: editing()'>Update spot</button>" +
               "</div>";
@@ -123,6 +143,9 @@ var ViewModel = function(places){
     }));
 
     this.selectedPlace = ko.observable(this.places()[0]);
+
+    //Variable to hold the temporary new place during the creation process
+    this.newPlace = new Place("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
 
     this.markers = ko.observableArray(this.places().map(function(place){
         return self.createMarker(place);
