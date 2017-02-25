@@ -8,6 +8,7 @@ var Place = function(name, latlng, info, id){
     this.info = ko.observable(info);
     this.id = id;
     this.editing = ko.observable(false);
+    this.visible = ko.observable(true);
 };
 
 var ViewModel = function(places){
@@ -30,18 +31,33 @@ var ViewModel = function(places){
         self.showLargeInfoWindow(!self.showLargeInfoWindow());
     };
 
+    //Current value in the searchBox
+    this.filterValue = ko.observable();
+
+    this.createPlace = function(name, latlng, info, id){
+        var place = new Place(name, latlng, info, id);
+        //ko.computed(function(){
+
+        //});
+        return place;
+    }
+
     this.addLocation = function(){
-        var name = newPlace.name();
-        var latlng = newPlace.latlng();
-        var info = newPlace.info();
-        var id = newPlace.id;
-        var addedPlace = new Place(name, latlng, info, id);
+        var name = self.newPlace.name();
+        var latlng = self.newPlace.latlng();
+        var info = self.newPlace.info();
+        var id = self.newPlace.id;
+        var addedPlace = self.createPlace(name, latlng, info, id);
         self.places.push(addedPlace);
         self.markers().push(self.createMarker(addedPlace));
         self.setSelectedPlace(addedPlace);
         //Set up a new place for the next location creation.
-        self.newPlace = new Place("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
+        self.newPlace.name(""); self.newPlace.latlng({lat: map.getCenter().lat(),lng: map.getCenter().lng()});
+        self.newPlace.info("");
+        self.newPlace.id = self.places().length;
+        //self.newPlace = self.createPlace("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
         self.toggleCreatingPlace();
+        self.toggleShowDrawer();
     };
 
     this.createMarker = function(place) {
@@ -52,6 +68,9 @@ var ViewModel = function(places){
             map: map,
             draggable: true, 
             animation: google.maps.Animation.DROP
+        });
+        ko.computed(function(){
+            marker.setVisible(place.visible());
         });
         marker.addListener('click', function(){
             self.setSelectedPlace(place);
@@ -93,6 +112,7 @@ var ViewModel = function(places){
               "<button data-bind='click: $parent.saveEditing, visible: editing()'>Update spot</button>" +
               "</div>";
           infoWindow.setContent(contentHTML);
+          //We need to apply the bindings for this new infowindow (because it didn't exist at the time of applying bindings to the ViewModel)
           ko.applyBindings(self, document.getElementById('infoWindow'));
           infoWindow.addListener('closeclick', function(){
                   infoWindow.marker = null;
@@ -138,13 +158,14 @@ var ViewModel = function(places){
 
     // Collection of places, create a new Place object with observable properties for each of these places. 
     this.places = ko.observableArray(places.map(function(place){
-        return new Place(place.name, place.latlng, place.info, place.id);
+        var place = self.createPlace(place.name, place.latlng, place.info, place.id);
+        return place;
     }));
 
     this.selectedPlace = ko.observable(this.places()[0]);
 
     //Variable to hold the temporary new place during the creation process
-    this.newPlace = new Place("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
+    this.newPlace = self.createPlace("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
 
     this.markers = ko.observableArray(this.places().map(function(place){
         return self.createMarker(place);

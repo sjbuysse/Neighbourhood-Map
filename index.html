@@ -18,14 +18,14 @@
         <nav class="drawer" data-bind="css:{'drawer--open': showDrawer()}">
             <i class="fa fa-bars" aria-hidden="true" data-bind="click: toggleShowDrawer"></i>
             <button class="drawer__create-location-btn" data-bind="click: toggleCreatingPlace, css:{'drawer__create-location-btn--closed': !$root.creatingPlace(), 'drawer__create-location-btn--open': $root.creatingPlace()}">Add Location</button>
-                <form class="create-location-form drawer__create-location-form" data-bind:"submit: $root.addLocation, visible: $root.creatingPlace()">
-                    <input class="create-location-form__name" placeholder="Name" data-bind="value: newPlace.name, visible: $root.creatingPlace()"></input>
-                    <textarea class="create-location-form__info" placeholder="Write down some information about your session at this spot" data-bind="value: newPlace.info, visible: $root.creatingPlace()"></textarea>
-                    <button type="submit" class="create-location-form__submit" data-bind="visible: $root.creatingPlace()">Pin to center</button>
-                </form>
-                </div>
+            <form class="create-location-form drawer__create-location-form" data-bind="submit: $root.addLocation, visible: $root.creatingPlace(), with: $root.newPlace">
+                <input class="create-location-form__name" placeholder="Name" data-bind="textInput: name"></input>
+                <textarea class="create-location-form__info" placeholder="Write down some information about your session at this spot" data-bind="textInput: info"></textarea>
+                <button type="submit" class="create-location-form__submit">Pin to center</button>
+            </form>
+            <input placeholder="Search for a place" data-bind="value: filterValue"></input>
             <ul data-bind="foreach: places" class="drawer__list">
-                <li data-bind="text: name()"></li>
+                <li data-bind="text: name(), visible: visible()"></li>
             </ul>
         </nav>
         <div id="map"></div>
