@@ -65,7 +65,7 @@ header {
 .drawer {
   text-align: left;
   color: #EEE;
-  height: 100%;
+  height: 100vh;
   width: 200px;
   background-color: #1C262F;
   position: absolute;
@@ -80,6 +80,8 @@ header {
     color: #FFF;
     right: -30px; }
   .drawer__list {
+    max-height: 100%;
+    overflow-y: scroll;
     list-style: none;
     text-transform: uppercase;
     margin: 6px;
@@ -111,9 +113,9 @@ header {
       transform: rotate(90deg); }
 
 .create-location-form {
-  color: #222;
   margin: 6px; }
   .create-location-form__name, .create-location-form__info {
+    color: #222;
     box-sizing: border-box;
     width: 188px; }
   .create-location-form__info {
@@ -128,5 +130,18 @@ header {
     background-color: #1C262F;
     border: 1px solid #EEE;
     outline: none; }
+
+.drawer__filter {
+  color: #222;
+  box-sizing: border-box;
+  width: 188px; }
+
+.filter-wrapper {
+  color: #222;
+  box-sizing: border-box;
+  width: 188px;
+  margin: 6px;
+  border-top: 1px solid #EEE;
+  padding: 6px 0 0; }
 
 /*# sourceMappingURL=style.css.map */

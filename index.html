@@ -23,7 +23,9 @@
                 <textarea class="create-location-form__info" placeholder="Write down some information about your session at this spot" data-bind="textInput: info"></textarea>
                 <button type="submit" class="create-location-form__submit">Pin to center</button>
             </form>
-            <input placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown'"></input>
+            <div class="filter-wrapper">
+                <input class="drawer__filter" placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown'"></input>
+            </div>
             <ul data-bind="foreach: places" class="drawer__list">
                 <li data-bind="text: name(), visible: visible(), click: $root.chooseListItem"></li>
             </ul>

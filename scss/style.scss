@@ -1,5 +1,10 @@
 $mirage: #1C262F;
 $gallery: #EEE;
+@mixin form-fields {
+    color: #222;
+    box-sizing: border-box;
+    width: 200px - 12px;
+}
 
 html, body{
     height: 100vh;
@@ -80,7 +85,7 @@ header {
 .drawer {
     text-align: left;
     color: $gallery;
-    height: 100%;
+    height: 100vh;
     width: 200px;
     background-color: $mirage;
     position: absolute;
@@ -96,11 +101,13 @@ header {
         right: -30px;
     }
     &__list {
+        max-height: 100%;
+        overflow-y: scroll;
         list-style: none;
         text-transform: uppercase;
         margin: 6px;
         padding: 6px 0 0;
-        border-top: 1px solid $gallery
+        border-top: 1px solid $gallery;
     }
     &__create-location-btn {
         text-align: left;
@@ -133,11 +140,9 @@ header {
     }
 }
 .create-location-form {
-    color: #222;
     margin: 6px;
     &__name, &__info{
-        box-sizing: border-box;
-        width: 200px - 12px;
+        @include form-fields;
     }
     &__info{
         height: 5rem;
@@ -154,3 +159,16 @@ header {
         outline: none;
     }
 }
+
+.drawer__filter {
+    @include form-fields;
+}
+
+.filter-wrapper {
+    @include form-fields;
+    margin: 6px;
+    border-top: 1px solid $gallery;
+    padding: 6px 0 0;
+}
+
+
