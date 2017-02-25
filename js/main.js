@@ -49,7 +49,7 @@ var ViewModel = function(places){
     }
 
     this.chooseListItem = function(place){
-        selftoggleShowDrawer();
+        self.toggleShowDrawer();
         var index = self.markers().findIndex(function(marker){
             return marker.id === place.id;
         });
