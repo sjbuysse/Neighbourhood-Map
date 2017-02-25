@@ -4,3 +4,5 @@
 -use a fun style on your map, also different marker. something opaque? 
 -when adding a new location, the button 'add location' (a 2nd one) should not work untill half a second after the marker is displayed (so the marker is actually created). Maybe even add a loading sign or something like that.
 -Remove small infowindow from mobile devices
+-When clicking on name, zoom to center like in google maps class (setcenter and zoom to location)
+!create init function that sets up this.places and selectedplace and newplace and so on... (declutter the viewmodel)

@@ -32,14 +32,28 @@ var ViewModel = function(places){
     };
 
     //Current value in the searchBox
-    this.filterValue = ko.observable();
+    this.filterValue = ko.observable('');
 
     this.createPlace = function(name, latlng, info, id){
         var place = new Place(name, latlng, info, id);
-        //ko.computed(function(){
-
-        //});
+        ko.computed(function(){
+            var visible = self.filterValue().trim().length > 0 ? self.partOfFilter(place) : true;
+            place.visible(visible);
+        });
         return place;
+    }
+
+    //This checks if the filter value is part of the passed in place's name
+    this.partOfFilter = function(place){
+        return place.name().toLowerCase().indexOf(self.filterValue().toLowerCase()) === -1 ? false : true;
+    }
+
+    this.chooseListItem = function(place){
+        selftoggleShowDrawer();
+        var index = self.markers().findIndex(function(marker){
+            return marker.id === place.id;
+        });
+        google.maps.event.trigger(self.markers()[index], 'click');
     }
 
     this.addLocation = function(){
