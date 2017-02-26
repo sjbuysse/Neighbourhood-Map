@@ -21,10 +21,16 @@ var ViewModel = function(places){
 
     this.toggleShowDrawer = function(){
         self.showDrawer(!self.showDrawer());
+        if(self.showDrawer){
+            self.creatingPlace(false);
+        }
     };
 
     this.toggleCreatingPlace = function(){
         self.creatingPlace(!self.creatingPlace());
+        if(self.creatingPlace){
+            self.showDrawer(false);
+        }
     };
 
     this.toggleShowLargeInfoWindow = function(){
@@ -64,14 +70,14 @@ var ViewModel = function(places){
         var addedPlace = self.createPlace(name, latlng, info, id);
         self.places.push(addedPlace);
         self.markers().push(self.createMarker(addedPlace));
+        self.toggleCreatingPlace();
+        google.maps.event.trigger(self.markers()[self.markers().length-1], 'click');
         self.setSelectedPlace(addedPlace);
         //Set up a new place for the next location creation.
         self.newPlace.name(""); self.newPlace.latlng({lat: map.getCenter().lat(),lng: map.getCenter().lng()});
         self.newPlace.info("");
         self.newPlace.id = self.places().length;
         //self.newPlace = self.createPlace("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
-        self.toggleCreatingPlace();
-        self.toggleShowDrawer();
     };
 
     this.createMarker = function(place) {

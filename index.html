@@ -17,19 +17,23 @@
         <header></header>
         <nav class="drawer" data-bind="css:{'drawer--open': showDrawer()}">
             <i class="fa fa-bars" aria-hidden="true" data-bind="click: toggleShowDrawer"></i>
-            <button class="drawer__create-location-btn" data-bind="click: toggleCreatingPlace, css:{'drawer__create-location-btn--closed': !$root.creatingPlace(), 'drawer__create-location-btn--open': $root.creatingPlace()}">Add Location</button>
-            <form class="create-location-form drawer__create-location-form" data-bind="submit: $root.addLocation, visible: $root.creatingPlace(), with: $root.newPlace">
-                <input class="create-location-form__name" placeholder="Name" data-bind="textInput: name"></input>
-                <textarea class="create-location-form__info" placeholder="Write down some information about your session at this spot" data-bind="textInput: info"></textarea>
-                <button type="submit" class="create-location-form__submit">Pin to center</button>
-            </form>
-            <div class="filter-wrapper">
-                <input class="drawer__filter" placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown'"></input>
+            <div class="drawer__filter">
+                <input class="drawer__filter__searchbox" placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown'"></input>
+                <ul data-bind="foreach: places" id="filter-list" class="drawer__filter__list">
+                    <li data-bind="text: name(), visible: visible(), click: $root.chooseListItem"></li>
+                </ul>
             </div>
-            <ul data-bind="foreach: places" class="drawer__list">
-                <li data-bind="text: name(), visible: visible(), click: $root.chooseListItem"></li>
-            </ul>
         </nav>
+        <div class="create-location" data-bind="css:{'create-location--open': creatingPlace()}">
+            <i class="fa fa-plus" aria-hidden="true" data-bind="click: toggleCreatingPlace"></i>
+            <i class="fa fa-minus" aria-hidden="true" data-bind="click: toggleCreatingPlace"></i>
+            <span class="create-location__title">Add Location</span>
+            <form class="create-location__form location-form" data-bind="submit: $root.addLocation,  with: $root.newPlace">
+                <input class="location-form__name" placeholder="Name" data-bind="textInput: name"></input>
+                <textarea class="location-form__info" placeholder="Write down some information about your session at this spot" data-bind="textInput: info"></textarea>
+                <button type="submit" class="location-form__submit">Pin to center</button>
+            </form>
+        </div>
         <div id="map"></div>
         <!--<button id="create-location" data-bind="click: createLocation" >Add Location</button>-->
         <!--<button id="export-locations" data-bind="click: exportLocations" >Export locations</button>-->
@@ -57,6 +61,7 @@
         <script src="js/doubletap.js"></script>
         <script src="js/console-save.js"></script>
         <script src="js/main.js"></script>
+        <script src="js/setListHeight.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=initMap"
         async defer></script>
     </body>
