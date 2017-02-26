@@ -11,7 +11,7 @@ var Place = function(name, latlng, info, id){
     this.visible = ko.observable(true);
 };
 
-var ViewModel = function(places){
+var ViewModel = function(){
     var self = this;
 
     //Observables to toggle classes to open and close these parts of the UI
@@ -40,7 +40,7 @@ var ViewModel = function(places){
     //Current value in the searchBox
     this.filterValue = ko.observable('');
 
-    this.createPlace = function(name, latlng, info, id){
+    this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}){
         var place = new Place(name, latlng, info, id);
         ko.computed(function(){
             var visible = self.filterValue().trim().length > 0 ? self.partOfFilter(place) : true;
@@ -67,7 +67,7 @@ var ViewModel = function(places){
         var latlng = self.newPlace.latlng();
         var info = self.newPlace.info();
         var id = self.newPlace.id;
-        var addedPlace = self.createPlace(name, latlng, info, id);
+        var addedPlace = self.createPlace(name, info, id, latlng);
         self.places.push(addedPlace);
         self.markers().push(self.createMarker(addedPlace));
         self.toggleCreatingPlace();
@@ -176,21 +176,6 @@ var ViewModel = function(places){
         console.save(localStorage['session-places'], 'sessions');
     };
 
-    // Collection of places, create a new Place object with observable properties for each of these places. 
-    this.places = ko.observableArray(places.map(function(place){
-        var place = self.createPlace(place.name, place.latlng, place.info, place.id);
-        return place;
-    }));
-
-    this.selectedPlace = ko.observable(this.places()[0]);
-
-    //Variable to hold the temporary new place during the creation process
-    this.newPlace = self.createPlace("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
-
-    this.markers = ko.observableArray(this.places().map(function(place){
-        return self.createMarker(place);
-    }));
-
 		// internal computed observable that fires whenever anything changes in our places
     // plagiarism: got this from todo-mvc
 		ko.computed(function () {
@@ -202,6 +187,23 @@ var ViewModel = function(places){
 		}); // save at most twice per second
 };
 
+ViewModel.prototype.init = function(places) {
+    var self = this;
+    // Collection of places, create a new Place object with observable properties for each of these places. 
+    this.places = ko.observableArray(places.map(function(place){
+        var place = self.createPlace(place.name, place.info, place.id, place.latlng);
+        return place;
+    }));
+
+    this.selectedPlace = ko.observable(this.places()[0]);
+
+    //Variable to hold the temporary new place during the creation process
+    this.newPlace = self.createPlace("", "", self.places().length);
+
+    this.markers = ko.observableArray(this.places().map(function(place){
+        return self.createMarker(place);
+    }));
+};
 
 
 function initMap(){
@@ -233,8 +235,11 @@ function initMap(){
     // check local storage for places 
     var places = ko.utils.parseJson(localStorage.getItem('session-places'));
     var placesFromServer = ko.utils.parseJson(placeList);
-    ko.applyBindings(new ViewModel(places || placeList));
+    var vm = new ViewModel();
+    vm.init(places || placeList);
+    ko.applyBindings(vm);
 }
+
 
 
 // Make an observable array of markers , and add a filter function to the viewmodel that sets the map `null` for any marker that doesn't fit the filter. 
