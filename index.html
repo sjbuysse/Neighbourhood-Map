@@ -38,14 +38,15 @@
         <!--<button id="create-location" data-bind="click: createLocation" >Add Location</button>-->
         <!--<button id="export-locations" data-bind="click: exportLocations" >Export locations</button>-->
         </div>
-        <div  class="large-info-window" data-bind="with: selectedPlace(), css:{'large-info-window--open': $root.showLargeInfoWindow()}">
+        <div  class="large-info-window" id="large-info-window" data-bind="with: selectedPlace(), css:{'large-info-window--open': $root.showLargeInfoWindow()}">
             <span class="large-info-window__toggle" data-bind="click: $root.toggleShowLargeInfoWindow">More Info</span>
             <label class="large-info-window__name" data-bind='text: name, visible: !editing(),event: { dblclick: $root.setEditing }, doubleTap: $root.setEditing'></label> 
             <input class='large-info-window__name--edit' data-bind="value: name, visible: editing,  valueUpdate: 'afterkeydown', enterKey: $root.saveEditing, escapeKey: $root.undoEditing"></input>
             <label class="large-info-window__latlng">lat: <span data-bind='text: latlng().lat'></span></label> 
             <label class="large-info-window__latlng">lng: <span data-bind='text: latlng().lng'></span> </label>
-            <label class="large-info-window__info" data-bind='text: info, visible: !editing(),event: { dblclick: $root.setEditing }, doubleTap: $root.setEditing'></label> 
-            <input class='large-info-window__info--edit' data-bind="value: info, visible: editing,  valueUpdate: 'afterkeydown', enterKey: $root.saveEditing, escapeKey: $root.undoEditing"></input>
+            <p class="large-info-window__info" data-bind='text: info, visible: !editing(),event: { dblclick: $root.setEditing }, doubleTap: $root.setEditing'></p> 
+            <textarea class='large-info-window__info--edit' data-bind="value: info, visible: editing,  valueUpdate: 'afterkeydown', enterKey: $root.saveEditing, escapeKey: $root.undoEditing"></textarea>
+            <span class="large-info-window__bottom-toggle" data-bind="click: $root.toggleShowLargeInfoWindow">Show Map</span>
         </div>
         <script type="text/template" id="info-window-template">
             "<h2 data-bind='text: name'></h2>"+

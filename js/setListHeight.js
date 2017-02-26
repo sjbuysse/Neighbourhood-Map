@@ -1,17 +1,16 @@
 (function($) {
-  $.fn.setHeight = function() {
+  $.fn.getPotentialHeight = function() {
         var $element = this;
-        var heightOfParent = $element.parent().height(),
-        offset = $element.offset(),
-        topOfList = offset.top,
-        potentialHeight = heightOfParent - topOfList;
-
-        $element.css('height',potentialHeight);
+        var heightOfParent = $element.parent().height();
+        offset = $element.offset();
+        topOfElement = offset.top;
+        return (heightOfParent - topOfElement);
   }
 })(jQuery);
 
 $(document).ready(
     function() {
-        $('#filter-list').setHeight();
+        var potentialHeight = $('#filter-list').getPotentialHeight();
+        $('#filter-list').css('height', potentialHeight);
     }
 );

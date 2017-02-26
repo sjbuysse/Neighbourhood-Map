@@ -127,7 +127,7 @@ var ViewModel = function(places){
               "visible: editing, enterKey: $root.saveEditing, escapeKey: $root.undoEditing'></input>" +
               "lat: " + "<span data-bind='text: latlng().lat'></span>" +
               "lng: " + "<span data-bind='text: latlng().lng'></span>" +
-              "<button id='showLargeInfo'>Show all info</button>" +
+              "<button data-bind='click: $parent.toggleShowLargeInfoWindow'>Show all info</button>" +
               "<button data-bind='click: $parent.removeLocation, visible: !editing()'>Remove spot</button>" +
               "<button data-bind='click: $parent.saveEditing, visible: editing()'>Update spot</button>" +
               "</div>";
