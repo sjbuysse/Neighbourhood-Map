@@ -140,6 +140,9 @@ var ViewModel = function(){
               "<button data-bind='click: $parent.saveEditing, visible: editing()'>Update spot</button>" +
               "</div>";
           infoWindow.setContent(contentHTML);
+          var query = marker.getPosition().lat() + "," + marker.getPosition().lng();
+          self.requestForecast(query);
+
           //We need to apply the bindings for this new infowindow (because it didn't exist at the time of applying bindings to the ViewModel)
           ko.applyBindings(self, document.getElementById('infoWindow'));
           infoWindow.addListener('closeclick', function(){
@@ -147,6 +150,38 @@ var ViewModel = function(){
               });
         }
     };
+
+    this.requestForecast = function(query){
+          var  _PremiumApiKey = "582f4a8e36294b81b54221346172602";
+          var  _PremiumApiBaseURL = "http://api.worldweatheronline.com/premium/v1/";
+          var input = {
+              query : query, 
+              format : "json",
+          }
+
+          JSONP_MarineWeather(input);
+            function JSONP_MarineWeather(input) {
+                var url = _PremiumApiBaseURL + "marine.ashx?q=" + input.query + "&format=" + input.format +  "&key=" + _PremiumApiKey;
+                jsonP(url, input.callback);
+            }
+
+            // Helper Method
+            function jsonP(url) {
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    async: false,
+                    contentType: "application/json",
+                    dataType: 'jsonp',
+                    success: function (json) {
+                        console.dir(json);
+                    },
+                    error: function (e) {
+                        console.log(e.message);
+                    }
+                });
+            }
+    }
 
     this.saveEditing = function(place){
         place.editing(false);
@@ -219,12 +254,20 @@ ViewModel.prototype.init = function(places) {
 		}); // save at most twice per second
 };
 
+function initViewModel(){
     // check local storage for places 
     var places = ko.utils.parseJson(localStorage.getItem('session-places'));
     var placesFromServer = ko.utils.parseJson(placeList);
     var vm = new ViewModel();
     vm.init(places || placeList);
     ko.applyBindings(vm);
+}
+
+function initWithoutMap(){
+    console.log("kaas");
+    initViewModel();
+    document.getElementById('map').innerHTML = "<p>It seems like we couldn\'t load the google maps API, you can still browse around the spots and read and the place information, but you won't be able to add any new places</p>";
+}
 
 function initMap(){
     //show world with center on New Zealand
@@ -252,6 +295,7 @@ function initMap(){
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
     infoWindow = new google.maps.InfoWindow();
 
+    initViewModel();
 }
 
 
