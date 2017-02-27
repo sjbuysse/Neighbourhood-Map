@@ -27,9 +27,11 @@ var ViewModel = function(){
     };
 
     this.toggleCreatingPlace = function(){
-        self.creatingPlace(!self.creatingPlace());
-        if(self.creatingPlace){
-            self.showDrawer(false);
+        if(self.googleDefined){
+            self.creatingPlace(!self.creatingPlace());
+            if(self.creatingPlace){
+                self.showDrawer(false);
+            }
         }
     };
 
@@ -40,7 +42,7 @@ var ViewModel = function(){
     //Current value in the searchBox
     this.filterValue = ko.observable('');
 
-    this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}){
+    this.createPlace = function(name, info, id, latlng = {lat: "0",lng: "0"}){
         var place = new Place(name, latlng, info, id);
         ko.computed(function(){
             var visible = self.filterValue().trim().length > 0 ? self.partOfFilter(place) : true;
@@ -56,10 +58,16 @@ var ViewModel = function(){
 
     this.chooseListItem = function(place){
         self.toggleShowDrawer();
-        var index = self.markers().findIndex(function(marker){
-            return marker.id === place.id;
-        });
-        google.maps.event.trigger(self.markers()[index], 'click');
+        //Check if markers observableArray exists (wouldn't be the case when google API failed to load)
+        if(self.markers){
+            var index = self.markers().findIndex(function(marker){
+                return marker.id === place.id;
+            });
+            google.maps.event.trigger(self.markers()[index], 'click');
+        } else{
+            self.setSelectedPlace(place);
+            self.showLargeInfoWindow(true);
+        }
     }
 
     this.addLocation = function(){
@@ -176,15 +184,6 @@ var ViewModel = function(){
         console.save(localStorage['session-places'], 'sessions');
     };
 
-		// internal computed observable that fires whenever anything changes in our places
-    // plagiarism: got this from todo-mvc
-		ko.computed(function () {
-			// store a clean copy to local storage, which also creates a dependency on
-			// the observableArray and all observables in each item
-			localStorage.setItem('session-places', ko.toJSON(this.places));
-		}.bind(this)).extend({
-			rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' }
-		}); // save at most twice per second
 };
 
 ViewModel.prototype.init = function(places) {
@@ -200,11 +199,32 @@ ViewModel.prototype.init = function(places) {
     //Variable to hold the temporary new place during the creation process
     this.newPlace = self.createPlace("", "", self.places().length);
 
-    this.markers = ko.observableArray(this.places().map(function(place){
-        return self.createMarker(place);
-    }));
+    this.googleDefined = false;
+
+    if(typeof google !== 'undefined'){
+        this.markers = ko.observableArray(this.places().map(function(place){
+            return self.createMarker(place);
+        }));
+        this.googleDefined = true;
+    }
+    //
+		// internal computed observable that fires whenever anything changes in our places
+    // plagiarism: got this from todo-mvc
+		ko.computed(function () {
+			// store a clean copy to local storage, which also creates a dependency on
+			// the observableArray and all observables in each item
+			localStorage.setItem('session-places', ko.toJSON(this.places));
+		}.bind(this)).extend({
+			rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' }
+		}); // save at most twice per second
 };
 
+    // check local storage for places 
+    var places = ko.utils.parseJson(localStorage.getItem('session-places'));
+    var placesFromServer = ko.utils.parseJson(placeList);
+    var vm = new ViewModel();
+    vm.init(places || placeList);
+    ko.applyBindings(vm);
 
 function initMap(){
     //show world with center on New Zealand
@@ -232,12 +252,6 @@ function initMap(){
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
     infoWindow = new google.maps.InfoWindow();
 
-    // check local storage for places 
-    var places = ko.utils.parseJson(localStorage.getItem('session-places'));
-    var placesFromServer = ko.utils.parseJson(placeList);
-    var vm = new ViewModel();
-    vm.init(places || placeList);
-    ko.applyBindings(vm);
 }
 
 
