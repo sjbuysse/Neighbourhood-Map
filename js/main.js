@@ -46,7 +46,7 @@ var ViewModel = function(){
     //Current value in the searchBox
     this.filterValue = ko.observable('');
 
-    this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable) {
+    this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable = false) {
         var place = new Place(name, info, id, latlng, draggable);
         ko.computed(function(){
             var visible = self.filterValue().trim().length > 0 ? self.partOfFilter(place) : true;
@@ -106,6 +106,9 @@ var ViewModel = function(){
             marker.setDraggable(place.draggable());
         });
         ko.computed(function(){
+            marker.setPosition(place.latlng());
+        });
+        ko.computed(function(){
             if(place.draggable()){
                 marker.setIcon( 'http://maps.google.com/mapfiles/ms/icons/green-dot.png');
             } else if(place.selected()) {
@@ -115,19 +118,24 @@ var ViewModel = function(){
             }
         });
         marker.addListener('click', function(){
-            self.setSelectedPlace(place);
-            self.populateInfowindow(marker);
+            if(self.setSelectedPlace(place)) {
+                self.populateInfowindow(marker);
+            }
         });
-        marker.addListener('dragend', function(){self.updateLocation(marker, place);});
         return marker;
     };
 
     this.setSelectedPlace = function(place){
+        if(this.selectedPlace().editing() || this.selectedPlace().draggable()){
+            alert("Please save or cancel the changes you've made to the currently selected place before selecting another.");
+            return false;
+        } 
         //Set selected property of last selectedPlace to false;
         this.selectedPlace().selected(false);
         this.selectedPlace(place);
         //Set selected property of selectedPlace to true;
         this.selectedPlace().selected(true);
+        return true;
     };
 
     this.removeLocation = function(place){
@@ -145,24 +153,18 @@ var ViewModel = function(){
         if(infoWindow.marker != marker){
           infoWindow.marker = marker;
           infoWindow.open(map, marker);
-          var contentHTML = "<div id='infoWindow' data-bind='with: $root.selectedPlace()'>" + 
-              "<label class='info-window__name' data-bind='text: name," + 
-              "visible: (!editing() && !draggable()), " + 
-              "event: { dblclick: $root.setEditing }'></label>" +
-              "<input class='info-window__name--edit' data-bind='value: name, " + 
-              "valueUpdate: &quot;afterkeydown&quot;, " + 
-              "visible: (editing() && !draggable()), enterKey: $root.saveEditing, escapeKey: $root.undoEditing'></input>" +
-              "lat: " + "<span data-bind='text: latlng().lat'></span>" +
-              "lng: " + "<span data-bind='text: latlng().lng'></span>" +
-              "<button data-bind='click: $parent.toggleShowLargeInfoWindow'>Show all info</button>" +
+          var contentHTML = "<div class='info-window' id='infoWindow'" + 
+              " data-bind='with: $root.selectedPlace()'>" + 
+              "<label class='info-window__name' data-bind='text: name'></label>" +
+              "<button data-bind='click: $parent.toggleShowLargeInfoWindow, visible: !draggable()'>Show all info</button>" +
+              "<button data-bind='click: $parent.setDraggable," + 
+              "visible: (!draggable())'>Move to new location</button>" +
+              "<button data-bind='visible: draggable(), click: $parent.updateLocation' >" + 
+              "Save location</button>" + 
+              "<button data-bind='visible: draggable(), click: $parent.toPreviousLocation' >" + 
+              "Reset location</button>" + 
               "<button data-bind='click: $parent.removeLocation," + 
-              " visible: (!editing() && !draggable())'>Remove spot</button>" +
-              "<button data-bind='click: $parent.saveEditing," + 
-              "visible: (editing() && !draggable())'>Update spot</button>" +
-              "<button data-bind='click: $parent.toggleDraggable," + 
-              "visible: (!editing() && !draggable())'>Move to new location</button>" +
-              "<button data-bind='visible: draggable(), click: $parent.toggleDraggable' >" + 
-              "Click me when you're happy with the location!</button>" + 
+              " visible: (!draggable())'>Remove spot</button>" +
               "</div>";
           infoWindow.setContent(contentHTML);
           var query = marker.getPosition().lat() + "," + marker.getPosition().lng();
@@ -233,7 +235,9 @@ var ViewModel = function(){
         place.latlng(newLocation);
     };
 
-    this.updateLocation = function(marker, place){
+    this.updateLocation = function(place){
+        place.draggable(false);
+        var marker = self.findMarker(place);
         var newLocation = {
             lat: marker.getPosition().lat(),
             lng: marker.getPosition().lng()
@@ -247,9 +251,15 @@ var ViewModel = function(){
         place.previousInfo = place.info();
     };
 
-    this.toggleDraggable = function(place){
-        place.draggable(!place.draggable());
-    }
+    this.toPreviousLocation = function(place) {
+        place.draggable(false);
+        place.latlng(place.previousLatLng);
+    };
+
+    this.setDraggable = function(place) {
+        place.draggable(true);
+        place.previousLatLng = place.latlng();
+    };
 
     this.exportLocations = function() {
         console.save(localStorage['session-places'], 'sessions');
@@ -268,7 +278,7 @@ ViewModel.prototype.init = function(places) {
     var self = this;
     // Collection of places, create a new Place object with observable properties for each of these places. 
     this.places = ko.observableArray(places.map(function(place){
-        var place = self.createPlace(place.name, place.info, place.id, place.latlng, place.draggable);
+        var place = self.createPlace(place.name, place.info, place.id, place.latlng);
         return place;
     }));
 
