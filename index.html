@@ -18,7 +18,7 @@
         <nav class="drawer" data-bind="css:{'drawer--open': showDrawer()}">
             <i class="fa fa-bars" aria-hidden="true" data-bind="click: toggleShowDrawer"></i>
             <div class="drawer__filter">
-                <input class="drawer__filter__searchbox" placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown'"></input>
+                <input class="drawer__filter__searchbox" placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown', event: {keypress: closeInfoWindow}"></input>
                 <ul data-bind="foreach: places" id="filter-list" class="drawer__filter__list">
                     <li data-bind="text: name(), visible: visible(), click: $root.chooseListItem"></li>
                 </ul>

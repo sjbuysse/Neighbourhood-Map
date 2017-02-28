@@ -2,19 +2,21 @@ var map;
 var infoWindow;
 
 //Model for places
-var Place = function(name, latlng, info, id){
+var Place = function(name, info, id, latlng, draggable){
     this.name = ko.observable(name);
     this.latlng = ko.observable(latlng);
     this.info = ko.observable(info);
     this.id = id;
     this.editing = ko.observable(false);
+    this.draggable = ko.observable(draggable);
     this.visible = ko.observable(true);
+    this.selected = ko.observable(false);
 };
 
 var ViewModel = function(){
     var self = this;
 
-    //Observables to toggle classes to open and close these parts of the UI
+    //Observables to keep track of the state of the UI
     this.showDrawer = ko.observable(false);
     this.showLargeInfoWindow = ko.observable(false);
     this.creatingPlace = ko.observable(false);
@@ -32,7 +34,9 @@ var ViewModel = function(){
             if(self.creatingPlace){
                 self.showDrawer(false);
             }
-        }
+        } else if(!self.googleDefined) {
+            alert("You can't create a new place at the moment, because the google API has trouble loading.");
+        }     
     };
 
     this.toggleShowLargeInfoWindow = function(){
@@ -42,8 +46,8 @@ var ViewModel = function(){
     //Current value in the searchBox
     this.filterValue = ko.observable('');
 
-    this.createPlace = function(name, info, id, latlng = {lat: "0",lng: "0"}){
-        var place = new Place(name, latlng, info, id);
+    this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable) {
+        var place = new Place(name, info, id, latlng, draggable);
         ko.computed(function(){
             var visible = self.filterValue().trim().length > 0 ? self.partOfFilter(place) : true;
             place.visible(visible);
@@ -60,32 +64,30 @@ var ViewModel = function(){
         self.toggleShowDrawer();
         //Check if markers observableArray exists (wouldn't be the case when google API failed to load)
         if(self.markers){
-            var index = self.markers().findIndex(function(marker){
-                return marker.id === place.id;
-            });
-            google.maps.event.trigger(self.markers()[index], 'click');
+            google.maps.event.trigger(self.findMarker(place), 'click');
         } else{
             self.setSelectedPlace(place);
             self.showLargeInfoWindow(true);
         }
     }
-
+    
     this.addLocation = function(){
         var name = self.newPlace.name();
         var latlng = self.newPlace.latlng();
         var info = self.newPlace.info();
         var id = self.newPlace.id;
-        var addedPlace = self.createPlace(name, info, id, latlng);
+        var draggable = true;
+        var addedPlace = self.createPlace(name, info, id, latlng, draggable);
         self.places.push(addedPlace);
         self.markers().push(self.createMarker(addedPlace));
         self.toggleCreatingPlace();
         google.maps.event.trigger(self.markers()[self.markers().length-1], 'click');
         self.setSelectedPlace(addedPlace);
         //Set up a new place for the next location creation.
-        self.newPlace.name(""); self.newPlace.latlng({lat: map.getCenter().lat(),lng: map.getCenter().lng()});
+        self.newPlace.name(""); 
+        self.newPlace.latlng({lat: map.getCenter().lat(),lng: map.getCenter().lng()});
         self.newPlace.info("");
         self.newPlace.id = self.places().length;
-        //self.newPlace = self.createPlace("", {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, "", self.places().length);
     };
 
     this.createMarker = function(place) {
@@ -100,6 +102,18 @@ var ViewModel = function(){
         ko.computed(function(){
             marker.setVisible(place.visible());
         });
+        ko.computed(function(){
+            marker.setDraggable(place.draggable());
+        });
+        ko.computed(function(){
+            if(place.draggable()){
+                marker.setIcon( 'http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+            } else if(place.selected()) {
+                marker.setIcon( 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+            } else {
+                marker.setIcon( 'http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+            }
+        });
         marker.addListener('click', function(){
             self.setSelectedPlace(place);
             self.populateInfowindow(marker);
@@ -109,7 +123,11 @@ var ViewModel = function(){
     };
 
     this.setSelectedPlace = function(place){
+        //Set selected property of last selectedPlace to false;
+        this.selectedPlace().selected(false);
         this.selectedPlace(place);
+        //Set selected property of selectedPlace to true;
+        this.selectedPlace().selected(true);
     };
 
     this.removeLocation = function(place){
@@ -128,16 +146,23 @@ var ViewModel = function(){
           infoWindow.marker = marker;
           infoWindow.open(map, marker);
           var contentHTML = "<div id='infoWindow' data-bind='with: $root.selectedPlace()'>" + 
-              "<label class='info-window__name' data-bind='text: name, visible: !editing(), " + 
+              "<label class='info-window__name' data-bind='text: name," + 
+              "visible: (!editing() && !draggable()), " + 
               "event: { dblclick: $root.setEditing }'></label>" +
               "<input class='info-window__name--edit' data-bind='value: name, " + 
               "valueUpdate: &quot;afterkeydown&quot;, " + 
-              "visible: editing, enterKey: $root.saveEditing, escapeKey: $root.undoEditing'></input>" +
+              "visible: (editing() && !draggable()), enterKey: $root.saveEditing, escapeKey: $root.undoEditing'></input>" +
               "lat: " + "<span data-bind='text: latlng().lat'></span>" +
               "lng: " + "<span data-bind='text: latlng().lng'></span>" +
               "<button data-bind='click: $parent.toggleShowLargeInfoWindow'>Show all info</button>" +
-              "<button data-bind='click: $parent.removeLocation, visible: !editing()'>Remove spot</button>" +
-              "<button data-bind='click: $parent.saveEditing, visible: editing()'>Update spot</button>" +
+              "<button data-bind='click: $parent.removeLocation," + 
+              " visible: (!editing() && !draggable())'>Remove spot</button>" +
+              "<button data-bind='click: $parent.saveEditing," + 
+              "visible: (editing() && !draggable())'>Update spot</button>" +
+              "<button data-bind='click: $parent.toggleDraggable," + 
+              "visible: (!editing() && !draggable())'>Move to new location</button>" +
+              "<button data-bind='visible: draggable(), click: $parent.toggleDraggable' >" + 
+              "Click me when you're happy with the location!</button>" + 
               "</div>";
           infoWindow.setContent(contentHTML);
           var query = marker.getPosition().lat() + "," + marker.getPosition().lng();
@@ -150,6 +175,13 @@ var ViewModel = function(){
               });
         }
     };
+
+    this.closeInfoWindow = function(){
+        if(self.googleDefined){
+            infoWindow.close();
+        }
+        return true;
+    }
 
     this.requestForecast = function(query){
           var  _PremiumApiKey = "582f4a8e36294b81b54221346172602";
@@ -215,17 +247,28 @@ var ViewModel = function(){
         place.previousInfo = place.info();
     };
 
+    this.toggleDraggable = function(place){
+        place.draggable(!place.draggable());
+    }
+
     this.exportLocations = function() {
         console.save(localStorage['session-places'], 'sessions');
     };
 
+    // Helper Method
+    this.findMarker = function(place) {
+        var index = self.markers().findIndex(function(marker){
+            return marker.id === place.id;
+        });
+        return self.markers()[index];
+    }
 };
 
 ViewModel.prototype.init = function(places) {
     var self = this;
     // Collection of places, create a new Place object with observable properties for each of these places. 
     this.places = ko.observableArray(places.map(function(place){
-        var place = self.createPlace(place.name, place.info, place.id, place.latlng);
+        var place = self.createPlace(place.name, place.info, place.id, place.latlng, place.draggable);
         return place;
     }));
 
@@ -241,6 +284,9 @@ ViewModel.prototype.init = function(places) {
             return self.createMarker(place);
         }));
         this.googleDefined = true;
+        this.selectedMarker = ko.computed(function(){
+            return self.findMarker(self.selectedPlace);
+        })
     }
     //
 		// internal computed observable that fires whenever anything changes in our places
@@ -264,7 +310,6 @@ function initViewModel(){
 }
 
 function initWithoutMap(){
-    console.log("kaas");
     initViewModel();
     document.getElementById('map').innerHTML = "<p>It seems like we couldn\'t load the google maps API, you can still browse around the spots and read and the place information, but you won't be able to add any new places</p>";
 }
