@@ -270,6 +270,11 @@ var ViewModel = function(){
         return element;
     };
 
+    this.removeForecast = function(place) {
+        place.forecastJSON(false);
+        place.forecastHTML(false);
+    }
+
     this.saveEditing = function(place){
         place.editing(false);
     };
