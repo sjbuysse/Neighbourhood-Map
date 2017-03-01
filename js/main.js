@@ -15,6 +15,7 @@ var Place = function(name, info, id, latlng, forecastJSON, forecastHTML, draggab
     this.selected = ko.observable(false);
 };
 
+//ViewModel
 var ViewModel = function(){
     var self = this;
 
@@ -23,6 +24,7 @@ var ViewModel = function(){
     this.showLargeInfoWindow = ko.observable(false);
     this.creatingPlace = ko.observable(false);
 
+    //Methods to toggle state of UI
     this.toggleShowDrawer = function(){
         if(!self.selectedPlace().draggable()) {
             self.showDrawer(!self.showDrawer());
@@ -33,7 +35,6 @@ var ViewModel = function(){
             alert("Please drag and save the green pin before doing something else.");
         }
     };
-
     this.toggleCreatingPlace = function(){
         if(self.googleDefined && !self.selectedPlace().draggable()){
             self.creatingPlace(!self.creatingPlace());
@@ -47,7 +48,6 @@ var ViewModel = function(){
             alert("Please drag and save the green pin before doing something else.");
         }
     };
-
     this.toggleShowLargeInfoWindow = function(){
         self.showLargeInfoWindow(!self.showLargeInfoWindow());
     };
@@ -64,11 +64,7 @@ var ViewModel = function(){
         return place;
     }
 
-    //This checks if the filter value is part of the passed in place's name
-    this.partOfFilter = function(place){
-        return place.name().toLowerCase().indexOf(self.filterValue().toLowerCase()) === -1 ? false : true;
-    }
-
+    //When we click on a list item, we want to open up the infowindow and set the selectedPlace
     this.chooseListItem = function(place){
         self.toggleShowDrawer();
         //Check if markers observableArray exists (wouldn't be the case when google API failed to load)
@@ -80,13 +76,15 @@ var ViewModel = function(){
         }
     }
     
+    //Add location from our form to the places collection
     this.addLocation = function(){
         var name = self.newPlace.name();
         var latlng = self.newPlace.latlng();
         var info = self.newPlace.info();
         var id = self.newPlace.id;
         var draggable = true;
-        var addedPlace = self.createPlace(name, info, id, latlng, draggable);
+        var addedPlace = self.createPlace(name, info, id, latlng);
+        self.setDraggable(addedPlace);
         self.toggleCreatingPlace();
         self.places.push(addedPlace);
         self.markers().push(self.createMarker(addedPlace));
@@ -98,6 +96,7 @@ var ViewModel = function(){
         self.newPlace.id = self.places().length;
     };
 
+    //Create a marker for the passed in place
     this.createMarker = function(place) {
         var marker = new google.maps.Marker({
             position: place.latlng(),
@@ -133,7 +132,9 @@ var ViewModel = function(){
         return marker;
     };
 
+    //Set the selectedPlace to the passed in place
     this.setSelectedPlace = function(place){
+        //You can only change the selected place if you're not editing or dragging a place. 
         if(this.selectedPlace().editing() || this.selectedPlace().draggable()){
             alert("Please save or cancel the changes you've made to the currently selected place before selecting another.");
             return false;
@@ -146,6 +147,7 @@ var ViewModel = function(){
         return true;
     };
 
+    //Remove place and associated marker from collection
     this.removeLocation = function(place){
         var i = self.markers().findIndex(function(marker){
             return marker.id == place.id;
@@ -157,6 +159,7 @@ var ViewModel = function(){
         self.places.remove(place);
     };
 
+    //Populate the infowindow with the correct marker information
     this.populateInfowindow = function(marker){
         if(infoWindow.marker != marker){
           infoWindow.marker = marker;
@@ -164,8 +167,10 @@ var ViewModel = function(){
           var contentHTML = "<div class='info-window' id='infoWindow'" + 
               " data-bind='with: $root.selectedPlace()'>" + 
               "<label class='info-window__name' data-bind='text: name'></label>" +
-              "<p>Drag and drop me in the correct location, then press 'Save Location'</p>" + 
-              "<button data-bind='click: $parent.toggleShowLargeInfoWindow, visible: !draggable()'>Show all info</button>" +
+              "<p data-bind='visible: draggable()'>" + 
+              "Drag and drop me in the correct location, then press 'Save Location'</p>" + 
+              "<button data-bind='click: $parent.toggleShowLargeInfoWindow," +
+              " visible: !draggable()'>Show all info</button>" +
               "<button data-bind='click: $parent.setDraggable," + 
               "visible: (!draggable())'>Move to new location</button>" +
               "<button data-bind='visible: draggable(), click: $parent.updateLocation' >" + 
@@ -221,7 +226,6 @@ var ViewModel = function(){
                   contentType: "application/json",
                   dataType: 'jsonp',
                   success: function (json) {
-                      console.dir(json);
                       //Add today's forecast to the place instance 
                       place.forecastJSON(json.data.weather[0]);
                       place.forecastHTML(self.createForecastElement(json.data.weather[0]));
@@ -231,6 +235,7 @@ var ViewModel = function(){
           }
     }
 
+    //Create HTML table for the forecast 
     this.createForecastElement = function(data) {
         function createRow(headerName, property){
             var row = "<tr><th scope='row'>" + headerName + "</th>";
@@ -313,7 +318,12 @@ var ViewModel = function(){
         console.save(localStorage['session-places'], 'sessions');
     };
 
-    // Helper Method
+    //Helper method to check if the filter value is part of the passed in place's name
+    this.partOfFilter = function(place){
+        return place.name().toLowerCase().indexOf(self.filterValue().toLowerCase()) === -1 ? false : true;
+    }
+
+    // Helper method to get the marker that belongs to the passed in place
     this.findMarker = function(place) {
         var index = self.markers().findIndex(function(marker){
             return marker.id === place.id;
@@ -322,6 +332,7 @@ var ViewModel = function(){
     }
 };
 
+//Initialize all places and markers 
 ViewModel.prototype.init = function(places) {
     var self = this;
     // Collection of places, create a new Place object with observable properties for each of these places. 
@@ -367,11 +378,13 @@ function initViewModel(){
     ko.applyBindings(vm);
 }
 
+//Init viewmodel without google maps (if the API Fails to load)
 function initWithoutMap(){
     initViewModel();
     document.getElementById('map').innerHTML = "<p>It seems like we couldn\'t load the google maps API, you can still browse around the spots and read and the place information, but you won't be able to add any new places</p>";
 }
 
+//Init viewmodel with google maps
 function initMap(){
     //show world with center on New Zealand
     var mapOptions = {
