@@ -84,14 +84,15 @@ html, body {
     margin-top: 2.4rem;
     font-weight: bold; }
   .large-info-window__info {
+    width: 100%;
     padding: 0px 10px;
-    height: 40%;
+    max-height: 20%;
     overflow-y: scroll; }
     .large-info-window__info::-webkit-scrollbar {
       width: 8px;
       right: 10px; }
     .large-info-window__info::-webkit-scrollbar-thumb {
-      background-color: rgba(200, 200, 200, 0.7); }
+      background-color: rgba(200, 200, 200, 0.85); }
   .large-info-window__info--edit {
     width: 100%;
     height: 40%;

@@ -2,10 +2,12 @@ var map;
 var infoWindow;
 
 //Model for places
-var Place = function(name, info, id, latlng, draggable){
+var Place = function(name, info, id, latlng, forecastJSON, forecastHTML, draggable){
     this.name = ko.observable(name);
     this.latlng = ko.observable(latlng);
     this.info = ko.observable(info);
+    this.forecastJSON = ko.observable(forecastJSON);
+    this.forecastHTML = ko.observable(forecastHTML);
     this.id = id;
     this.editing = ko.observable(false);
     this.draggable = ko.observable(draggable);
@@ -22,21 +24,28 @@ var ViewModel = function(){
     this.creatingPlace = ko.observable(false);
 
     this.toggleShowDrawer = function(){
-        self.showDrawer(!self.showDrawer());
-        if(self.showDrawer){
-            self.creatingPlace(false);
+        if(!self.selectedPlace().draggable()) {
+            self.showDrawer(!self.showDrawer());
+            if(self.showDrawer){
+                self.creatingPlace(false);
+            }
+        } else {
+            alert("Please drag and save the green pin before doing something else.");
         }
     };
 
     this.toggleCreatingPlace = function(){
-        if(self.googleDefined){
+        if(self.googleDefined && !self.selectedPlace().draggable()){
             self.creatingPlace(!self.creatingPlace());
             if(self.creatingPlace){
                 self.showDrawer(false);
+                self.showLargeInfoWindow(false);
             }
         } else if(!self.googleDefined) {
             alert("You can't create a new place at the moment, because the google API has trouble loading.");
-        }     
+        } else if(self.selectedPlace().draggable()) {
+            alert("Please drag and save the green pin before doing something else.");
+        }
     };
 
     this.toggleShowLargeInfoWindow = function(){
@@ -46,8 +55,8 @@ var ViewModel = function(){
     //Current value in the searchBox
     this.filterValue = ko.observable('');
 
-    this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable = false) {
-        var place = new Place(name, info, id, latlng, draggable);
+    this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, forecastJSON = false, forecastHTML = false, draggable = false) {
+        var place = new Place(name, info, id, latlng, forecastJSON, forecastHTML, draggable);
         ko.computed(function(){
             var visible = self.filterValue().trim().length > 0 ? self.partOfFilter(place) : true;
             place.visible(visible);
@@ -78,11 +87,10 @@ var ViewModel = function(){
         var id = self.newPlace.id;
         var draggable = true;
         var addedPlace = self.createPlace(name, info, id, latlng, draggable);
+        self.toggleCreatingPlace();
         self.places.push(addedPlace);
         self.markers().push(self.createMarker(addedPlace));
-        self.toggleCreatingPlace();
         google.maps.event.trigger(self.markers()[self.markers().length-1], 'click');
-        self.setSelectedPlace(addedPlace);
         //Set up a new place for the next location creation.
         self.newPlace.name(""); 
         self.newPlace.latlng({lat: map.getCenter().lat(),lng: map.getCenter().lng()});
@@ -156,6 +164,7 @@ var ViewModel = function(){
           var contentHTML = "<div class='info-window' id='infoWindow'" + 
               " data-bind='with: $root.selectedPlace()'>" + 
               "<label class='info-window__name' data-bind='text: name'></label>" +
+              "<p>Drag and drop me in the correct location, then press 'Save Location'</p>" + 
               "<button data-bind='click: $parent.toggleShowLargeInfoWindow, visible: !draggable()'>Show all info</button>" +
               "<button data-bind='click: $parent.setDraggable," + 
               "visible: (!draggable())'>Move to new location</button>" +
@@ -168,7 +177,6 @@ var ViewModel = function(){
               "</div>";
           infoWindow.setContent(contentHTML);
           var query = marker.getPosition().lat() + "," + marker.getPosition().lng();
-          self.requestForecast(query);
 
           //We need to apply the bindings for this new infowindow (because it didn't exist at the time of applying bindings to the ViewModel)
           ko.applyBindings(self, document.getElementById('infoWindow'));
@@ -185,37 +193,73 @@ var ViewModel = function(){
         return true;
     }
 
-    this.requestForecast = function(query){
+    this.requestForecast = function(place){
           var  _PremiumApiKey = "582f4a8e36294b81b54221346172602";
           var  _PremiumApiBaseURL = "http://api.worldweatheronline.com/premium/v1/";
           var input = {
-              query : query, 
+              query : place.latlng().lat + "," + place.latlng().lng,
               format : "json",
+              interval: 6
           }
 
           JSONP_MarineWeather(input);
-            function JSONP_MarineWeather(input) {
-                var url = _PremiumApiBaseURL + "marine.ashx?q=" + input.query + "&format=" + input.format +  "&key=" + _PremiumApiKey;
-                jsonP(url, input.callback);
-            }
+          function JSONP_MarineWeather(input) {
+              var url = _PremiumApiBaseURL + "marine.ashx?q=" + input.query + "&tp=" +input.interval + "&format=" + input.format +  "&key=" + _PremiumApiKey;
+              jsonP(url, input.callback);
+          }
 
-            // Helper Method
-            function jsonP(url) {
-                $.ajax({
-                    type: 'GET',
-                    url: url,
-                    async: false,
-                    contentType: "application/json",
-                    dataType: 'jsonp',
-                    success: function (json) {
-                        console.dir(json);
-                    },
-                    error: function (e) {
-                        console.log(e.message);
-                    }
-                });
-            }
+          // Helper Method
+          function jsonP(url) {
+              $.ajax({
+                  type: 'GET',
+                  url: url,
+                  async: false,
+                  contentType: "application/json",
+                  dataType: 'jsonp',
+                  success: function (json) {
+                      console.dir(json);
+                      //Add today's forecast to the place instance 
+                      place.forecastJSON(json.data.weather[0]);
+                      place.forecastHTML(self.createForecastElement(json.data.weather[0]));
+                  },
+                  error: function (e) {
+                      console.log(e.message);
+                  }
+              });
+          }
     }
+
+    this.createForecastElement = function(data) {
+        function createRow(headerName, property){
+            var row = "<tr><th scope='row'>" + headerName + "</th>";
+            data.hourly.forEach(function(forecast){
+                row += "<td>" + forecast[property] + "</td>";
+            });
+            row += "</tr>";
+            return row;
+        }
+        var date = data.date;
+        var element = "<thead><tr>" + 
+            "<th scope='row'>" + date + "</th>" + 
+            "<th scope='col'>6AM</th>" + 
+            "<th scope='col'>12AM</th>" + 
+            "<th scope='col'>6PM</th>" + 
+            "<th scope='col'>12PM</th>" + 
+            "</tr></thead>";
+        //Add row with swell info
+        element += createRow("Swell (m):", "swellHeight_m");
+        //Add row with Significant wave height
+        element += createRow("Wave Heigth (m):", "sigHeight_m");
+        //Add row with Swell direction
+        element += createRow("Swell direction:", "swellDir16Point");
+        //Add row with Swell period
+        element += createRow("Period (s):", "swellPeriod_secs");
+        //Add row with Wind direction
+        element += createRow("Wind direction:", "swellDir16Point");
+        //Add row with Wind speed
+        element += createRow("Wind speed (kmph):", "windspeedKmph");
+        return element;
+    };
 
     this.saveEditing = function(place){
         place.editing(false);
@@ -278,7 +322,7 @@ ViewModel.prototype.init = function(places) {
     var self = this;
     // Collection of places, create a new Place object with observable properties for each of these places. 
     this.places = ko.observableArray(places.map(function(place){
-        var place = self.createPlace(place.name, place.info, place.id, place.latlng);
+        var place = self.createPlace(place.name, place.info, place.id, place.latlng, place.forecastJSON, place.forecastHTML);
         return place;
     }));
 

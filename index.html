@@ -32,11 +32,10 @@
                 <input class="location-form__name" placeholder="Name" data-bind="textInput: name"></input>
                 <textarea class="location-form__info" placeholder="Write down some information about your session at this spot" data-bind="textInput: info"></textarea>
                 <button type="submit" class="location-form__submit">Pin to center</button>
+                <p>When you submit this form, a green pin will be added to the center of the map. You can then drag it to its correct location.</p>
             </form>
         </div>
         <div id="map"></div>
-        <!--<button id="create-location" data-bind="click: createLocation" >Add Location</button>-->
-        <!--<button id="export-locations" data-bind="click: exportLocations" >Export locations</button>-->
         </div>
         <div  class="large-info-window" id="large-info-window" data-bind="with: selectedPlace(), css:{'large-info-window--open': $root.showLargeInfoWindow()}">
             <span class="large-info-window__toggle" data-bind="click: $root.toggleShowLargeInfoWindow">More Info</span>
@@ -52,6 +51,8 @@
             <button data-bind='click: $parent.undoEditing, visible: (editing())'>
                 Cancel
             </button>
+            <button data-bind='click: $parent.requestForecast'>Attach today's surf forecast</button>
+            <table data-bind="visible: forecastHTML, html: forecastHTML"></table>
             <span class="large-info-window__bottom-toggle" data-bind="click: $root.toggleShowLargeInfoWindow">Show Map</span>
         </div>
         <script type="text/template" id="info-window-template">
