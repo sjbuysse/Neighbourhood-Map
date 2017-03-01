@@ -1,4 +1,3 @@
-//plagiarism: 
 //Source:
 //https://plus.google.com/+AddyOsmani/posts/jBS8CiNTESM
 //http://bgrins.github.io/devtools-snippets/#console-save

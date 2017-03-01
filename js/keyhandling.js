@@ -1,5 +1,4 @@
-// Plagiarism
-// Source todo-mvc
+// Source: custom bindings from todo-mvc (www.todo-mvc.com)
 var ENTER_KEY = 13;
 var ESCAPE_KEY = 27;
 

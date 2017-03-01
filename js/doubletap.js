@@ -1,4 +1,5 @@
 // Create custom event binding for listening to double taps on mobile devices
+// Source: base idea for this custom binding comes from http://stackoverflow.com/a/32761323/5065235
 ko.bindingHandlers.doubleTap = {
     init: function(element, valueAccessor, allBindingsAccessor, data, bindingContext){
         var tappedTwice = false;

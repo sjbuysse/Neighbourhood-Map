@@ -348,7 +348,7 @@ ViewModel.prototype.init = function(places) {
     }
     //
 		// internal computed observable that fires whenever anything changes in our places
-    // plagiarism: got this from todo-mvc
+    // Source: todo-mvc (www.todo-mvc.com)
 		ko.computed(function () {
 			// store a clean copy to local storage, which also creates a dependency on
 			// the observableArray and all observables in each item
