@@ -1,3 +1,4 @@
+//Source: http://stackoverflow.com/questions/3837037/div-with-scrollbar-inside-div-with-positionfixed
 (function($) {
   $.fn.getPotentialHeight = function() {
         var $element = this;
@@ -12,5 +13,6 @@ $(document).ready(
     function() {
         var potentialHeight = $('#filter-list').getPotentialHeight();
         $('#filter-list').css('height', potentialHeight);
+        $('#info-wrapper').css('height', potentialHeight);
     }
 );

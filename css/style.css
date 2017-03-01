@@ -28,9 +28,6 @@ html, body {
   height: 100%;
   width: 100%;
   position: absolute;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
   bottom: 0px;
   transform: translate(0, 100%);
   transition: transform 0.3s ease-out; }
@@ -74,29 +71,50 @@ html, body {
   .large-info-window--open {
     transform: translate(0, 0);
     transition: transform 0.3s ease-out; }
-  .large-info-window__name, .large-info-window__latlng, .large-info-window__name--edit {
+
+.info {
+  margin-top: 2rem;
+  height: 400px;
+  width: 100%;
+  overflow-y: scroll;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start; }
+  .info::-webkit-scrollbar {
+    width: 8px;
+    right: 10px; }
+  .info::-webkit-scrollbar-thumb {
+    background-color: rgba(200, 200, 200, 0.85); }
+  .info__name, .info__latlng, .info__name--edit {
     width: 100%;
     text-align: center; }
-  .large-info-window__name, .large-info-window__name--edit {
+  .info__name, .info__name--edit {
     text-transform: uppercase;
     font-size: 1.2rem;
-    padding: 0rem;
-    margin-top: 2.4rem;
+    padding: 0.4rem 0 0;
     font-weight: bold; }
-  .large-info-window__info {
+  .info__info {
     width: 100%;
-    padding: 0px 10px;
-    max-height: 20%;
-    overflow-y: scroll; }
-    .large-info-window__info::-webkit-scrollbar {
-      width: 8px;
-      right: 10px; }
-    .large-info-window__info::-webkit-scrollbar-thumb {
-      background-color: rgba(200, 200, 200, 0.85); }
-  .large-info-window__info--edit {
+    padding: 0px 10px; }
+  .info__info--edit {
     width: 100%;
     height: 40%;
     padding: 10px; }
+  .info__table-wrapper {
+    width: 100%;
+    overflow-x: scroll;
+    margin-bottom: 1.2rem; }
+    .info__table-wrapper::-webkit-scrollbar {
+      width: 10px;
+      bottom: 2px; }
+    .info__table-wrapper::-webkit-scrollbar-thumb {
+      background-color: rgba(93, 93, 93, 0.7); }
+    .info__table-wrapper__table {
+      border-collapse: collapse; }
+      .info__table-wrapper__table, .info__table-wrapper__table th, .info__table-wrapper__table td {
+        border: 1px solid #1C262F; }
+      .info__table-wrapper__table td {
+        padding: 0.1rem 0.6rem; }
 
 header {
   height: 2rem;
