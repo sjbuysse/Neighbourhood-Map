@@ -210,6 +210,10 @@ var ViewModel = function(){
 
           // Helper Method
           function jsonP(url) {
+            //Fallback error message that shows itself if the ajax request hasn't been successful after 5seconds.
+            var wikiRequestTimeout = setTimeout(function(){
+              alert("Failed to get forecast data, make sure you're connected to the internet or that your firewall doesn't prevent you from accessing the worldweatheronline servers");
+                }, 5000);
               $.ajax({
                   type: 'GET',
                   url: url,
@@ -221,9 +225,7 @@ var ViewModel = function(){
                       //Add today's forecast to the place instance 
                       place.forecastJSON(json.data.weather[0]);
                       place.forecastHTML(self.createForecastElement(json.data.weather[0]));
-                  },
-                  error: function (e) {
-                      console.log(e.message);
+                      clearTimeout(wikiRequestTimeout);
                   }
               });
           }
@@ -258,6 +260,8 @@ var ViewModel = function(){
         element += createRow("Wind direction:", "swellDir16Point");
         //Add row with Wind speed
         element += createRow("Wind speed (kmph):", "windspeedKmph");
+        //add footer row with attribution
+        element += "<tfoot><tr><td colspan='5'>Source: www.worldweatheronline.com</td></tr></tfoot>"
         return element;
     };
 
@@ -396,8 +400,3 @@ function initMap(){
 
     initViewModel();
 }
-
-
-
-// Make an observable array of markers , and add a filter function to the viewmodel that sets the map `null` for any marker that doesn't fit the filter. 
-// Geocode the data first time and save in localstorage, then from then on use localstorage
