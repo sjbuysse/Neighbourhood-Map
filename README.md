@@ -18,6 +18,9 @@ You can only add the forecast of the current day, so make sure you write down yo
 Click the `+` on the right hand corner of the window. After pinning the new location to the map you can drag it to it's correct
 location. 
 
+## How to edit a location?
+Simply select the location, show all info, and doubleclick either the name or the info text to edit them. 
+
 ## Import/Export
 Since all data is currently stored to LocalStorage, you can't see the data in different browsers. 
 However, you can export the data to a file and import this file it on a different machine/browser!
