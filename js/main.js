@@ -323,6 +323,10 @@ var ViewModel = function(){
         console.save(localStorage['session-places'], 'sessions');
     };
 
+    this.importLocations = function() {
+        return true;
+    }
+
     //Helper method to check if the filter value is part of the passed in place's name
     this.partOfFilter = function(place){
         return place.name().toLowerCase().indexOf(self.filterValue().toLowerCase()) === -1 ? false : true;
@@ -336,6 +340,34 @@ var ViewModel = function(){
         return self.markers()[index];
     }
 };
+
+//Return true if browser supports the File API
+ViewModel.prototype.supportFileAPI = function(){
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+//Handle imported location JSON file
+ViewModel.prototype.handleFileSelect = function(data, evt) {
+    var file = evt.target.files[0]; // FileList object
+
+  // Loop through the FileList and render image files as thumbnails.
+
+    var reader = new FileReader();
+
+    // callback for when reader finished loading the file
+    reader.onload = function(event) {
+        localStorage.removeItem('session-places');
+        var data = event.target.result;
+        localStorage.setItem('session-places', data);
+    };
+
+    // Read in the image file as a data URL.
+    reader.readAsText(file);
+}
 
 //Initialize all places and markers 
 ViewModel.prototype.init = function(places) {

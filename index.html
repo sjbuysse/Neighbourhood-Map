@@ -22,6 +22,9 @@
                 <ul data-bind="foreach: places" id="filter-list" class="drawer__filter__list">
                     <li data-bind="text: name(), visible: visible(), click: $root.chooseListItem"></li>
                 </ul>
+                <button class="drawer__filter__export-btn" data-bind="click: exportLocations">Export locations</button>
+                <input type="file" name="file" id="file" class="drawer__filter__import-input" data-bind="visible: supportFileAPI, event: {change: handleFileSelect}" />
+            <label for="file" data-bind="visible: supportFileAPI" class="drawer__filter__import-btn">Import locations</label>
             </div>
         </nav>
         <div class="create-location" data-bind="css:{'create-location--open': creatingPlace()}">

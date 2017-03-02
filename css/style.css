@@ -193,6 +193,8 @@ header {
   .location-form__info {
     height: 10rem; }
   .location-form__submit {
+    padding: 1px 6px;
+    box-sizing: border-box;
     text-transform: uppercase;
     text-align: left;
     color: #EEE;
@@ -209,12 +211,14 @@ header {
   position: absolute;
   margin: 0px;
   color: #EEE;
-  padding: 6px; }
+  padding: 6px;
+  padding-bottom: 4.2rem; }
   .drawer__filter__searchbox {
     color: #222;
     box-sizing: border-box;
     width: 188px; }
   .drawer__filter__list {
+    margin-bottom: 2rem;
     height: 100%;
     box-sizing: border-box;
     overflow-y: scroll;
@@ -228,5 +232,32 @@ header {
       -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3); }
     .drawer__filter__list::-webkit-scrollbar-thumb {
       background-color: rgba(93, 93, 93, 0.7); }
+  .drawer__filter__export-btn, .drawer__filter__import-btn {
+    position: absolute;
+    left: 0;
+    padding: 1px 6px;
+    box-sizing: border-box;
+    text-transform: uppercase;
+    text-align: left;
+    color: #EEE;
+    line-height: 2rem;
+    width: 100%;
+    height: 2rem;
+    background-color: #1C262F;
+    border: 1px solid #EEE;
+    outline: none; }
+  .drawer__filter__export-btn {
+    bottom: 2rem; }
+  .drawer__filter__import-btn {
+    border-top: none;
+    bottom: 0rem;
+    cursor: pointer; }
+  .drawer__filter__import-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1; }
 
 /*# sourceMappingURL=style.css.map */
