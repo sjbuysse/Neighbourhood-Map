@@ -14,6 +14,9 @@ Since a lot of these impressions can only be made after studying the surf foreca
 you can add the forecast of the day to the information of the surfspot. 
 You can only add the forecast of the current day, so make sure you write down your observations on the same day you surfed!
 
+## How to run the application? 
+Clone the repository to a local forlder and open up `index.html`.
+
 ## How to add a location?
 Click the `+` on the right hand corner of the window. After pinning the new location to the map you can drag it to it's correct
 location. 
