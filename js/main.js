@@ -187,8 +187,11 @@ var module = (function(){
 
         //Set the selectedPlace to the passed in place
         this.setSelectedPlace = function(place){
+            if(this.selectedPlace() === place){
+                return true;
+            }
             //You can only change the selected place if you're not editing or dragging a place. 
-            if(this.selectedPlace().editing() || this.selectedPlace().draggable()){
+            else if(this.selectedPlace().editing() || this.selectedPlace().draggable()){
                 alert("Please save or cancel the changes you've made to the currently selected place before selecting another.");
                 return false;
             } 
