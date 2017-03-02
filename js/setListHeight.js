@@ -7,7 +7,7 @@
         offset = $element.offset();
         topOfElement = offset.top;
         return (heightOfParent - topOfElement);
-  }
+  };
 })(jQuery);
 
 $(document).ready(

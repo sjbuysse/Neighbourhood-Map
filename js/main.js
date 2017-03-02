@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 var module = (function(){
     //global variables for the google map, google infowindow, and viewmodel instance
     var map;
@@ -81,7 +82,7 @@ var module = (function(){
     Place.prototype.removeForecast = function() {
         this.forecastJSON(false);
         this.forecastHTML(false);
-    }
+    };
 
     Place.prototype.saveEditing = function(){
         this.editing(false);
@@ -151,7 +152,7 @@ var module = (function(){
                 place.visible(visible);
             });
             return place;
-        }
+        };
 
         //When we click on a list item, we want to open up the infowindow and set the selectedPlace
         this.chooseListItem = function(place){
@@ -163,7 +164,7 @@ var module = (function(){
                 self.setSelectedPlace(place);
                 self.showLargeInfoWindow(true);
             }
-        }
+        };
 
         //Add location from our form to the places collection
         this.addLocation = function(){
@@ -251,7 +252,7 @@ var module = (function(){
                 infoWindow.close();
             }
             return true;
-        }
+        };
 
         this.requestForecast = function(place){
             var  _PremiumApiKey = "582f4a8e36294b81b54221346172602";
@@ -260,7 +261,7 @@ var module = (function(){
                 query : place.latlng().lat + "," + place.latlng().lng,
                 format : "json",
                 interval: 6
-            }
+            };
 
             JSONP_MarineWeather(input);
             function JSONP_MarineWeather(input) {
@@ -288,7 +289,7 @@ var module = (function(){
                     }
                 });
             }
-        }
+        };
 
         //Create HTML table for the forecast 
         this.createForecastElement = function(data) {
@@ -321,7 +322,7 @@ var module = (function(){
             //Add row with Wind speed
             element += createRow("Wind speed (kmph):", "windspeedKmph");
             //add footer row with attribution
-            element += "<tfoot><tr><td colspan='5'>Source: www.worldweatheronline.com</td></tr></tfoot>"
+            element += "<tfoot><tr><td colspan='5'>Source: www.worldweatheronline.com</td></tr></tfoot>";
                 return element;
         };
 
@@ -332,12 +333,12 @@ var module = (function(){
 
         this.importLocations = function() {
             return true;
-        }
+        };
 
         //Helper method to check if the filter value is part of the passed in place's name
         this.partOfFilter = function(place){
             return place.name().toLowerCase().indexOf(self.filterValue().toLowerCase()) === -1 ? false : true;
-        }
+        };
 
         // Helper method to get the marker that belongs to the passed in place
         this.findMarker = function(place) {
@@ -345,7 +346,7 @@ var module = (function(){
                 return marker.id === place.id;
             });
             return self.markers()[index];
-        }
+        };
     };
 
     //Return true if browser supports the File API
@@ -355,7 +356,7 @@ var module = (function(){
         } else {
             return false;
         }
-    }
+    };
 
     //Handle imported location JSON file
     ViewModel.prototype.handleFileSelect = function(data, evt) {
@@ -374,15 +375,15 @@ var module = (function(){
 
         // Read in the image file as a data URL.
         reader.readAsText(file);
-    }
+    };
 
     //Initialize all places and markers 
     ViewModel.prototype.init = function(places) {
         var self = this;
         // Collection of places, create a new Place object with observable properties for each of these places. 
         this.places = ko.observableArray(places.map(function(place){
-            var place = self.createPlace(place.name, place.info, place.id, place.latlng, place.forecastJSON, place.forecastHTML);
-            return place;
+            var newPlace = self.createPlace(place.name, place.info, place.id, place.latlng, place.forecastJSON, place.forecastHTML);
+            return newPlace;
         }));
 
         this.selectedPlace = ko.observable(this.places()[0]);
@@ -399,7 +400,7 @@ var module = (function(){
             this.googleDefined = true;
             this.selectedMarker = ko.computed(function(){
                 return self.findMarker(self.selectedPlace);
-            })
+            });
         }
         //
         // internal computed observable that fires whenever anything changes in our places
@@ -426,7 +427,7 @@ var module = (function(){
     methods.initWithoutMap = function(){
         initViewModel();
         document.getElementById('map').innerHTML = "<p>It seems like we couldn\'t load the google maps API, you can still browse around the spots and read and the place information, but you won't be able to add any new places</p>";
-    }
+    };
 
     //Init viewmodel with google maps
     methods.initMap = function(){
@@ -456,7 +457,7 @@ var module = (function(){
         infoWindow = new google.maps.InfoWindow();
 
         initViewModel();
-    }
+    };
     
     return methods;
 })();
