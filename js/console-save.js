@@ -1,6 +1,7 @@
 //Source:
 //https://plus.google.com/+AddyOsmani/posts/jBS8CiNTESM
 //http://bgrins.github.io/devtools-snippets/#console-save
+//A simple way to save objects as .json files from the console
 (function(console){
 
     console.save = function(data, filename){
