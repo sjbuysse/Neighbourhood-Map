@@ -389,9 +389,6 @@ var module = (function(){
 
         this.selectedPlace = ko.observable(this.places()[0]);
 
-        //Variable to hold the temporary new place during the creation process
-        this.newPlace = self.createPlace("", "", self.places().length);
-
         this.googleDefined = false;
 
         if(typeof google !== 'undefined'){
@@ -403,6 +400,12 @@ var module = (function(){
                 return self.findMarker(self.selectedPlace);
             });
         }
+
+        //Variable to hold the temporary new place during the creation process
+        if(this.googleDefined){
+            this.newPlace = self.createPlace("", "", self.places().length);
+        }
+
         //
         // internal computed observable that fires whenever anything changes in our places
         // Source: todo-mvc (www.todo-mvc.com)
