@@ -20,6 +20,7 @@ var module = (function(){
         this.draggable = ko.observable(draggable);
         this.visible = ko.observable(true);
         this.selected = ko.observable(false);
+        this.marker = this.createMarker();
     };
 
     //I don't add the markers as a property of the place instance because it's easier to export the places to JSON this way (you can't export a marker instance), and I can still use the application without googlemaps
@@ -178,6 +179,14 @@ var module = (function(){
         element += "<tfoot><tr><td colspan='5'>Source: www.worldweatheronline.com</td></tr></tfoot>";
             return element;
     };
+
+    Place.prototype.export = function(){
+        return {
+            name: this.name(),
+            info: this.info(),
+            latlng: this.latlng()
+        }
+    }
 
     //ViewModel
     var ViewModel = function(){
@@ -361,8 +370,16 @@ var module = (function(){
         reader.readAsText(file);
     };
 
+    ViewModel.prototype.getExportJSON = function() {
+        var self = this;
+        return self.places().map(function(place) {
+            return place.export();
+        });
+    };
+
     ViewModel.prototype.exportLocations = function() {
-        console.save(localStorage['session-places'], 'sessions');
+        var self = this;
+        console.save(self.getExportJSON(), 'sessions');
     };
 
     //Initialize all places and markers 
@@ -412,7 +429,7 @@ var module = (function(){
         ko.computed(function () {
             // store a clean copy to local storage, which also creates a dependency on
             // the observableArray and all observables in each item
-            localStorage.setItem('session-places', ko.toJSON(this.places));
+            localStorage.setItem('session-places', this.getExportJSON()));
         }.bind(this)).extend({
             rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' }
         }); // save at most twice per second
