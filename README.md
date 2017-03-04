@@ -14,6 +14,9 @@ Since a lot of these impressions can only be made after studying the surf foreca
 you can add the forecast of the day to the information of the surfspot. 
 You can only add the forecast of the current day, so make sure you write down your observations on the same day you surfed!
 
+## How to run the application? 
+Clone the repository to a local forlder and open up `index.html`.
+
 ## How to add a location?
 Click the `+` on the right hand corner of the window. After pinning the new location to the map you can drag it to it's correct
 location. 
@@ -26,4 +29,7 @@ Since all data is currently stored to LocalStorage, you can't see the data in di
 However, you can export the data to a file and import this file it on a different machine/browser!
 
 ## Possible future improvements
-Add posibility to add information and forecast about multiple sessions to a surfspot. 
+* Add posibility to add information and forecast about multiple sessions to a surfspot. 
+* Add the ability to “favorite” a location
+* Incorporate a build process allowing for production quality, minified code, to be delivered to the client.
+* Implement additional optimizations that improve the performance and user experience of the filter functionality (keyboard shortcuts, autocomplete functionality, filtering of multiple fields, etc).
