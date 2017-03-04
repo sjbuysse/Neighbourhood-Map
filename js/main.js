@@ -20,7 +20,10 @@ var module = (function(){
         this.draggable = ko.observable(draggable);
         this.visible = ko.observable(true);
         this.selected = ko.observable(false);
-        this.marker = this.createMarker();
+        //only create markers if the google API is working.
+        if(typeof google){
+            this.marker = this.createMarker();
+        }
     };
 
     //I don't add the markers as a property of the place instance because it's easier to export the places to JSON this way (you can't export a marker instance), and I can still use the application without googlemaps
@@ -54,11 +57,13 @@ var module = (function(){
                 marker.setIcon( 'http://maps.google.com/mapfiles/ms/icons/red-dot.png');
             }
         });
-        marker.addListener('click', function(){
-            if(vm.setSelectedPlace(self)) {
-                vm.populateInfowindow(marker);
+        marker.addListener('click', (function(self){
+            return function(){
+                if(vm.setSelectedPlace(self)) {
+                    vm.populateInfowindow(marker);
+                }
             }
-        });
+        })(self));
         return marker;
     };
 
@@ -90,12 +95,10 @@ var module = (function(){
     };
 
     Place.prototype.updateLocation = function(){
-        var self = this;
         this.draggable(false);
-        var marker = vm.findMarker(self);
         var newLocation = {
-            lat: marker.getPosition().lat(),
-            lng: marker.getPosition().lng()
+            lat: this.marker.getPosition().lat(),
+            lng: this.marker.getPosition().lng()
         };
         this.latlng(newLocation);
     };
@@ -180,11 +183,13 @@ var module = (function(){
             return element;
     };
 
+    //This is the information we'd like to export, so that we exclude the marker property
     Place.prototype.export = function(){
         return {
-            name: this.name(),
-            info: this.info(),
-            latlng: this.latlng()
+            name: this.name,
+            info: this.info,
+            id: this.id,
+            latlng: this.latlng
         }
     }
 
@@ -229,15 +234,15 @@ var module = (function(){
         this.filterValue = ko.observable('');
 
         this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, forecastJSON = false, forecastHTML = false, draggable = false) {
-            return place = new Place(name, info, id, latlng, forecastJSON, forecastHTML, draggable);
+            return new Place(name, info, id, latlng, forecastJSON, forecastHTML, draggable);
         };
 
         //When we click on a list item, we want to open up the infowindow and set the selectedPlace
         this.chooseListItem = function(place){
             self.toggleShowDrawer();
-            //Check if markers observableArray exists (wouldn't be the case when google API failed to load)
-            if(self.markers){
-                google.maps.event.trigger(self.findMarker(place), 'click');
+            //Check if marker exists (wouldn't be the case when google API failed to load)
+            if(place.marker){
+                google.maps.event.trigger(place.marker, 'click');
             } else{
                 self.setSelectedPlace(place);
                 self.showLargeInfoWindow(true);
@@ -255,8 +260,7 @@ var module = (function(){
             addedPlace.setDraggable();
             self.toggleCreatingPlace();
             self.places.push(addedPlace);
-            self.markers().push(addedPlace.createMarker());
-            google.maps.event.trigger(self.markers()[self.markers().length-1], 'click');
+            google.maps.event.trigger(addedPlace.marker, 'click');
             //Set up a new place for the next location creation.
             self.newPlace.name(""); 
             self.newPlace.info("");
@@ -283,11 +287,9 @@ var module = (function(){
 
         //Remove place and associated marker from collection
         this.removeLocation = function(place){
-            var marker = self.findMarker(place);
-            marker.setVisible(false);
+            place.marker.setVisible(false);
             infoWindow.close();
             infoWindow.marker = null;
-            self.markers.remove(marker);
             self.places.remove(place);
             self.setSelectedPlace(self.places()[0]);
         };
@@ -330,14 +332,6 @@ var module = (function(){
             }
             return true;
         };
-
-        // Helper method to get the marker that belongs to the passed in place
-        this.findMarker = function(place) {
-            var index = self.markers().findIndex(function(marker){
-                return marker.id === place.id;
-            });
-            return self.markers()[index];
-        };
     };
 
     //Return true if browser supports the File API
@@ -370,16 +364,9 @@ var module = (function(){
         reader.readAsText(file);
     };
 
-    ViewModel.prototype.getExportJSON = function() {
-        var self = this;
-        return self.places().map(function(place) {
-            return place.export();
-        });
-    };
-
     ViewModel.prototype.exportLocations = function() {
         var self = this;
-        console.save(self.getExportJSON(), 'sessions');
+        console.save(ko.toJSON(self.exportPlaces()), 'sessions');
     };
 
     //Initialize all places and markers 
@@ -409,27 +396,28 @@ var module = (function(){
         this.googleDefined = false;
 
         if(typeof google !== 'undefined'){
-            this.markers = ko.observableArray(this.places().map(function(place){
-                return place.createMarker();
-            }));
             this.googleDefined = true;
-            this.selectedMarker = ko.computed(function(){
-                return self.findMarker(self.selectedPlace);
-            });
         }
 
         //Variable to hold the temporary new place during the creation process
         if(this.googleDefined){
             this.newPlace = self.createPlace("", "", self.places().length);
+            this.newPlace.visible(false);
         }
 
+        //exportPlaces is a computed array that we'll store the data in that we'd like to save to the localStorage (so we'll exclude the markers). This array has to be a computed (or observable) so that when it updates, it will let the computed variable that sets the localStorage item gets fired
+        this.exportPlaces = ko.computed(function(){
+            return self.places().map(function(place){
+                return place.export();
+            });
+        });
         //
         // internal computed observable that fires whenever anything changes in our places
         // Source: todo-mvc (www.todo-mvc.com)
         ko.computed(function () {
             // store a clean copy to local storage, which also creates a dependency on
             // the observableArray and all observables in each item
-            localStorage.setItem('session-places', this.getExportJSON()));
+            localStorage.setItem('session-places', ko.toJSON(this.exportPlaces));
         }.bind(this)).extend({
             rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' }
         }); // save at most twice per second
