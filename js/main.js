@@ -9,12 +9,10 @@ var module = (function(){
     var methods = {};
 
     //Model for places
-    var Place = function(name, info, id, latlng, forecastJSON, forecastHTML, draggable){
+    var Place = function(name, info, id, latlng, draggable){
         this.name = ko.observable(name);
         this.latlng = ko.observable(latlng);
         this.info = ko.observable(info);
-        this.forecastJSON = ko.observable(forecastJSON);
-        this.forecastHTML = ko.observable(forecastHTML);
         this.id = id;
         this.editing = ko.observable(false);
         this.draggable = ko.observable(draggable);
@@ -26,6 +24,11 @@ var module = (function(){
         }
     };
 
+    //Model for sessions
+    var Session = function(info){
+        this.info = ko.observable(info);
+        this.images = ko.observableArray([]);
+    };
     //I don't add the markers as a property of the place instance because it's easier to export the places to JSON this way (you can't export a marker instance), and I can still use the application without googlemaps
     //
     //Create a marker for the place
@@ -62,7 +65,7 @@ var module = (function(){
                 if(vm.setSelectedPlace(self)) {
                     vm.populateInfowindow(marker);
                 }
-            }
+            };
         })(self));
         return marker;
     };
@@ -85,11 +88,6 @@ var module = (function(){
         this.info(this.previousInfo);
     };
 
-    Place.prototype.removeForecast = function() {
-        this.forecastJSON(false);
-        this.forecastHTML(false);
-    };
-
     Place.prototype.saveEditing = function(){
         this.editing(false);
     };
@@ -109,80 +107,6 @@ var module = (function(){
         this.latlng(this.previousLatLng);
     };
 
-    //Method to request forecast data from Worldweatheronline.com
-    Place.prototype.requestForecast = function(){
-        var self = this;
-        var  _PremiumApiKey = "582f4a8e36294b81b54221346172602";
-        var  _PremiumApiBaseURL = "http://api.worldweatheronline.com/premium/v1/";
-        var input = {
-            query : this.latlng().lat + "," + this.latlng().lng,
-            format : "json",
-            interval: 6
-        };
-
-        JSONP_MarineWeather(input);
-        function JSONP_MarineWeather(input) {
-            var url = _PremiumApiBaseURL + "marine.ashx?q=" + input.query + "&tp=" +input.interval + "&format=" + input.format +  "&key=" + _PremiumApiKey;
-            jsonP(url, input.callback);
-        }
-
-        // Helper Method
-        function jsonP(url) {
-            //Fallback error message that shows itself if the ajax request hasn't been successful after 5seconds.
-            var wikiRequestTimeout = setTimeout(function(){
-                alert("Failed to get forecast data, make sure you're connected to the internet or that your firewall doesn't prevent you from accessing the worldweatheronline servers");
-            }, 5000);
-            $.ajax({
-                type: 'GET',
-                url: url,
-                async: false,
-                contentType: "application/json",
-                dataType: 'jsonp',
-                success: function (json) {
-                    //Add today's forecast to the place instance 
-                    self.forecastJSON(json.data.weather[0]);
-                    self.forecastHTML(self.createForecastElement(json.data.weather[0]));
-                    clearTimeout(wikiRequestTimeout);
-                }
-            });
-        }
-    };
-
-    //Create HTML table for the forecast 
-    Place.prototype.createForecastElement = function(data) {
-        function createRow(headerName, property){
-            var row = "<tr><th scope='row'>" + headerName + "</th>";
-            data.hourly.forEach(function(forecast){
-                row += "<td>" + forecast[property] + "</td>";
-            });
-            row += "</tr>";
-            return row;
-        }
-        var date = data.date;
-        var element = "<thead><tr>" + 
-            "<th scope='row'>" + date + "</th>" + 
-            "<th scope='col'>6AM</th>" + 
-            "<th scope='col'>12AM</th>" + 
-            "<th scope='col'>6PM</th>" + 
-            "<th scope='col'>12PM</th>" + 
-            "</tr></thead>";
-        //Add row with swell info
-        element += createRow("Swell (m):", "swellHeight_m");
-        //Add row with Significant wave height
-        element += createRow("Wave Heigth (m):", "sigHeight_m");
-        //Add row with Swell direction
-        element += createRow("Swell direction:", "swellDir16Point");
-        //Add row with Swell period
-        element += createRow("Period (s):", "swellPeriod_secs");
-        //Add row with Wind direction
-        element += createRow("Wind direction:", "swellDir16Point");
-        //Add row with Wind speed
-        element += createRow("Wind speed (kmph):", "windspeedKmph");
-        //add footer row with attribution
-        element += "<tfoot><tr><td colspan='5'>Source: www.worldweatheronline.com</td></tr></tfoot>";
-            return element;
-    };
-
     //This is the information we'd like to export, so that we exclude the marker property
     Place.prototype.export = function(){
         return {
@@ -190,8 +114,8 @@ var module = (function(){
             info: this.info,
             id: this.id,
             latlng: this.latlng
-        }
-    }
+        };
+    };
 
     //ViewModel
     var ViewModel = function(){
@@ -233,8 +157,8 @@ var module = (function(){
         //Current value in the searchBox
         this.filterValue = ko.observable('');
 
-        this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, forecastJSON = false, forecastHTML = false, draggable = false) {
-            return new Place(name, info, id, latlng, forecastJSON, forecastHTML, draggable);
+        this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable = false) {
+            return new Place(name, info, id, latlng, draggable);
         };
 
         //When we click on a list item, we want to open up the infowindow and set the selectedPlace
@@ -374,7 +298,7 @@ var module = (function(){
         var self = this;
         // Collection of places, create a new Place object with observable properties for each of these places. 
         this.places = ko.observableArray(places.map(function(place){
-            var newPlace = self.createPlace(place.name, place.info, place.id, place.latlng, place.forecastJSON, place.forecastHTML);
+            var newPlace = self.createPlace(place.name, place.info, place.id, place.latlng);
             return newPlace;
         }));
 

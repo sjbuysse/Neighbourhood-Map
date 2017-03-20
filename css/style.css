@@ -100,21 +100,6 @@ html, body {
     width: 100%;
     height: 40%;
     padding: 10px; }
-  .info__table-wrapper {
-    width: 100%;
-    overflow-x: scroll;
-    margin-bottom: 1.2rem; }
-    .info__table-wrapper::-webkit-scrollbar {
-      width: 10px;
-      bottom: 2px; }
-    .info__table-wrapper::-webkit-scrollbar-thumb {
-      background-color: rgba(93, 93, 93, 0.7); }
-    .info__table-wrapper__table {
-      border-collapse: collapse; }
-      .info__table-wrapper__table, .info__table-wrapper__table th, .info__table-wrapper__table td {
-        border: 1px solid #1C262F; }
-      .info__table-wrapper__table td {
-        padding: 0.1rem 0.6rem; }
 
 header {
   height: 2rem;
