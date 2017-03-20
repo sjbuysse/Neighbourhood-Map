@@ -298,7 +298,6 @@ var module = (function(){
         this.populateInfowindow = function(marker){
             if(infoWindow.marker != marker){
                 infoWindow.marker = marker;
-                infoWindow.open(map, marker);
                 var contentHTML = "<div class='info-window' id='infoWindow'" + 
                     " data-bind='with: $root.selectedPlace()'>" + 
                     "<label class='info-window__name' data-bind='text: name'></label>" +
@@ -316,6 +315,7 @@ var module = (function(){
                     " visible: (!draggable())'>Remove spot</button>" +
                     "</div>";
                 infoWindow.setContent(contentHTML);
+                infoWindow.open(map, marker);
                 var query = marker.getPosition().lat() + "," + marker.getPosition().lng();
 
                 //We need to apply the bindings for this new infowindow (because it didn't exist at the time of applying bindings to the ViewModel)
@@ -378,7 +378,7 @@ var module = (function(){
             return newPlace;
         }));
 
-        //Source: I created this computed observable after getting some ideas from Tamas Crasser
+        //Source: I created this computed observable after getting some ideas from Tamas Krasser
         this.filterPlaces = ko.computed(function() {
             var filter = self.filterValue().toLowerCase();
 
