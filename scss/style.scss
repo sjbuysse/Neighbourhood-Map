@@ -113,7 +113,9 @@ html, body{
 }
 
 .info {
+    box-sizing: border-box;
     margin-top: 2rem;
+    padding: 0 10px;
     height: 400px;;
     width: 100%;
     overflow-y: scroll;
@@ -139,12 +141,18 @@ html, body{
     }
     &__info {
         width: 100%;
-        padding: 0px 10px;
     }
     &__info--edit {
         width: 100%;
         height: 40%;
-        padding: 10px;
+    }
+}
+.sessions {
+    box-sizing: border-box;
+    width: 100%;
+    &__session__info, &__session__info--edit {
+        box-sizing: border-box;
+        width: 100%;
     }
 }
 

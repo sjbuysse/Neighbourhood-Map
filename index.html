@@ -50,6 +50,20 @@
                 <label class="info__latlng">lng: <span data-bind='text: latlng().lng'></span> </label>
                 <p class="info__info" data-bind='text: info, visible: !editing(),event: { dblclick: setEditing }, doubleTap: setEditing'></p> 
                 <textarea class='info__info--edit' data-bind="value: info, visible: editing,  valueUpdate: 'afterkeydown', escapeKey: undoEditing"></textarea>
+                <div class="info__sessions sessions">
+                    <!-- ko foreach: sessions -->
+                    <div class="sessions__session">
+                        <h2 class="sessions_session__title" >
+                            Sessie <span data-bind="text: ($index() + 1)"></span>
+                        </h2>
+                        <p class="sessions__session__info" data-bind='text: info, visible: !($parent.editing()),event: { dblclick: function() {$parent.setEditing()}}, doubleTap: function() {$parent.setEditing()}'></p> 
+                        <textarea class='sessions__session__info--edit' data-bind="value: info, visible: $parent.editing,  valueUpdate: 'afterkeydown', escapeKey: function() {$parent.undoEditing()}"></textarea>
+                    </div>
+                    <!-- /ko -->
+                    <button data-bind='click: createSession, visible: !editing()'>
+                        Add a session
+                    </button>
+                </div>
                 <button data-bind='click: saveEditing, visible: (editing())'>
                     Update
                 </button>

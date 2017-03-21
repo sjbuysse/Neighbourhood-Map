@@ -18,6 +18,7 @@ var module = (function(){
         this.draggable = ko.observable(draggable);
         this.visible = ko.observable(true);
         this.selected = ko.observable(false);
+        this.sessions = ko.observableArray([]);
         //only create markers if the google API is working.
         if(typeof google){
             this.marker = this.createMarker();
@@ -25,12 +26,17 @@ var module = (function(){
     };
 
     //Model for sessions
-    var Session = function(info){
+    var Session = function(info = ""){
         this.info = ko.observable(info);
         this.images = ko.observableArray([]);
     };
-    //I don't add the markers as a property of the place instance because it's easier to export the places to JSON this way (you can't export a marker instance), and I can still use the application without googlemaps
-    //
+
+    Place.prototype.createSession = function(){
+        var session = new Session();
+        this.sessions.push(session);
+        this.setEditing();
+    };
+
     //Create a marker for the place
     Place.prototype.createMarker = function() {
         var self = this;
@@ -72,9 +78,15 @@ var module = (function(){
 
     //Method to set the place in edit mode
     Place.prototype.setEditing = function(){
+        var self = this;
         this.editing(true);
         this.previousName = this.name();
         this.previousInfo = this.info();
+        // copy session info by value 
+        this.previousSessionInfo = [];
+        this.sessions().forEach(function(session){
+            self.previousSessionInfo.push(session.info());
+        });
     };
 
     Place.prototype.setDraggable = function() {
@@ -83,13 +95,29 @@ var module = (function(){
     };
 
     Place.prototype.undoEditing = function(){
+        var self = this;
         this.editing(false);
         this.name(this.previousName);
         this.info(this.previousInfo);
+        this.sessions().forEach(function(session, index){
+            //return the info to its previous value
+            session.info(self.previousSessionInfo[index]);
+            //remove session if it's empty
+            if (session.info().trim().length == 0){
+                self.sessions.remove(session);
+            }
+        });
     };
 
     Place.prototype.saveEditing = function(){
+        var self = this;
         this.editing(false);
+        //remove session if it's empty
+        this.sessions().forEach(function(session) {
+            if (session.info().trim().length == 0){
+                self.sessions.remove(session);
+            }
+        });
     };
 
     Place.prototype.updateLocation = function(){
@@ -108,12 +136,21 @@ var module = (function(){
     };
 
     //This is the information we'd like to export, so that we exclude the marker property
+    //If you add something here, make sure you adjust the createPlace function for importing the localStorage data correctly
     Place.prototype.export = function(){
+        var sessions = [];
+        this.sessions().forEach(function(session) {
+            var exportSession = {
+                info: session.info
+            };
+            sessions.push(exportSession);
+        });
         return {
             name: this.name,
             info: this.info,
             id: this.id,
-            latlng: this.latlng
+            latlng: this.latlng,
+            sessions: sessions
         };
     };
 
@@ -157,8 +194,13 @@ var module = (function(){
         //Current value in the searchBox
         this.filterValue = ko.observable('');
 
-        this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable = false) {
-            return new Place(name, info, id, latlng, draggable);
+        this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, sessions = [], draggable = false) {
+            var place = new Place(name, info, id, latlng, draggable);
+            sessions.forEach(function(session) {
+                var session = new Session(session.info);
+                place.sessions.push(session);
+            })
+            return place;
         };
 
         //When we click on a list item, we want to open up the infowindow and set the selectedPlace
@@ -281,6 +323,7 @@ var module = (function(){
             localStorage.removeItem('session-places');
             var data = event.target.result;
             localStorage.setItem('session-places', data);
+            //reload the current document
             location.reload();
         };
 
@@ -298,7 +341,7 @@ var module = (function(){
         var self = this;
         // Collection of places, create a new Place object with observable properties for each of these places. 
         this.places = ko.observableArray(places.map(function(place){
-            var newPlace = self.createPlace(place.name, place.info, place.id, place.latlng);
+            var newPlace = self.createPlace(place.name, place.info, place.id, place.latlng, place.sessions);
             return newPlace;
         }));
 
@@ -355,6 +398,11 @@ var module = (function(){
         vm.init(places || placeList);
         ko.applyBindings(vm);
     }
+
+    //return places from the ViewModel (mostly for debugging reasons)
+    methods.getPlaces  = function(){
+        return vm.places();
+    };
 
     //Init viewmodel without google maps (if the API Fails to load)
     methods.initWithoutMap = function(){
