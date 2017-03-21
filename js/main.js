@@ -372,10 +372,14 @@ var module = (function(){
             this.newPlace.visible(false);
         }
 
-        //exportPlaces is a computed array that we'll store the data in that we'd like to save to the localStorage (so we'll exclude the markers). This array has to be a computed (or observable) so that when it updates, it will let the computed variable that sets the localStorage item gets fired
-        this.exportPlaces = ko.computed(function(){
-            return self.places().map(function(place){
-                return place.export();
+    };
+
+    //exportData is a computed array that we'll store the data in that we'd like to save to the localStorage. This array has to be a computed (or observable) so that when it updates, it will let the computed variable that sets the localStorage item gets fired
+    //syncDataLocalStorage accepts as a parameter a collection with elements that have an export function that returns the JSON that we want to save in LocalStorage
+    var syncDataLocalStorage = function(data) {
+        this.exportData = ko.computed(function(){
+            return data.map(function(element){
+                return element.export();
             });
         });
         //
@@ -384,11 +388,11 @@ var module = (function(){
         ko.computed(function () {
             // store a clean copy to local storage, which also creates a dependency on
             // the observableArray and all observables in each item
-            localStorage.setItem('session-places', ko.toJSON(this.exportPlaces));
+            localStorage.setItem('session-places', ko.toJSON(this.exportData));
         }.bind(this)).extend({
             rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' }
         }); // save at most twice per second
-    };
+    }
 
     function initViewModel(){
         // check local storage for places 
@@ -397,6 +401,7 @@ var module = (function(){
         vm = new ViewModel();
         vm.init(places || placeList);
         ko.applyBindings(vm);
+        syncDataLocalStorage(vm.places());
     }
 
     //return places from the ViewModel (mostly for debugging reasons)
