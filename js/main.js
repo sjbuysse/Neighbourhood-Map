@@ -393,9 +393,8 @@ var module = (function(){
     function initViewModel(){
         // check local storage for places 
         var places = ko.utils.parseJson(localStorage.getItem('session-places'));
-        console.log(places);
+        var placesFromServer = ko.utils.parseJson(placeList);
         vm = new ViewModel();
-        //placeList is the JSON object that is loaded in session-places.js
         vm.init(places || placeList);
         ko.applyBindings(vm);
     }
