@@ -81,13 +81,24 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
         <script src="js/plugins.js"></script>
         <script src="bower_components/knockout/dist/knockout.js"></script>
-        <script src="js/session-places.js"></script>
         <script src="js/keyhandling.js"></script>
         <script src="js/doubletap.js"></script>
         <script src="js/console-save.js"></script>
         <script src="js/main.js"></script>
         <script src="js/setListHeight.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=module.initMap" onerror="module.initWithoutMap()"
-        async defer></script>
+        <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-database.js"></script>
+        <script>
+          // Initialize Firebase
+          var config = {
+            apiKey: "AIzaSyDCYpUjurtGKHJ3mIpMik5_mLhRrVgM33E",
+            authDomain: "surf-sessions-7accd.firebaseapp.com",
+            databaseURL: "https://surf-sessions-7accd.firebaseio.com",
+            storageBucket: "surf-sessions-7accd.appspot.com",
+            messagingSenderId: "246363609320"
+          };
+          firebase.initializeApp(config);
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=module.initMap" onerror="module.initWithoutMap()" async defer></script>
     </body>
 </html>

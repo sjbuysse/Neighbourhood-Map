@@ -121,12 +121,15 @@ var module = (function(){
     };
 
     Place.prototype.updateLocation = function(){
+        var self = this;
         this.draggable(false);
         var newLocation = {
             lat: this.marker.getPosition().lat(),
             lng: this.marker.getPosition().lng()
         };
         this.latlng(newLocation);
+        this.placeRef = new firebase.database().ref().child(self.id);
+        this.placeRef.update({latlng: newLocation});
     };
 
 
@@ -141,15 +144,15 @@ var module = (function(){
         var sessions = [];
         this.sessions().forEach(function(session) {
             var exportSession = {
-                info: session.info
+                info: session.info()
             };
             sessions.push(exportSession);
         });
         return {
-            name: this.name,
-            info: this.info,
+            name: this.name(),
+            info: this.info(),
             id: this.id,
-            latlng: this.latlng,
+            latlng: this.latlng(),
             sessions: sessions
         };
     };
@@ -220,9 +223,16 @@ var module = (function(){
             var name = self.newPlace.name();
             var latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()};
             var info = self.newPlace.info();
-            var id = self.newPlace.id;
+            // Get a key for a new Place.
+            var newPostKey = firebase.database().ref().push().key;
+            var id = newPostKey;
             var draggable = true;
             var addedPlace = self.createPlace(name, info, id, latlng);
+            this.databaseRef.child(newPostKey).update(addedPlace.export(), function(err){
+                if(err){
+                    console.log("error: " + err);
+                }
+            });
             addedPlace.setDraggable();
             self.toggleCreatingPlace();
             self.places.push(addedPlace);
@@ -340,43 +350,49 @@ var module = (function(){
     ViewModel.prototype.init = function(places) {
         var self = this;
         // Collection of places, create a new Place object with observable properties for each of these places. 
-        this.places = ko.observableArray(places.map(function(place){
-            var newPlace = self.createPlace(place.name, place.info, place.id, place.latlng, place.sessions);
-            return newPlace;
-        }));
+        this.databaseRef = new firebase.database().ref();
+        this.databaseRef.once('value', function(snap){
+            self.places = ko.observableArray([]);
+            snap.forEach(function(childSnapshot){
+                var place = childSnapshot.val();
+                var newPlace = self.createPlace(place.name, place.info, childSnapshot.key, place.latlng, place.sessions);
+                self.places.push(newPlace);
+            })
 
-        //Source: I created this computed observable after getting some ideas from Tamas Krasser
-        this.filterPlaces = ko.computed(function() {
-            var filter = self.filterValue().toLowerCase();
+            //Source: I created this computed observable after getting some ideas from Tamas Krasser
+            self.filterPlaces = ko.computed(function() {
+                var filter = self.filterValue().toLowerCase();
 
-            self.places().forEach(function(place) {
-                if (place.name().toLowerCase().indexOf(filter) > -1) {
-                    place.visible(true);
-                } else {
-                    place.visible(false);
-                }
+                self.places().forEach(function(place) {
+                    if (place.name().toLowerCase().indexOf(filter) > -1) {
+                        place.visible(true);
+                    } else {
+                        place.visible(false);
+                    }
+                });
             });
-        });
 
-        this.selectedPlace = ko.observable(this.places()[0]);
+            self.selectedPlace = ko.observable(self.places()[0]);
 
-        this.googleDefined = false;
+            self.googleDefined = false;
 
-        if(typeof google !== 'undefined'){
-            this.googleDefined = true;
-        }
+            if(typeof google !== 'undefined'){
+                self.googleDefined = true;
+            }
 
-        //Variable to hold the temporary new place during the creation process
-        if(this.googleDefined){
-            this.newPlace = self.createPlace("", "", self.places().length);
-            this.newPlace.visible(false);
-        }
+            //Variable to hold the temporary new place during the creation process
+            if(self.googleDefined){
+                self.newPlace = self.createPlace("", "", self.places().length);
+                self.newPlace.visible(false);
+            }
 
-        //exportPlaces is a computed array that we'll store the data in that we'd like to save to the localStorage (so we'll exclude the markers). This array has to be a computed (or observable) so that when it updates, it will let the computed variable that sets the localStorage item gets fired
-        this.exportPlaces = ko.computed(function(){
-            return self.places().map(function(place){
-                return place.export();
+            //exportPlaces is a computed array that we'll store the data in that we'd like to save to the localStorage (so we'll exclude the markers). This array has to be a computed (or observable) so that when it updates, it will let the computed variable that sets the localStorage item gets fired
+            self.exportPlaces = ko.computed(function(){
+                return self.places().map(function(place){
+                    return place.export();
+                });
             });
+            ko.applyBindings(vm);
         });
         //
         // internal computed observable that fires whenever anything changes in our places
@@ -392,11 +408,9 @@ var module = (function(){
 
     function initViewModel(){
         // check local storage for places 
-        var places = ko.utils.parseJson(localStorage.getItem('session-places'));
-        var placesFromServer = ko.utils.parseJson(placeList);
+        //var places = ko.utils.parseJson(localStorage.getItem('session-places'));
         vm = new ViewModel();
-        vm.init(places || placeList);
-        ko.applyBindings(vm);
+        vm.init();
     }
 
     //return places from the ViewModel (mostly for debugging reasons)
