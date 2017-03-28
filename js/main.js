@@ -23,6 +23,7 @@ var module = (function(){
         if(typeof google){
             this.marker = this.createMarker();
         }
+        this.placeRef = firebase.database().ref().child(this.id);
     };
 
     //Model for sessions
@@ -102,7 +103,7 @@ var module = (function(){
         this.sessions().forEach(function(session, index){
             //return the info to its previous value
             session.info(self.previousSessionInfo[index]);
-            //remove session if it's empty
+            //remove session if it's empty, this happens when we undo edit just after adding a session
             if (session.info().trim().length == 0){
                 self.sessions.remove(session);
             }
@@ -118,6 +119,11 @@ var module = (function(){
                 self.sessions.remove(session);
             }
         });
+        this.placeRef.set(self.export(), function(err){
+            if(err){
+                console.log("error: " + err);
+            }
+        });
     };
 
     Place.prototype.updateLocation = function(){
@@ -128,7 +134,6 @@ var module = (function(){
             lng: this.marker.getPosition().lng()
         };
         this.latlng(newLocation);
-        this.placeRef = new firebase.database().ref().child(self.id);
         this.placeRef.update({latlng: newLocation});
     };
 
@@ -263,6 +268,11 @@ var module = (function(){
 
         //Remove place and associated marker from collection
         this.removeLocation = function(place){
+            place.placeRef.remove(function(err){
+                if(err){
+                    console.log("error: " + err);
+                }
+            });
             place.marker.setVisible(false);
             infoWindow.close();
             infoWindow.marker = null;
@@ -328,11 +338,18 @@ var module = (function(){
 
         var reader = new FileReader();
 
-        // callback for when reader finished loading the file
+        // set firebase data to new JSON file when reader finished loading the JSON file
         reader.onload = function(event) {
-            localStorage.removeItem('session-places');
             var data = event.target.result;
-            localStorage.setItem('session-places', data);
+            var jsonData = JSON.parse(data);
+
+            self.databaseRef.set(jsonData, function(err){
+                if(err){
+                    console.log("error: " + err);
+                } else {
+                    console.log(jsonData);
+                }
+            });
             //reload the current document
             location.reload();
         };
@@ -343,14 +360,20 @@ var module = (function(){
 
     ViewModel.prototype.exportLocations = function() {
         var self = this;
-        console.save(ko.toJSON(self.exportPlaces()), 'sessions');
+        var exportPlaces = {};
+        self.places().map(function(place){
+            exportPlaces[place.export().id] = place.export();
+        });
+
+        console.save(ko.toJSON(exportPlaces), 'sessions');
     };
 
     //Initialize all places and markers 
-    ViewModel.prototype.init = function(places) {
+    ViewModel.prototype.init = function() {
         var self = this;
         // Collection of places, create a new Place object with observable properties for each of these places. 
-        this.databaseRef = new firebase.database().ref();
+        this.databaseRef = firebase.database().ref();
+        this.storageRef = firebase.storage().ref();
         this.databaseRef.once('value', function(snap){
             self.places = ko.observableArray([]);
             snap.forEach(function(childSnapshot){
@@ -386,24 +409,8 @@ var module = (function(){
                 self.newPlace.visible(false);
             }
 
-            //exportPlaces is a computed array that we'll store the data in that we'd like to save to the localStorage (so we'll exclude the markers). This array has to be a computed (or observable) so that when it updates, it will let the computed variable that sets the localStorage item gets fired
-            self.exportPlaces = ko.computed(function(){
-                return self.places().map(function(place){
-                    return place.export();
-                });
-            });
             ko.applyBindings(vm);
         });
-        //
-        // internal computed observable that fires whenever anything changes in our places
-        // Source: todo-mvc (www.todo-mvc.com)
-        ko.computed(function () {
-            // store a clean copy to local storage, which also creates a dependency on
-            // the observableArray and all observables in each item
-            localStorage.setItem('session-places', ko.toJSON(this.exportPlaces));
-        }.bind(this)).extend({
-            rateLimit: { timeout: 500, method: 'notifyWhenChangesStop' }
-        }); // save at most twice per second
     };
 
     function initViewModel(){
