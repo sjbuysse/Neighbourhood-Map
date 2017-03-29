@@ -23,7 +23,7 @@ var module = (function(){
         if(typeof google){
             this.marker = this.createMarker();
         }
-        this.placeRef = firebase.database().ref().child(this.id);
+        this.placeRef = firebase.database().ref().child('places').child(this.id);
     };
 
     //Model for sessions
@@ -104,7 +104,7 @@ var module = (function(){
             //return the info to its previous value
             session.info(self.previousSessionInfo[index]);
             //remove session if it's empty, this happens when we undo edit just after adding a session
-            if (session.info().trim().length == 0){
+            if (session.info().trim().length === 0){
                 self.sessions.remove(session);
             }
         });
@@ -115,7 +115,7 @@ var module = (function(){
         this.editing(false);
         //remove session if it's empty
         this.sessions().forEach(function(session) {
-            if (session.info().trim().length == 0){
+            if (session.info().trim().length === 0){
                 self.sessions.remove(session);
             }
         });
@@ -204,10 +204,10 @@ var module = (function(){
 
         this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, sessions = [], draggable = false) {
             var place = new Place(name, info, id, latlng, draggable);
-            sessions.forEach(function(session) {
-                var session = new Session(session.info);
+            sessions.forEach(function(sessionData) {
+                var session = new Session(sessionData.info);
                 place.sessions.push(session);
-            })
+            });
             return place;
         };
 
@@ -233,7 +233,7 @@ var module = (function(){
             var id = newPostKey;
             var draggable = true;
             var addedPlace = self.createPlace(name, info, id, latlng);
-            this.databaseRef.child(newPostKey).update(addedPlace.export(), function(err){
+            this.placesRef.child(newPostKey).update(addedPlace.export(), function(err){
                 if(err){
                     console.log("error: " + err);
                 }
@@ -330,11 +330,9 @@ var module = (function(){
     };
 
     //Handle imported location JSON file
-    ViewModel.prototype.handleFileSelect = function(data, evt) {
+    ViewModel.prototype.handleJSONSelect = function(data, evt) {
         var self = this;
         var file = evt.target.files[0]; // FileList object
-
-        // Loop through the FileList and render image files as thumbnails.
 
         var reader = new FileReader();
 
@@ -358,11 +356,74 @@ var module = (function(){
         reader.readAsText(file);
     };
 
+    //Handle image selecting
+    ViewModel.prototype.handleImageSelect = function(data, evt) {
+        var preview = document.getElementById('previewImg');
+        this.selectedFile = evt.target.files[0]; // save the selected file in your ViewModel
+        //check if selected file extension is allowed
+        var ext = this.selectedFile.name.match(/\.([^\.]+)$/)[1];
+        switch(ext.toLowerCase()) {
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'bmp':
+                break;
+            default:
+                alert('The file with extension ' + ext + " is not allowed.\n" +
+                        "Please try again with a jpg, jpeg, png or bmp file.")
+                this.selectedFile = null;
+                return;
+        }
+
+        //preview images, add show upload button
+        var reader = new FileReader();
+        reader.onload = function(event) {
+            preview.src = event.target.result;
+            document.getElementById('images-upload-btn').classList.remove("hidden");
+        };
+        // Read in the image file as a data URL.
+        reader.readAsDataURL(this.selectedFile);
+    };
+
+    //upload selected images to firebase
+    ViewModel.prototype.uploadImage = function() {
+        document.getElementById('images-upload-btn').classList.add("hidden");
+        var imageStorageRef = this.storageRef.child('/images/' + this.selectedFile.name);
+        var uploadTask = imageStorageRef.put(this.selectedFile);
+        // Register three observers:
+        // 1. 'state_changed' observer, called any time the state changes
+        // 2. Error observer, called on failure
+        // 3. Completion observer, called on successful completion
+        uploadTask.on('state_changed', function(snapshot){
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED: // or 'paused'
+                    console.log('Upload is paused');
+                    break;
+                case firebase.storage.TaskState.RUNNING: // or 'running'
+                    console.log('Upload is running');
+                    break;
+            }
+        }, function(error) {
+            // Handle unsuccessful uploads
+        }, function() {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            var downloadURL = uploadTask.snapshot.downloadURL;
+            console.log(downloadURL);
+        });
+    }
+
     ViewModel.prototype.exportLocations = function() {
         var self = this;
-        var exportPlaces = {};
+        var exportPlaces = {
+            places: {}
+        };
         self.places().map(function(place){
-            exportPlaces[place.export().id] = place.export();
+            exportPlaces.places[place.export().id] = place.export();
         });
 
         console.save(ko.toJSON(exportPlaces), 'sessions');
@@ -373,14 +434,15 @@ var module = (function(){
         var self = this;
         // Collection of places, create a new Place object with observable properties for each of these places. 
         this.databaseRef = firebase.database().ref();
+        this.placesRef = this.databaseRef.child('places');
         this.storageRef = firebase.storage().ref();
-        this.databaseRef.once('value', function(snap){
+        this.placesRef.once('value', function(snap){
             self.places = ko.observableArray([]);
             snap.forEach(function(childSnapshot){
                 var place = childSnapshot.val();
                 var newPlace = self.createPlace(place.name, place.info, childSnapshot.key, place.latlng, place.sessions);
                 self.places.push(newPlace);
-            })
+            });
 
             //Source: I created this computed observable after getting some ideas from Tamas Krasser
             self.filterPlaces = ko.computed(function() {

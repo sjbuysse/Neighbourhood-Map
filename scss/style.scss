@@ -1,10 +1,22 @@
 $mirage: #1C262F;
 $gallery: #EEE;
+@mixin hide-input{
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
 @mixin button {
     padding: 1px 6px;
     box-sizing: border-box;
     text-transform: uppercase;
     text-align: left;
+    outline: none;
+}
+@mixin drawer-button {
+    @include button;
     color: $gallery;
     line-height: 2rem;
     width: 100%;
@@ -147,12 +159,30 @@ html, body{
         height: 40%;
     }
 }
+
 .sessions {
     box-sizing: border-box;
     width: 100%;
-    &__session__info, &__session__info--edit {
+}
+
+.session{
+    &__info, &__info--edit {
         box-sizing: border-box;
         width: 100%;
+    } 
+    &__images-input {
+        @include hide-input;
+    }
+    &__preview-image{
+        display: block;
+        max-height: 200px;
+        max-width: 200px;
+    }
+    &__images-upload-btn, &__images-select-btn {
+        @include button
+    }
+    &__images-upload-btn.hidden{
+        display: none;
     }
 }
 
@@ -231,7 +261,7 @@ header {
         height: 10rem;
     }
     &__submit {
-        @include button
+        @include drawer-button
     }
 }
 
@@ -268,7 +298,7 @@ header {
     &__export-btn, &__import-btn {
         position: absolute;
         left: 0;
-        @include button
+        @include drawer-button
     }
     &__export-btn {
         bottom: 2rem; 
@@ -279,11 +309,6 @@ header {
         cursor: pointer;
     }
     &__import-input {
-        width: 0.1px;
-        height: 0.1px;
-        opacity: 0;
-        overflow: hidden;
-        position: absolute;
-        z-index: -1;
+        @include hide-input;
     }
 }
