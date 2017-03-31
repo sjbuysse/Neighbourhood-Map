@@ -18,24 +18,11 @@ var module = (function(){
         this.draggable = ko.observable(draggable);
         this.visible = ko.observable(true);
         this.selected = ko.observable(false);
-        this.sessions = ko.observableArray([]);
         //only create markers if the google API is working.
         if(typeof google){
             this.marker = this.createMarker();
         }
         this.placeRef = firebase.database().ref().child('places').child(this.id);
-    };
-
-    //Model for sessions
-    var Session = function(info = ""){
-        this.info = ko.observable(info);
-        this.images = ko.observableArray([]);
-    };
-
-    Place.prototype.createSession = function(){
-        var session = new Session();
-        this.sessions.push(session);
-        this.setEditing();
     };
 
     //Create a marker for the place
@@ -83,11 +70,6 @@ var module = (function(){
         this.editing(true);
         this.previousName = this.name();
         this.previousInfo = this.info();
-        // copy session info by value 
-        this.previousSessionInfo = [];
-        this.sessions().forEach(function(session){
-            self.previousSessionInfo.push(session.info());
-        });
     };
 
     Place.prototype.setDraggable = function() {
@@ -100,25 +82,11 @@ var module = (function(){
         this.editing(false);
         this.name(this.previousName);
         this.info(this.previousInfo);
-        this.sessions().forEach(function(session, index){
-            //return the info to its previous value
-            session.info(self.previousSessionInfo[index]);
-            //remove session if it's empty, this happens when we undo edit just after adding a session
-            if (session.info().trim().length === 0){
-                self.sessions.remove(session);
-            }
-        });
     };
 
     Place.prototype.saveEditing = function(){
         var self = this;
         this.editing(false);
-        //remove session if it's empty
-        this.sessions().forEach(function(session) {
-            if (session.info().trim().length === 0){
-                self.sessions.remove(session);
-            }
-        });
         this.placeRef.set(self.export(), function(err){
             if(err){
                 console.log("error: " + err);
@@ -146,19 +114,11 @@ var module = (function(){
     //This is the information we'd like to export, so that we exclude the marker property
     //If you add something here, make sure you adjust the createPlace function for importing the localStorage data correctly
     Place.prototype.export = function(){
-        var sessions = [];
-        this.sessions().forEach(function(session) {
-            var exportSession = {
-                info: session.info()
-            };
-            sessions.push(exportSession);
-        });
         return {
             name: this.name(),
             info: this.info(),
             id: this.id,
             latlng: this.latlng(),
-            sessions: sessions
         };
     };
 
@@ -202,12 +162,8 @@ var module = (function(){
         //Current value in the searchBox
         this.filterValue = ko.observable('');
 
-        this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, sessions = [], draggable = false) {
+        this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable = false) {
             var place = new Place(name, info, id, latlng, draggable);
-            sessions.forEach(function(sessionData) {
-                var session = new Session(sessionData.info);
-                place.sessions.push(session);
-            });
             return place;
         };
 
@@ -372,7 +328,7 @@ var module = (function(){
                 break;
             default:
                 alert('The file with extension ' + ext + " is not allowed.\n" +
-                        "Please try again with a jpg, jpeg, png or bmp file.")
+                        "Please try again with a jpg, jpeg, png or bmp file.");
                 //reset selected and resized image 
                 this.selectedFile = null;
                 this.resizedImage = null;
@@ -389,7 +345,7 @@ var module = (function(){
                 self.resizedImage = null;
             }
             // start processing image in background (worker?)
-            imageResizer.resizeImage(event.target.result, function(result){self.resizedImage = result});
+            imageResizer.resizeImage(event.target.result, function(result){self.resizedImage = result;});
             // if they click upload image before finished (processedImage = false), then it should wait
         };
         // Read in the image file as a data URL.
@@ -431,7 +387,7 @@ var module = (function(){
             var downloadURL = uploadTask.snapshot.downloadURL;
             console.log(downloadURL);
         });
-    }
+    };
 
     ViewModel.prototype.exportLocations = function() {
         var self = this;
@@ -456,7 +412,7 @@ var module = (function(){
             self.places = ko.observableArray([]);
             snap.forEach(function(childSnapshot){
                 var place = childSnapshot.val();
-                var newPlace = self.createPlace(place.name, place.info, childSnapshot.key, place.latlng, place.sessions);
+                var newPlace = self.createPlace(place.name, place.info, childSnapshot.key, place.latlng);
                 self.places.push(newPlace);
             });
 

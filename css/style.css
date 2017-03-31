@@ -100,33 +100,25 @@ html, body {
   .info__info--edit {
     width: 100%;
     height: 40%; }
-
-.sessions {
-  box-sizing: border-box;
-  width: 100%; }
-
-.session__info, .session__info--edit {
-  box-sizing: border-box;
-  width: 100%; }
-.session__images-input {
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1; }
-.session__preview-image {
-  display: block;
-  max-height: 200px;
-  max-width: 200px; }
-.session__images-upload-btn, .session__images-select-btn {
-  padding: 1px 6px;
-  box-sizing: border-box;
-  text-transform: uppercase;
-  text-align: left;
-  outline: none; }
-.session__images-upload-btn.hidden {
-  display: none; }
+  .info__images-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1; }
+  .info__preview-image {
+    display: block;
+    max-height: 200px;
+    max-width: 200px; }
+  .info__images-upload-btn, .info__images-select-btn {
+    padding: 1px 6px;
+    box-sizing: border-box;
+    text-transform: uppercase;
+    text-align: left;
+    outline: none; }
+  .info__images-upload-btn.hidden {
+    display: none; }
 
 header {
   height: 2rem;
