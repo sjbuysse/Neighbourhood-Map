@@ -358,8 +358,10 @@ var module = (function(){
 
     //Handle image selecting
     ViewModel.prototype.handleImageSelect = function(data, evt) {
+        var self = this;
         var preview = document.getElementById('previewImg');
         this.selectedFile = evt.target.files[0]; // save the selected file in your ViewModel
+        this.resizedImage = null;
         //check if selected file extension is allowed
         var ext = this.selectedFile.name.match(/\.([^\.]+)$/)[1];
         switch(ext.toLowerCase()) {
@@ -371,15 +373,24 @@ var module = (function(){
             default:
                 alert('The file with extension ' + ext + " is not allowed.\n" +
                         "Please try again with a jpg, jpeg, png or bmp file.")
+                //reset selected and resized image 
                 this.selectedFile = null;
+                this.resizedImage = null;
                 return;
         }
 
-        //preview images, add show upload button
+        //preview images, show upload button, and start resizing image for upload
         var reader = new FileReader();
         reader.onload = function(event) {
             preview.src = event.target.result;
             document.getElementById('images-upload-btn').classList.remove("hidden");
+            //reset resized image 
+            if(self.resizedImage){
+                self.resizedImage = null;
+            }
+            // start processing image in background (worker?)
+            imageResizer.resizeImage(event.target.result, function(result){self.resizedImage = result});
+            // if they click upload image before finished (processedImage = false), then it should wait
         };
         // Read in the image file as a data URL.
         reader.readAsDataURL(this.selectedFile);
@@ -388,8 +399,13 @@ var module = (function(){
     //upload selected images to firebase
     ViewModel.prototype.uploadImage = function() {
         document.getElementById('images-upload-btn').classList.add("hidden");
+        //if(this.resizedImage === null ){
+            //console.log("Image is still resizing, will try again in 1 sec");
+            //setTimeout(this.uploadImage, 1000);
+            //return;
+        //}
         var imageStorageRef = this.storageRef.child('/images/' + this.selectedFile.name);
-        var uploadTask = imageStorageRef.put(this.selectedFile);
+        var uploadTask = imageStorageRef.put(this.resizedImage);
         // Register three observers:
         // 1. 'state_changed' observer, called any time the state changes
         // 2. Error observer, called on failure
