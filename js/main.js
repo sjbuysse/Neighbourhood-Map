@@ -384,7 +384,7 @@ var module = (function(){
         }, function(error) {
             // Handle unsuccessful uploads
             // Closure to ensure that placeKey and imageName are still relevant after image has uploaded
-        }, (function(placeKey, imageName){
+        }, (function(selectedPlace, imageName){
             return function() {
                 // Handle successful uploads on complete
                 // Upload image meta data to firebase
@@ -393,15 +393,17 @@ var module = (function(){
                 var updates = {};
                 var imageData = {
                     'url': downloadURL,
-                    'place': placeKey,
+                    'place': selectedPlace.placeRef.key,
                     'caption': 'kaasjes',
                     'name': imageName
                     //'user': user.uid
                 }
                 updates['images/' + imageKey] = imageData;
                 self.databaseRef.update(updates);
+                // Add imagedata to place instance
+                selectedPlace.images.push(imageData);
             }
-        })(self.selectedPlace().placeRef.key, self.selectedFile.name));
+        })(self.selectedPlace(), self.selectedFile.name));
     };
 
     ViewModel.prototype.exportLocations = function() {
