@@ -64,13 +64,16 @@ var module = (function(){
         })(self));
         return marker;
     };
-
+//make variables for images.forEach(function(image){image.caption}),  and be able to edit them. 
+//change export, so that it exports also these captions and that they be automatically uploaded
+//when saving th edit
     //Method to set the place in edit mode
     Place.prototype.setEditing = function(){
         var self = this;
         this.editing(true);
         this.previousName = this.name();
         this.previousInfo = this.info();
+        this.previousImages = this.images();
     };
 
     Place.prototype.setDraggable = function() {
@@ -83,6 +86,7 @@ var module = (function(){
         this.editing(false);
         this.name(this.previousName);
         this.info(this.previousInfo);
+        this.images(this.previousImages);
     };
 
     Place.prototype.saveEditing = function(){
@@ -93,6 +97,9 @@ var module = (function(){
                 console.log("error: " + err);
             }
         });
+        this.images().forEach(function(imageObject){
+
+        })
     };
 
     Place.prototype.updateLocation = function(){
@@ -114,7 +121,7 @@ var module = (function(){
 
     //This is the information we'd like to export, so that we exclude the marker property
     //If you add something here, make sure you adjust the createPlace function for importing the localStorage data correctly
-    Place.prototype.export = function(){
+    Place.prototype.export = function() {
         return {
             name: this.name(),
             info: this.info(),
@@ -122,6 +129,21 @@ var module = (function(){
             latlng: this.latlng(),
         };
     };
+
+    //var Image = function(url ){
+        //this.url = url;
+        //this.place': selectedPlace.placeRef.key,
+        //'caption': caption,
+        //'name': imageName
+        //this.name = ;
+        //this.placeRef = firebase.database().ref().child('places').child(this.id);
+    //}
+
+    //Image.prototype.export = function() {
+        //return {
+            //this.
+        //}
+    //}
 
     //ViewModel
     var ViewModel = function(){
@@ -330,9 +352,7 @@ var module = (function(){
             default:
                 alert('The file with extension ' + ext + " is not allowed.\n" +
                         "Please try again with a jpg, jpeg, png or bmp file.");
-                //reset selected and resized image 
-                this.selectedFile = null;
-                this.resizedImage = null;
+                this.resetUploadVariables();
                 return;
         }
 
@@ -341,7 +361,8 @@ var module = (function(){
         reader.onload = function(event) {
             preview.src = event.target.result;
             document.getElementById('images-upload-btn').classList.remove("hidden");
-            //reset resized image 
+            document.getElementById('image-caption').classList.remove("hidden");
+            //reset resized image if still present from last time
             if(self.resizedImage){
                 self.resizedImage = null;
             }
@@ -353,16 +374,31 @@ var module = (function(){
         reader.readAsDataURL(this.selectedFile);
     };
 
+    ViewModel.prototype.resetUploadVariables = function(){
+        this.resizedImage = null;
+        this.selectedFile = null;
+        document.getElementById('previewImg').src = "";
+        document.getElementById('image-caption').value = "";
+    }
+
     //upload selected images to firebase
     ViewModel.prototype.uploadImage = function() {
         var self = this;
         document.getElementById('images-upload-btn').classList.add("hidden");
+        document.getElementById('image-caption').classList.add("hidden");
         //if(this.resizedImage === null ){
             //console.log("Image is still resizing, will try again in 1 sec");
             //setTimeout(this.uploadImage, 1000);
             //return;
         //}
-        var imageStorageRef = this.storageRef.child('/images/' + this.selectedFile.name);
+        var caption = document.getElementById('image-caption').value;
+
+        //local referenc of selectedPlace, to make sure all async functions have access to it.
+        var selectedPlace = this.selectedPlace;
+        var selectedPlaceKey = this.selectedPlace().placeRef.key;
+
+        var imageStorageRef = this.storageRef.child('/images/' + selectedPlaceKey + "/" 
+                + this.selectedFile.name);
         var uploadTask = imageStorageRef.put(this.resizedImage);
         // Register three observers:
         // 1. 'state_changed' observer, called any time the state changes
@@ -383,27 +419,28 @@ var module = (function(){
             }
         }, function(error) {
             // Handle unsuccessful uploads
-            // Closure to ensure that placeKey and imageName are still relevant after image has uploaded
-        }, (function(selectedPlace, imageName){
+            console.log("There occured an error while uploading the file to the server :" + error);
+            self.resetUploadVariables();
+        }, (function(imageName, caption){  // Closure to ensure that placeKey and imageName are still relevant after image has uploaded
             return function() {
                 // Handle successful uploads on complete
                 // Upload image meta data to firebase
                 var downloadURL = uploadTask.snapshot.downloadURL;
-                var imageKey = self.databaseRef.child('images/').push().key;
+                var imageKey = self.databaseRef.child('images/' + selectedPlaceKey).push().key;
                 var updates = {};
                 var imageData = {
                     'url': downloadURL,
-                    'place': selectedPlace.placeRef.key,
-                    'caption': 'kaasjes',
+                    'caption': caption,
                     'name': imageName
                     //'user': user.uid
-                }
-                updates['images/' + imageKey] = imageData;
+                };
+                updates['images/' + selectedPlaceKey + "/" + imageKey] = imageData;
                 self.databaseRef.update(updates);
                 // Add imagedata to place instance
-                selectedPlace.images.push(imageData);
-            }
-        })(self.selectedPlace(), self.selectedFile.name));
+                selectedPlace().images.push(imageData);
+                self.resetUploadVariables();
+            };
+        })(self.selectedFile.name, caption));
     };
 
     ViewModel.prototype.exportLocations = function() {
@@ -429,16 +466,17 @@ var module = (function(){
             self.places = ko.observableArray([]);
             snap.forEach(function(childSnapshot){
                 var place = childSnapshot.val();
-                var newPlace = self.createPlace(place.name, place.info, childSnapshot.key, place.latlng);
+                var placeKey = childSnapshot.key;
+                var newPlace = self.createPlace(place.name, place.info, placeKey, place.latlng);
                 self.places.push(newPlace);
                 // Add image metadata to place instance
-                self.databaseRef.child('images/').orderByChild('place').equalTo(childSnapshot.key)
+                self.databaseRef.child('images/' + placeKey)
                 .once('value', (function(newPlace){
                     return function(imagesSnap){
                         imagesSnap.forEach(function(imageSnap){
                             newPlace.images.push(imageSnap.val());
-                        })
-                    }
+                        });
+                    };
                 })(newPlace));
             });
 
@@ -476,12 +514,11 @@ var module = (function(){
 
         this.placesRef.on('child_removed', function(snap){
             var placeKey = snap.key;
-            query = self.databaseRef.child('images/').orderByChild('place').equalTo(placeKey);
-            query.once('value')
-            .then(function(snap){
+            self.databaseRef.child('images/'+ placeKey)
+            .once('value').then(function(snap){
                 snap.forEach(function(childSnap){
                     //remove actual images from storage
-                    self.storageRef.child('images/' + childSnap.val().name).delete()
+                    self.storageRef.child('images/' + placeKey + "/" + childSnap.val().name).delete()
                     .then(function(){
                         // if success
                         // remove images metadata in database
@@ -489,12 +526,12 @@ var module = (function(){
                             if(err){
                                 console.log("Error when removing image metadata " + err);
                             }
-                        })
+                        });
                     }).catch(function(err){
                             console.log("Error when removing image from cloud storage :" + err);
                     });
-                })
-            })
+                });
+            });
         });
     };
 
