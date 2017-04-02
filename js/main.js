@@ -18,6 +18,7 @@ var module = (function(){
         this.draggable = ko.observable(draggable);
         this.visible = ko.observable(true);
         this.selected = ko.observable(false);
+        this.images = ko.observableArray([]);
         //only create markers if the google API is working.
         if(typeof google){
             this.marker = this.createMarker();
@@ -354,6 +355,7 @@ var module = (function(){
 
     //upload selected images to firebase
     ViewModel.prototype.uploadImage = function() {
+        var self = this;
         document.getElementById('images-upload-btn').classList.add("hidden");
         //if(this.resizedImage === null ){
             //console.log("Image is still resizing, will try again in 1 sec");
@@ -381,12 +383,25 @@ var module = (function(){
             }
         }, function(error) {
             // Handle unsuccessful uploads
-        }, function() {
-            // Handle successful uploads on complete
-            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-            var downloadURL = uploadTask.snapshot.downloadURL;
-            console.log(downloadURL);
-        });
+            // Closure to ensure that placeKey and imageName are still relevant after image has uploaded
+        }, (function(placeKey, imageName){
+            return function() {
+                // Handle successful uploads on complete
+                // Upload image meta data to firebase
+                var downloadURL = uploadTask.snapshot.downloadURL;
+                var imageKey = self.databaseRef.child('images/').push().key;
+                var updates = {};
+                var imageData = {
+                    'url': downloadURL,
+                    'place': placeKey,
+                    'caption': 'kaasjes',
+                    'name': imageName
+                    //'user': user.uid
+                }
+                updates['images/' + imageKey] = imageData;
+                self.databaseRef.update(updates);
+            }
+        })(self.selectedPlace().placeRef.key, self.selectedFile.name));
     };
 
     ViewModel.prototype.exportLocations = function() {
@@ -414,7 +429,18 @@ var module = (function(){
                 var place = childSnapshot.val();
                 var newPlace = self.createPlace(place.name, place.info, childSnapshot.key, place.latlng);
                 self.places.push(newPlace);
+                // Add image metadata to place instance
+                self.databaseRef.child('images/').orderByChild('place').equalTo(childSnapshot.key)
+                .once('value', (function(newPlace){
+                    return function(imagesSnap){
+                        imagesSnap.forEach(function(imageSnap){
+                            newPlace.images.push(imageSnap.val());
+                        })
+                    }
+                })(newPlace));
             });
+
+
 
             //Source: I created this computed observable after getting some ideas from Tamas Krasser
             self.filterPlaces = ko.computed(function() {
@@ -444,6 +470,29 @@ var module = (function(){
             }
 
             ko.applyBindings(vm);
+        });
+
+        this.placesRef.on('child_removed', function(snap){
+            var placeKey = snap.key;
+            query = self.databaseRef.child('images/').orderByChild('place').equalTo(placeKey);
+            query.once('value')
+            .then(function(snap){
+                snap.forEach(function(childSnap){
+                    //remove actual images from storage
+                    self.storageRef.child('images/' + childSnap.val().name).delete()
+                    .then(function(){
+                        // if success
+                        // remove images metadata in database
+                        childSnap.ref.remove(function(err){
+                            if(err){
+                                console.log("Error when removing image metadata " + err);
+                            }
+                        })
+                    }).catch(function(err){
+                            console.log("Error when removing image from cloud storage :" + err);
+                    });
+                })
+            })
         });
     };
 
