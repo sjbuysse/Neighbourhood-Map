@@ -98,7 +98,8 @@ var module = (function(){
             }
         });
         this.images().forEach(function(imageObject){
-
+            imageRef = firebase.database().ref().child('images/' + self.id + "/" + imageObject.key);
+            imageRef.set(imageObject.export());
         })
     };
 
@@ -130,17 +131,19 @@ var module = (function(){
         };
     };
 
-    var Image = function(url, caption, name){
+    var Image = function(url, caption, name, key){
         this.url = ko.observable(url);
         this.caption = ko.observable(caption);
         this.name = ko.observable(name);
+        this.key = key;
     }
 
     Image.prototype.export = function() {
         return {
             url: this.url(),
             caption: this.caption(),
-            name: this.name()
+            name: this.name(),
+            key: this.key
         }
     }
 
@@ -430,13 +433,14 @@ var module = (function(){
                 var imageData = {
                     'url': downloadURL,
                     'caption': caption,
-                    'name': imageName
+                    'name': imageName,
+                    'key': imageKey
                     //'user': user.uid
                 };
                 updates['images/' + selectedPlaceKey + "/" + imageKey] = imageData;
                 self.databaseRef.update(updates);
                 // Add imagedata to place instance
-                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name));
+                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
                 self.resetUploadVariables();
             };
         })(self.selectedFile.name, caption));
@@ -474,7 +478,7 @@ var module = (function(){
                     return function(imagesSnap){
                         imagesSnap.forEach(function(imageSnap){
                             var imageObj = imageSnap.val();
-                            newPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name));
+                            newPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name, imageObj.key));
                         });
                     };
                 })(newPlace));
