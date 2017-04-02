@@ -130,20 +130,19 @@ var module = (function(){
         };
     };
 
-    //var Image = function(url ){
-        //this.url = url;
-        //this.place': selectedPlace.placeRef.key,
-        //'caption': caption,
-        //'name': imageName
-        //this.name = ;
-        //this.placeRef = firebase.database().ref().child('places').child(this.id);
-    //}
+    var Image = function(url, caption, name){
+        this.url = ko.observable(url);
+        this.caption = ko.observable(caption);
+        this.name = ko.observable(name);
+    }
 
-    //Image.prototype.export = function() {
-        //return {
-            //this.
-        //}
-    //}
+    Image.prototype.export = function() {
+        return {
+            url: this.url(),
+            caption: this.caption(),
+            name: this.name()
+        }
+    }
 
     //ViewModel
     var ViewModel = function(){
@@ -437,7 +436,7 @@ var module = (function(){
                 updates['images/' + selectedPlaceKey + "/" + imageKey] = imageData;
                 self.databaseRef.update(updates);
                 // Add imagedata to place instance
-                selectedPlace().images.push(imageData);
+                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name));
                 self.resetUploadVariables();
             };
         })(self.selectedFile.name, caption));
@@ -474,7 +473,8 @@ var module = (function(){
                 .once('value', (function(newPlace){
                     return function(imagesSnap){
                         imagesSnap.forEach(function(imageSnap){
-                            newPlace.images.push(imageSnap.val());
+                            var imageObj = imageSnap.val();
+                            newPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name));
                         });
                     };
                 })(newPlace));
