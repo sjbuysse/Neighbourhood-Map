@@ -469,6 +469,26 @@ var module = (function(){
 
     //Initialize all places and markers 
     ViewModel.prototype.init = function() {
+        var provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            console.log("kaas");
+            var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            // ...
+        }).catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            console.log(errorMessage);
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            // ...
+        });
+
         var self = this;
         // Collection of places, create a new Place object with observable properties for each of these places. 
         this.databaseRef = firebase.database().ref();
@@ -554,11 +574,6 @@ var module = (function(){
         vm = new ViewModel();
         vm.init();
     }
-
-    //return places from the ViewModel (mostly for debugging reasons)
-    methods.getPlaces  = function(){
-        return vm.places();
-    };
 
     //Init viewmodel without google maps (if the API Fails to load)
     methods.initWithoutMap = function(){
