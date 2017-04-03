@@ -73,7 +73,10 @@ var module = (function(){
         this.editing(true);
         this.previousName = this.name();
         this.previousInfo = this.info();
-        this.previousImages = this.images();
+        this.previousImages = [];
+        this.images().forEach(function(image){
+            self.previousImages.push(image.export());
+        });
     };
 
     Place.prototype.setDraggable = function() {
@@ -86,7 +89,13 @@ var module = (function(){
         this.editing(false);
         this.name(this.previousName);
         this.info(this.previousInfo);
-        this.images(this.previousImages);
+        // Reset caption
+        this.previousImages.forEach(function(prevImage){
+            var image = this.images.filter(function(image){
+                return image.key === prevImage.key;
+            });
+            image.caption(prevImage.caption);
+        });
     };
 
     Place.prototype.saveEditing = function(){

@@ -132,18 +132,19 @@ html, body {
     margin-top: 0.7rem;
     width: 200px;
     height: 4rem; }
-  .info__images {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    width: 100%; }
-    .info__images__image {
-      width: 47%;
-      align-self: center;
-      margin-top: 0.7rem; }
-    .info__images__image-caption {
-      width: 47%;
-      text-align: right; }
+
+.images {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%; }
+  .images__image {
+    width: 47%;
+    align-self: center;
+    margin-top: 0.7rem; }
+  .images__image-caption {
+    width: 47%;
+    text-align: right; }
 
 header {
   height: 2rem;

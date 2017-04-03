@@ -187,20 +187,20 @@ html, body{
         width: 200px;
         height: 4rem;
     }
-    &__images{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        width: 100%;
-        &__image{
-            width: 47%;
-            align-self: center;
-            margin-top: 0.7rem;
-        }
-        &__image-caption{
-            width: 47%;
-            text-align: right;
-        }
+}
+.images{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    &__image{
+        width: 47%;
+        align-self: center;
+        margin-top: 0.7rem;
+    }
+    &__image-caption{
+        width: 47%;
+        text-align: right;
     }
 }
 
