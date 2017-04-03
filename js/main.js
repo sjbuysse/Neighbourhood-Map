@@ -469,103 +469,101 @@ var module = (function(){
 
     //Initialize all places and markers 
     ViewModel.prototype.init = function() {
-        var provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).then(function(result) {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            console.log("kaas");
-            var token = result.credential.accessToken;
-            // The signed-in user info.
-            var user = result.user;
-            // ...
-        }).catch(function(error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            console.log(errorMessage);
-            // The email of the user's account used.
-            var email = error.email;
-            // The firebase.auth.AuthCredential type that was used.
-            var credential = error.credential;
-            // ...
-        });
-
         var self = this;
+        self.places = ko.observableArray([]);
         // Collection of places, create a new Place object with observable properties for each of these places. 
-        this.databaseRef = firebase.database().ref();
-        this.placesRef = this.databaseRef.child('places');
-        this.storageRef = firebase.storage().ref();
-        this.placesRef.once('value', function(snap){
-            self.places = ko.observableArray([]);
-            snap.forEach(function(childSnapshot){
-                var place = childSnapshot.val();
-                var placeKey = childSnapshot.key;
-                var newPlace = self.createPlace(place.name, place.info, placeKey, place.latlng);
-                self.places.push(newPlace);
-                // Add image metadata to place instance
-                self.databaseRef.child('images/' + placeKey)
-                .once('value', (function(newPlace){
-                    return function(imagesSnap){
-                        imagesSnap.forEach(function(imageSnap){
-                            var imageObj = imageSnap.val();
-                            newPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name, imageObj.key));
-                        });
-                    };
-                })(newPlace));
-            });
-
-
-
-            //Source: I created this computed observable after getting some ideas from Tamas Krasser
-            self.filterPlaces = ko.computed(function() {
-                var filter = self.filterValue().toLowerCase();
-
-                self.places().forEach(function(place) {
-                    if (place.name().toLowerCase().indexOf(filter) > -1) {
-                        place.visible(true);
+        firebase.auth().onAuthStateChanged(function(user) {
+            if(user){
+                document.getElementById('auth-modal').className += " hidden";
+                
+                self.databaseRef = firebase.database().ref();
+                self.userRef = self.databaseRef.child('user').child(user.uid);
+                self.userRef.once('value', function(snapshot){
+                    if(snapshot.exists()){
+                        //cool, load all places
+                        console.log("exists");
                     } else {
-                        place.visible(false);
+                        // create userNode
+                        
                     }
                 });
-            });
-
-            self.selectedPlace = ko.observable(self.places()[0]);
-
-            self.googleDefined = false;
-
-            if(typeof google !== 'undefined'){
-                self.googleDefined = true;
+                self.placesRef = self.databaseRef.child('places');
+                self.storageRef = firebase.storage().ref();
+                self.placesRef.once('value', function(snap){
+                    snap.forEach(function(childSnapshot){
+                        var place = childSnapshot.val();
+                        var placeKey = childSnapshot.key;
+                        var newPlace = self.createPlace(place.name, place.info, placeKey, place.latlng);
+                        self.places.push(newPlace);
+                        // Add image metadata to place instance
+                        self.databaseRef.child('images/' + placeKey)
+                        .once('value', (function(newPlace){
+                            return function(imagesSnap){
+                                imagesSnap.forEach(function(imageSnap){
+                                    var imageObj = imageSnap.val();
+                                    newPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name, imageObj.key));
+                                });
+                            };
+                        })(newPlace));
+                    });
+                });
+            } else {
+              // User not logged out, so show authorization modal. 
+              document.getElementById('auth-modal').classList.remove('hidden');
             }
-
-            //Variable to hold the temporary new place during the creation process
-            if(self.googleDefined){
-                self.newPlace = self.createPlace("", "", self.places().length);
-                self.newPlace.visible(false);
-            }
-
-            ko.applyBindings(vm);
-        });
-
-        this.placesRef.on('child_removed', function(snap){
-            var placeKey = snap.key;
-            self.databaseRef.child('images/'+ placeKey)
-            .once('value').then(function(snap){
-                snap.forEach(function(childSnap){
-                    //remove actual images from storage
-                    self.storageRef.child('images/' + placeKey + "/" + childSnap.val().name).delete()
-                    .then(function(){
-                        // if success
-                        // remove images metadata in database
-                        childSnap.ref.remove(function(err){
-                            if(err){
-                                console.log("Error when removing image metadata " + err);
-                            }
+            self.placesRef.on('child_removed', function(snap){
+                var placeKey = snap.key;
+                self.databaseRef.child('images/'+ placeKey)
+                .once('value').then(function(snap){
+                    snap.forEach(function(childSnap){
+                        //remove actual images from storage
+                        self.storageRef.child('images/' + placeKey + "/" + childSnap.val().name).delete()
+                        .then(function(){
+                            // if success
+                            // remove images metadata in database
+                            childSnap.ref.remove(function(err){
+                                if(err){
+                                    console.log("Error when removing image metadata " + err);
+                                }
+                            });
+                        }).catch(function(err){
+                                console.log("Error when removing image from cloud storage :" + err);
                         });
-                    }).catch(function(err){
-                            console.log("Error when removing image from cloud storage :" + err);
                     });
                 });
             });
         });
+
+
+        //Source: I created this computed observable after getting some ideas from Tamas Krasser
+        self.filterPlaces = ko.computed(function() {
+            var filter = self.filterValue().toLowerCase();
+
+            self.places().forEach(function(place) {
+                if (place.name().toLowerCase().indexOf(filter) > -1) {
+                    place.visible(true);
+                } else {
+                    place.visible(false);
+                }
+            });
+        });
+
+        self.selectedPlace = ko.observable(self.places()[0]);
+
+        self.googleDefined = false;
+
+        if(typeof google !== 'undefined'){
+            self.googleDefined = true;
+        }
+
+        //Variable to hold the temporary new place during the creation process
+        if(self.googleDefined){
+            self.newPlace = self.createPlace("", "", self.places().length);
+            self.newPlace.visible(false);
+        }
+
+        ko.applyBindings(vm);
+
     };
 
     function initViewModel(){

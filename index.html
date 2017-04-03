@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/style.css">
+        <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
         <script src="https://use.fontawesome.com/f300c85415.js"></script>
     </head>
@@ -28,6 +29,11 @@
                 <label for="file" data-bind="visible: supportFileAPI" class="drawer__filter__import-btn">Import locations</label>
             </div>
         </nav>
+        <div id="auth-modal" class="modal hidden">
+            <div class="modal-content">
+                <div id="firebaseui-auth-container"></div>
+            </div>  
+        </div>
         <div class="create-location" data-bind="css:{'create-location--open': creatingPlace()}">
             <i class="fa fa-plus" aria-hidden="true" data-bind="click: toggleCreatingPlace"></i>
             <i class="fa fa-minus" aria-hidden="true" data-bind="click: toggleCreatingPlace"></i>
@@ -110,6 +116,24 @@
             messagingSenderId: "246363609320"
           };
           firebase.initializeApp(config);
+        </script>
+        <script src="bower_components/firebaseui/dist/firebaseui.js"></script>
+        <script type="text/javascript">
+            // FirebaseUI config.
+            var uiConfig = {
+                signInFlow: 'popup',
+                signInOptions: [
+                    // Leave the lines as is for the providers you want to offer your users.
+                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                    firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+                    firebase.auth.EmailAuthProvider.PROVIDER_ID
+                ]
+            };
+
+            // Initialize the FirebaseUI Widget using Firebase.
+            var ui = new firebaseui.auth.AuthUI(firebase.auth());
+            // The start method will wait until the DOM is loaded.
+            ui.start('#firebaseui-auth-container', uiConfig);
         </script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=module.initMap" onerror="module.initWithoutMap()" async defer></script>
     </body>
