@@ -187,6 +187,7 @@ html, body {
   width: 100%; }
   .images__image {
     width: 47%;
+    max-height: 300px;
     align-self: center;
     margin-top: 0.7rem; }
   .images__image-caption {
