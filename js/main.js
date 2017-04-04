@@ -1,9 +1,10 @@
 /*jshint esversion: 6 */
 var module = (function(){
-    //global variables for the google map, google infowindow, and viewmodel instance
+    //global variables for the google map, google infowindow, viewmodel and logged in user instance
     var map;
     var infoWindow;
     var vm;
+    var user;
 
     //Object that holds the methods that we need to access from outside this module
     var methods = {};
@@ -19,11 +20,15 @@ var module = (function(){
         this.visible = ko.observable(true);
         this.selected = ko.observable(false);
         this.images = ko.observableArray([]);
-        //only create markers if the google API is working.
+        // Only create markers if the google API is working.
         if(typeof google){
             this.marker = this.createMarker();
         }
-        this.placeRef = firebase.database().ref().child('places').child(this.id);
+        // Only create a firebase reference if a user has logged in;
+        if(user){
+            this.placeRef = firebase.database().ref().child('userObjects')
+                .child('places').child(user.uid).child(this.id);
+        }
     };
 
     //Create a marker for the place
@@ -109,7 +114,7 @@ var module = (function(){
         this.images().forEach(function(imageObject){
             imageRef = firebase.database().ref().child('images/' + self.id + "/" + imageObject.key);
             imageRef.set(imageObject.export());
-        })
+        });
     };
 
     Place.prototype.updateLocation = function(){
@@ -145,7 +150,8 @@ var module = (function(){
         this.caption = ko.observable(caption);
         this.name = ko.observable(name);
         this.key = key;
-    }
+        this.imageRef = vm.imagesRef.child(this.key);
+    };
 
     Image.prototype.export = function() {
         return {
@@ -153,8 +159,8 @@ var module = (function(){
             caption: this.caption(),
             name: this.name(),
             key: this.key
-        }
-    }
+        };
+    };
 
     //ViewModel
     var ViewModel = function(){
@@ -167,7 +173,7 @@ var module = (function(){
 
         //Methods to toggle state of UI
         this.toggleShowDrawer = function(){
-            if(!self.selectedPlace().draggable()) {
+            if(self.places.length === 0 || !self.selectedPlace().draggable()) {
                 self.showDrawer(!self.showDrawer());
                 if(self.showDrawer){
                     self.creatingPlace(false);
@@ -177,7 +183,7 @@ var module = (function(){
             }
         };
         this.toggleCreatingPlace = function(){
-            if(self.googleDefined && !self.selectedPlace().draggable()){
+            if(self.googleDefined && (self.places.length === 0 || !self.selectedPlace().draggable())){
                 self.creatingPlace(!self.creatingPlace());
                 if(self.creatingPlace){
                     self.showDrawer(false);
@@ -219,11 +225,11 @@ var module = (function(){
             var latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()};
             var info = self.newPlace.info();
             // Get a key for a new Place.
-            var newPostKey = firebase.database().ref().push().key;
+            var newPostKey = self.placesRef.push().key;
             var id = newPostKey;
             var draggable = true;
             var addedPlace = self.createPlace(name, info, id, latlng);
-            this.placesRef.child(newPostKey).update(addedPlace.export(), function(err){
+            this.placesRef.child(newPostKey).update(addedPlace.export(), function handleError(err){
                 if(err){
                     console.log("error: " + err);
                 }
@@ -240,11 +246,18 @@ var module = (function(){
 
         //Set the selectedPlace to the passed in place
         this.setSelectedPlace = function(place){
-            if(this.selectedPlace() === place){
+            if(this.places.length === 0) {
+                // This is the first place that the user adds. 
+                this.selectedPlace(place);
+                //Set selected property of selectedPlace to true;
+                this.selectedPlace().selected(true);
+                return true;
+                // No need for the following checks, since this is the first place.
+            } else if(this.selectedPlace() === place){
                 return true;
             }
             //You can only change the selected place if you're not editing or dragging a place. 
-            else if(this.selectedPlace().editing() || this.selectedPlace().draggable()){
+            else if((this.selectedPlace().editing() || this.selectedPlace().draggable())){
                 alert("Please save or cancel the changes you've made to the currently selected place before selecting another.");
                 return false;
             } 
@@ -258,10 +271,10 @@ var module = (function(){
 
         //Remove place and associated marker from collection
         this.removeLocation = function(place){
-            place.placeRef.remove(function(err){
+            place.placeRef.remove(function handleError(err){
                 if(err){
                     console.log("error: " + err);
-                }
+                } 
             });
             place.marker.setVisible(false);
             infoWindow.close();
@@ -296,7 +309,7 @@ var module = (function(){
 
                 //We need to apply the bindings for this new infowindow (because it didn't exist at the time of applying bindings to the ViewModel)
                 ko.applyBindings(self, document.getElementById('infoWindow'));
-                infoWindow.addListener('closeclick', function(){
+                infoWindow.addListener('closeclick', function setMarkerToNull(){
                     infoWindow.marker = null;
                 });
             }
@@ -331,7 +344,7 @@ var module = (function(){
             var data = event.target.result;
             var jsonData = JSON.parse(data);
 
-            self.databaseRef.set(jsonData, function(err){
+            self.databaseRef.set(jsonData, function handleError(err){
                 if(err){
                     console.log("error: " + err);
                 } else {
@@ -390,7 +403,7 @@ var module = (function(){
         this.selectedFile = null;
         document.getElementById('previewImg').src = "";
         document.getElementById('image-caption').value = "";
-    }
+    };
 
     //upload selected images to firebase
     ViewModel.prototype.uploadImage = function() {
@@ -404,18 +417,39 @@ var module = (function(){
         //}
         var caption = document.getElementById('image-caption').value;
 
-        //local referenc of selectedPlace, to make sure all async functions have access to it.
+        //local reference of selectedPlace, to make sure all async functions have access to it.
         var selectedPlace = this.selectedPlace;
         var selectedPlaceKey = this.selectedPlace().placeRef.key;
 
-        var imageStorageRef = this.storageRef.child('/images/' + selectedPlaceKey + "/" 
-                + this.selectedFile.name);
+        var imageStorageRef = this.storageRef.child('/images/' + selectedPlaceKey + "/" +
+                this.selectedFile.name);
         var uploadTask = imageStorageRef.put(this.resizedImage);
         // Register three observers:
         // 1. 'state_changed' observer, called any time the state changes
         // 2. Error observer, called on failure
         // 3. Completion observer, called on successful completion
-        uploadTask.on('state_changed', function(snapshot){
+        uploadTask.on('state_changed', showUploadProgress, handleError, 
+                (function(imageName, caption){  // Closure to ensure that placeKey and imageName are still relevant after image has uploaded
+            return function uploadMetaData() {
+                // Handle successful uploads on complete
+                // Upload image meta data to firebase
+                var downloadURL = uploadTask.snapshot.downloadURL;
+                var imageKey = self.imagesRef.child(selectedPlaceKey).push().key;
+                var updates = {};
+                var imageData = {
+                    'url': downloadURL,
+                    'caption': caption,
+                    'name': imageName,
+                    'key': imageKey
+                    //'user': user.uid
+                };
+                self.imagesRef.child(selectedPlaceKey).child(imageKey).update(imageData);
+                // Add imagedata to place instance
+                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
+                self.resetUploadVariables();
+            };
+        })(self.selectedFile.name, caption));
+        function showUploadProgress(snapshot){
             // Observe state change events such as progress, pause, and resume
             // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -428,31 +462,34 @@ var module = (function(){
                     console.log('Upload is running');
                     break;
             }
-        }, function(error) {
+        }
+
+        function handleError(error) {
             // Handle unsuccessful uploads
             console.log("There occured an error while uploading the file to the server :" + error);
             self.resetUploadVariables();
-        }, (function(imageName, caption){  // Closure to ensure that placeKey and imageName are still relevant after image has uploaded
-            return function() {
-                // Handle successful uploads on complete
-                // Upload image meta data to firebase
-                var downloadURL = uploadTask.snapshot.downloadURL;
-                var imageKey = self.databaseRef.child('images/' + selectedPlaceKey).push().key;
-                var updates = {};
-                var imageData = {
-                    'url': downloadURL,
-                    'caption': caption,
-                    'name': imageName,
-                    'key': imageKey
-                    //'user': user.uid
-                };
-                updates['images/' + selectedPlaceKey + "/" + imageKey] = imageData;
-                self.databaseRef.update(updates);
-                // Add imagedata to place instance
-                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
-                self.resetUploadVariables();
+        }
+
+        function uploadMetaData() {
+            // Handle successful uploads on complete
+            // Upload image meta data to firebase
+            var downloadURL = uploadTask.snapshot.downloadURL;
+            var imageKey = self.imagesRef.child(selectedPlaceKey).push().key;
+            var updates = {};
+            var imageData = {
+                'url': downloadURL,
+                'caption': caption,
+                'name': imageName,
+                'key': imageKey
+                //'user': user.uid
             };
-        })(self.selectedFile.name, caption));
+            //updates['images/' + selectedPlaceKey + "/" + imageKey] = imageData;
+            //self.databaseRef.update(updates);
+            self.imagesRef.child(selectedPlaceKey).child(imageKey).update(imageData);
+            // Add imagedata to place instance
+            selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
+            self.resetUploadVariables();
+        }
     };
 
     ViewModel.prototype.exportLocations = function() {
@@ -471,69 +508,99 @@ var module = (function(){
     ViewModel.prototype.init = function() {
         var self = this;
         self.places = ko.observableArray([]);
-        // Collection of places, create a new Place object with observable properties for each of these places. 
-        firebase.auth().onAuthStateChanged(function(user) {
-            if(user){
+        self.googleDefined = false;
+
+        if(typeof google !== 'undefined'){
+            self.googleDefined = true;
+        }
+
+        firebase.auth().onAuthStateChanged(function(loggedInUser) {
+            if(loggedInUser){
+                // Set the global user variable to the logged in user
+                user = loggedInUser;
                 document.getElementById('auth-modal').className += " hidden";
                 
                 self.databaseRef = firebase.database().ref();
-                self.userRef = self.databaseRef.child('user').child(user.uid);
+                self.userRef = self.databaseRef.child('users').child(user.uid);
                 self.userRef.once('value', function(snapshot){
                     if(snapshot.exists()){
-                        //cool, load all places
-                        console.log("exists");
+                        // Cool, been here before.
+                        console.log("Existing user");
                     } else {
-                        // create userNode
-                        
+                        // New user, create some nodes
+                        console.log("New user");
+                        console.log(user.uid);
                     }
                 });
-                self.placesRef = self.databaseRef.child('places');
-                self.storageRef = firebase.storage().ref();
+                self.placesRef = self.databaseRef.child('userObjects').child('places').child(user.uid);
+                self.imagesRef = self.databaseRef.child('userObjects').child('images').child(user.uid);
+                self.storageRef = firebase.storage().ref().child(user.uid);
                 self.placesRef.once('value', function(snap){
                     snap.forEach(function(childSnapshot){
                         var place = childSnapshot.val();
                         var placeKey = childSnapshot.key;
-                        var newPlace = self.createPlace(place.name, place.info, placeKey, place.latlng);
-                        self.places.push(newPlace);
+                        var currentPlace = self.createPlace(place.name, place.info, placeKey, place.latlng);
+                        self.places.push(currentPlace);
                         // Add image metadata to place instance
-                        self.databaseRef.child('images/' + placeKey)
-                        .once('value', (function(newPlace){
+                        self.imagesRef.child(placeKey)
+                        .once('value', (function(currentPlace){
                             return function(imagesSnap){
                                 imagesSnap.forEach(function(imageSnap){
                                     var imageObj = imageSnap.val();
-                                    newPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name, imageObj.key));
+                                    currentPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name, imageObj.key));
                                 });
                             };
-                        })(newPlace));
+                        })(currentPlace));
                     });
+                });
+                self.placesRef.on('child_removed', function(snap){
+                    var placeKey = snap.key;
+                    console.log("plcaKey " + placeKey);
+                    self.imagesRef.child(placeKey)
+                    .once('value').then(removePlaceImages);
                 });
             } else {
               // User not logged out, so show authorization modal. 
               document.getElementById('auth-modal').classList.remove('hidden');
+              self.userRef = null;
+              return;
             }
-            self.placesRef.on('child_removed', function(snap){
-                var placeKey = snap.key;
-                self.databaseRef.child('images/'+ placeKey)
-                .once('value').then(function(snap){
-                    snap.forEach(function(childSnap){
-                        //remove actual images from storage
-                        self.storageRef.child('images/' + placeKey + "/" + childSnap.val().name).delete()
-                        .then(function(){
-                            // if success
-                            // remove images metadata in database
-                            childSnap.ref.remove(function(err){
-                                if(err){
-                                    console.log("Error when removing image metadata " + err);
-                                }
-                            });
-                        }).catch(function(err){
-                                console.log("Error when removing image from cloud storage :" + err);
-                        });
-                    });
-                });
-            });
         });
 
+        function removePlaceImages(snap){
+            snap.forEach(removeSingleImage);
+        };
+
+        function removeSingleImage(snap){
+            //remove actual images from storage
+            var placeKey = snap.key;
+            console.log(placeKey);
+            self.storageRef.child('images/' + placeKey + "/" + snap.val().name).delete()
+            .then(removeMetaData(snap))
+            .catch(handleStorageRemovalError);
+        };
+
+        function removeMetaData(snap){
+            // if success
+            // remove images metadata in database
+            snap.ref.remove(handleMetaDataRemovalError);
+        };
+
+        function handleMetaDataRemovalError(err){
+            if(err){
+                console.log("Error when removing image metadata " + err);
+            }
+        };
+
+        function handleStorageRemovalError(err){
+            console.log("Error when removing image from cloud storage :" + err);
+        };
+
+        //Variable to hold the temporary new place during the creation process
+        if(self.googleDefined){
+            self.newPlace = self.createPlace("", "", self.places().length);
+            self.newPlace.visible(false);
+        }
 
         //Source: I created this computed observable after getting some ideas from Tamas Krasser
         self.filterPlaces = ko.computed(function() {
@@ -549,18 +616,6 @@ var module = (function(){
         });
 
         self.selectedPlace = ko.observable(self.places()[0]);
-
-        self.googleDefined = false;
-
-        if(typeof google !== 'undefined'){
-            self.googleDefined = true;
-        }
-
-        //Variable to hold the temporary new place during the creation process
-        if(self.googleDefined){
-            self.newPlace = self.createPlace("", "", self.places().length);
-            self.newPlace.visible(false);
-        }
 
         ko.applyBindings(vm);
 
