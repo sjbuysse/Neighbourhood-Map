@@ -246,9 +246,15 @@ var module = (function(){
 
         //Set the selectedPlace to the passed in place
         this.setSelectedPlace = function(place){
-            if(!place || this.places.length === 0) {
-                // The places collection is empty
+            if(!place) {
+                // We deleted the last selected place
+                console.log("saaa");
                 this.selectedPlace(place);
+                return true;
+            } else if (!this.selectedPlace()){
+                // This is the initial selection of the session.
+                this.selectedPlace(place);
+                this.selectedPlace().selected(true);
                 return true;
             } else if(this.selectedPlace() === place){
                 // The place is already selected
@@ -277,7 +283,7 @@ var module = (function(){
             infoWindow.close();
             infoWindow.marker = null;
             self.places.remove(place);
-            self.setSelectedPlace(self.places()[0]);
+            self.setSelectedPlace(null);
         };
 
         //Populate the infowindow with the correct marker information
@@ -341,7 +347,7 @@ var module = (function(){
             var data = event.target.result;
             var jsonData = JSON.parse(data);
 
-            self.databaseRef.set(jsonData, function handleError(err){
+            self.placesRef.set(jsonData.places, function handleError(err){
                 if(err){
                     console.log("error: " + err);
                 } else {
@@ -501,16 +507,6 @@ var module = (function(){
                 
                 self.databaseRef = firebase.database().ref();
                 self.userRef = self.databaseRef.child('users').child(user.uid);
-                self.userRef.once('value', function(snapshot){
-                    if(snapshot.exists()){
-                        // Cool, been here before.
-                        console.log("Existing user");
-                    } else {
-                        // New user, create some nodes
-                        console.log("New user");
-                        console.log(user.uid);
-                    }
-                });
                 self.placesRef = self.databaseRef.child('userObjects').child('places').child(user.uid);
                 self.imagesRef = self.databaseRef.child('userObjects').child('images').child(user.uid);
                 self.storageRef = firebase.storage().ref().child(user.uid);
