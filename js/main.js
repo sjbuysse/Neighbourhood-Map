@@ -246,18 +246,15 @@ var module = (function(){
 
         //Set the selectedPlace to the passed in place
         this.setSelectedPlace = function(place){
-            if(this.places.length === 0) {
-                // This is the first place that the user adds. 
+            if(!place || this.places.length === 0) {
+                // The places collection is empty
                 this.selectedPlace(place);
-                //Set selected property of selectedPlace to true;
-                this.selectedPlace().selected(true);
                 return true;
-                // No need for the following checks, since this is the first place.
             } else if(this.selectedPlace() === place){
+                // The place is already selected
                 return true;
-            }
-            //You can only change the selected place if you're not editing or dragging a place. 
-            else if((this.selectedPlace().editing() || this.selectedPlace().draggable())){
+            } else if(this.selectedPlace().editing() || this.selectedPlace().draggable()){
+                // You can only change the selected place if you're not editing or dragging a place. 
                 alert("Please save or cancel the changes you've made to the currently selected place before selecting another.");
                 return false;
             } 
@@ -420,7 +417,6 @@ var module = (function(){
         //local reference of selectedPlace, to make sure all async functions have access to it.
         var selectedPlace = this.selectedPlace;
         var selectedPlaceKey = this.selectedPlace().placeRef.key;
-
         var imageStorageRef = this.storageRef.child('/images/' + selectedPlaceKey + "/" +
                 this.selectedFile.name);
         var uploadTask = imageStorageRef.put(this.resizedImage);
@@ -429,26 +425,8 @@ var module = (function(){
         // 2. Error observer, called on failure
         // 3. Completion observer, called on successful completion
         uploadTask.on('state_changed', showUploadProgress, handleError, 
-                (function(imageName, caption){  // Closure to ensure that placeKey and imageName are still relevant after image has uploaded
-            return function uploadMetaData() {
-                // Handle successful uploads on complete
-                // Upload image meta data to firebase
-                var downloadURL = uploadTask.snapshot.downloadURL;
-                var imageKey = self.imagesRef.child(selectedPlaceKey).push().key;
-                var updates = {};
-                var imageData = {
-                    'url': downloadURL,
-                    'caption': caption,
-                    'name': imageName,
-                    'key': imageKey
-                    //'user': user.uid
-                };
-                self.imagesRef.child(selectedPlaceKey).child(imageKey).update(imageData);
-                // Add imagedata to place instance
-                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
-                self.resetUploadVariables();
-            };
-        })(self.selectedFile.name, caption));
+        uploadMetaData(selectedPlaceKey, self.selectedFile.name, caption));
+
         function showUploadProgress(snapshot){
             // Observe state change events such as progress, pause, and resume
             // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -470,25 +448,26 @@ var module = (function(){
             self.resetUploadVariables();
         }
 
-        function uploadMetaData() {
-            // Handle successful uploads on complete
-            // Upload image meta data to firebase
-            var downloadURL = uploadTask.snapshot.downloadURL;
-            var imageKey = self.imagesRef.child(selectedPlaceKey).push().key;
-            var updates = {};
-            var imageData = {
-                'url': downloadURL,
-                'caption': caption,
-                'name': imageName,
-                'key': imageKey
-                //'user': user.uid
-            };
-            //updates['images/' + selectedPlaceKey + "/" + imageKey] = imageData;
-            //self.databaseRef.update(updates);
-            self.imagesRef.child(selectedPlaceKey).child(imageKey).update(imageData);
-            // Add imagedata to place instance
-            selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
-            self.resetUploadVariables();
+        function uploadMetaData(selectedPlaceKey, imageName, caption) {
+            // Closure to ensure that placeKey and imageName are still relevant after image has uploaded
+            return function(){
+                // Handle successful uploads on complete
+                // Upload image meta data to firebase
+                var downloadURL = uploadTask.snapshot.downloadURL;
+                var imageKey = self.imagesRef.child(selectedPlaceKey).push().key;
+                var updates = {};
+                var imageData = {
+                    'url': downloadURL,
+                    'caption': caption,
+                    'name': imageName,
+                    'key': imageKey
+                    //'user': user.uid
+                };
+                self.imagesRef.child(selectedPlaceKey).child(imageKey).update(imageData);
+                // Add imagedata to place instance
+                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
+                self.resetUploadVariables();
+            }
         }
     };
 
@@ -555,7 +534,6 @@ var module = (function(){
                 });
                 self.placesRef.on('child_removed', function(snap){
                     var placeKey = snap.key;
-                    console.log("plcaKey " + placeKey);
                     self.imagesRef.child(placeKey)
                     .once('value').then(removePlaceImages);
                 });
@@ -568,14 +546,13 @@ var module = (function(){
         });
 
         function removePlaceImages(snap){
-            snap.forEach(removeSingleImage);
+            var placeKey = snap.key;
+            snap.forEach(removeSingleImage.bind({placeKey: placeKey}));
         };
 
         function removeSingleImage(snap){
             //remove actual images from storage
-            var placeKey = snap.key;
-            console.log(placeKey);
-            self.storageRef.child('images/' + placeKey + "/" + snap.val().name).delete()
+            self.storageRef.child('images/' + this.placeKey + "/" + snap.val().name).delete()
             .then(removeMetaData(snap))
             .catch(handleStorageRemovalError);
         };
