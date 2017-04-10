@@ -15,7 +15,7 @@
         <script src="https://use.fontawesome.com/f300c85415.js"></script>
     </head>
     <body>
-        <header></header>
+    <header><button data-bind="visible: (user && !showDrawer() && !creatingPlace()), click: signOut" class="log-out-btn">Log Out</button></header>
         <nav class="drawer" data-bind="css:{'drawer--open': showDrawer()}">
             <i class="fa fa-bars" aria-hidden="true" data-bind="click: toggleShowDrawer"></i>
             <div class="drawer__filter">

@@ -1,16 +1,15 @@
 /*jshint esversion: 6 */
 var module = (function(){
-    //global variables for the google map, google infowindow, viewmodel and logged in user instance
+    //global variables for the google map, google infowindow and ViewModel instances
     var map;
     var infoWindow;
     var vm;
-    var user;
 
     //Object that holds the methods that we need to access from outside this module
     var methods = {};
 
     //Model for places
-    var Place = function(name, info, id, latlng, draggable){
+    var Place = function(name, info, id, latlng, draggable, user){
         this.name = ko.observable(name);
         this.latlng = ko.observable(latlng);
         this.info = ko.observable(info);
@@ -203,7 +202,8 @@ var module = (function(){
         this.filterValue = ko.observable('');
 
         this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable = false) {
-            var place = new Place(name, info, id, latlng, draggable);
+            var self = this;
+            var place = new Place(name, info, id, latlng, draggable, self.user());
             return place;
         };
 
@@ -347,19 +347,62 @@ var module = (function(){
             var data = event.target.result;
             var jsonData = JSON.parse(data);
 
-            self.placesRef.set(jsonData.places, function handleError(err){
-                if(err){
-                    console.log("error: " + err);
-                } else {
-                    console.log(jsonData);
-                }
-            });
-            //reload the current document
-            location.reload();
+            self.imagesRef.once('value').then(removeUserImages)
+                .then(function(){importPlacesToFirebase(jsonData);})
+                .catch(function(err){
+                    console.log("An error occured :" + err);
+                });
+            function importPlacesToFirebase(jsonData) {
+                self.placesRef.set(jsonData.places, function handleError(err){
+                    if(err){
+                        console.log("error: " + err);
+                    } else {
+                        //reload the current document
+                        location.reload();
+                    }
+                });
+            }
         };
 
+        // Remove al images related to a user
+        // Accepts a firebase DataSnapshot of the users database node that stores all images metadata.
+        function removeUserImages(snap) {
+            var removals = [];
+            snap.forEach(function(childSnapshot){
+                var promise = removePlaceImages(childSnapshot);
+                removals.push(promise);
+            });
+            return Promise.all(removals);
+        }
+
+        // Remove all images related to a place
+        function removePlaceImages(snap) {
+            var removals = [];
+            snap.forEach(function(childSnapshot){
+                var promise = removeSingleImage(childSnapshot);
+                removals.push(promise);
+            });
+            return Promise.all(removals);
+        }
+
+        // Remove the image metadata and remove the actual image from the storage
+        function removeSingleImage(snap){
+            var url = snap.val().url;
+            return Promise.all([snap.ref.remove(), removeImageWithUrl(url)]);
+        }
+
+        // Remove actual image from storage
+        function removeImageWithUrl(url) {
+            // Request the firebase storage reference of the image
+            var httpRef = firebase.storage().refFromURL(url);
+            return httpRef.delete();
+        }
+
         // Read in the image file as a data URL.
-        reader.readAsText(file);
+        if(confirm("Are you sure you want to load this file? \n"+
+                    "This will replace all your current data.")){
+                        reader.readAsText(file);
+                    }
     };
 
     //Handle image selecting
@@ -467,13 +510,12 @@ var module = (function(){
                     'caption': caption,
                     'name': imageName,
                     'key': imageKey
-                    //'user': user.uid
                 };
                 self.imagesRef.child(selectedPlaceKey).child(imageKey).update(imageData);
                 // Add imagedata to place instance
                 selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
                 self.resetUploadVariables();
-            }
+            };
         }
     };
 
@@ -489,11 +531,37 @@ var module = (function(){
         console.save(ko.toJSON(exportPlaces), 'sessions');
     };
 
+    ViewModel.prototype.signOut = function() {
+        var self = this;
+        firebase.auth().signOut()
+            .then(handleSignOut)
+            .catch(handleSignOutError);
+
+        function handleSignOut(){
+              document.getElementById('auth-modal').classList.remove('hidden');
+              self.userRef = null;
+              self.user(null);
+              self.places().forEach(hideMarker);
+              infoWindow.close();
+              infoWindow.marker = null;
+              self.places([]);
+        }
+
+        function handleSignOutError(err) {
+            console.log("sign out failed because of error: " + err);
+        }
+
+        function hideMarker(place){
+            place.marker.setVisible(false);
+        }
+    };
+
     //Initialize all places and markers 
     ViewModel.prototype.init = function() {
         var self = this;
         self.places = ko.observableArray([]);
         self.googleDefined = false;
+        self.user = ko.observable(null);
 
         if(typeof google !== 'undefined'){
             self.googleDefined = true;
@@ -502,14 +570,15 @@ var module = (function(){
         firebase.auth().onAuthStateChanged(function(loggedInUser) {
             if(loggedInUser){
                 // Set the global user variable to the logged in user
-                user = loggedInUser;
+                console.log(loggedInUser.uid);
+                self.user(loggedInUser);
                 document.getElementById('auth-modal').className += " hidden";
                 
                 self.databaseRef = firebase.database().ref();
-                self.userRef = self.databaseRef.child('users').child(user.uid);
-                self.placesRef = self.databaseRef.child('userObjects').child('places').child(user.uid);
-                self.imagesRef = self.databaseRef.child('userObjects').child('images').child(user.uid);
-                self.storageRef = firebase.storage().ref().child(user.uid);
+                self.userRef = self.databaseRef.child('users').child(self.user().uid);
+                self.placesRef = self.databaseRef.child('userObjects').child('places').child(self.user().uid);
+                self.imagesRef = self.databaseRef.child('userObjects').child('images').child(self.user().uid);
+                self.storageRef = firebase.storage().ref().child(self.user().uid);
                 self.placesRef.once('value', function(snap){
                     snap.forEach(function(childSnapshot){
                         var place = childSnapshot.val();
@@ -535,39 +604,39 @@ var module = (function(){
                 });
             } else {
               // User not logged out, so show authorization modal. 
+              console.log("User logged out");
               document.getElementById('auth-modal').classList.remove('hidden');
-              self.userRef = null;
-              return;
+              ui.start('#firebaseui-auth-container', uiConfig);
             }
         });
 
         function removePlaceImages(snap){
             var placeKey = snap.key;
             snap.forEach(removeSingleImage.bind({placeKey: placeKey}));
-        };
+        }
 
         function removeSingleImage(snap){
             //remove actual images from storage
             self.storageRef.child('images/' + this.placeKey + "/" + snap.val().name).delete()
             .then(removeMetaData(snap))
             .catch(handleStorageRemovalError);
-        };
+        }
 
         function removeMetaData(snap){
             // if success
             // remove images metadata in database
             snap.ref.remove(handleMetaDataRemovalError);
-        };
+        }
 
         function handleMetaDataRemovalError(err){
             if(err){
                 console.log("Error when removing image metadata " + err);
             }
-        };
+        }
 
         function handleStorageRemovalError(err){
             console.log("Error when removing image from cloud storage :" + err);
-        };
+        }
 
         //Variable to hold the temporary new place during the creation process
         if(self.googleDefined){
@@ -600,6 +669,12 @@ var module = (function(){
         vm = new ViewModel();
         vm.init();
     }
+
+    methods.getUser = function() {
+        if(vm.user){
+            console.log("true");
+        }
+    };
 
     //Init viewmodel without google maps (if the API Fails to load)
     methods.initWithoutMap = function(){
