@@ -17,6 +17,19 @@ module.exports = function(grunt) {
         jshint: {
             all: ['Gruntfile.js', config.jsDir + '*.js']
         },
+        postcss: {
+            options: {
+                map: true,
+                processors: [
+                    require('pixrem')(), // add fallback for rem units
+                    require('autoprefixer')(), // add vendor prefixes
+                    require('cssnano')() // minify the result
+                ]
+            },
+            dist: {
+                src: config.cssDir + '*.css'
+            }
+        },
         watch: {
             css: {
                 options: {
@@ -30,5 +43,5 @@ module.exports = function(grunt) {
         } 
     });
     
-    grunt.registerTask('default', ['jshint', 'sass', 'watch']);
+    grunt.registerTask('default', ['jshint', 'sass', 'postcss', 'watch']);
 };
