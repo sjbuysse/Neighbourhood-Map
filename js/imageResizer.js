@@ -5,7 +5,7 @@ var imageResizer = ( function(){
     methods.resizeImage = function(data, callback, maxWidth = 400, maxHeight = 300){
          var img = document.createElement("img");
 
-         img.onLoad = function(){
+         img.onload = function(){
              var width = img.width;
              console.log(width);
              var height = img.height;
@@ -31,6 +31,7 @@ var imageResizer = ( function(){
              drawImageIOSFix(ctx, img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, width, height);
 
              canvas.toBlob(function(blob){
+                 console.log("blob :" + typeof blob);
                  callback(blob);
              }, "image/png");
          };
