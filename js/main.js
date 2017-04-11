@@ -341,6 +341,23 @@ var module = (function(){
           //unhide modal
           imgModal.classList.remove("hidden");
         };
+
+        this.hideAbsoluteElements = function() {
+            var absoluteElements = document.getElementsByClassName('absolute');
+            for(var i = 0, len = absoluteElements.length; i<len; i++){
+                console.log(absoluteElements[i]);
+                absoluteElements[i].style.zIndex = '-1';
+            }
+            return true;
+        }
+
+        this.showAbsoluteElements = function() {
+            var absoluteElements = document.getElementsByClassName('absolute');
+            for(var i = 0, len = absoluteElements.length; i<len; i++){
+                console.log(absoluteElements[i]);
+                absoluteElements[i].style.zIndex = '1';
+            }
+        }
     };
 
     //Return true if browser supports the File API
@@ -440,9 +457,10 @@ var module = (function(){
                 alert('The file with extension ' + ext + " is not allowed.\n" +
                         "Please try again with a jpg, jpeg, png or bmp file.");
                 this.resetUploadVariables();
-                return;
+                return; 
         }
 
+        self.showAbsoluteElements();
         //preview images, show upload button, and start resizing image for upload
         var reader = new FileReader();
         reader.onload = function(event) {

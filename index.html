@@ -15,8 +15,8 @@
         <script src="https://use.fontawesome.com/f300c85415.js"></script>
     </head>
     <body>
-    <header><button data-bind="visible: (user && !showDrawer() && !creatingPlace()), click: signOut" class="log-out-btn">Log Out</button></header>
-        <nav class="drawer" data-bind="css:{'drawer--open': showDrawer()}">
+    <header class="absolute"><button data-bind="visible: (user && !showDrawer() && !creatingPlace()), click: signOut" class="log-out-btn">Log Out</button></header>
+        <nav class="drawer absolute" data-bind="css:{'drawer--open': showDrawer()}">
             <i class="fa fa-bars" aria-hidden="true" data-bind="click: toggleShowDrawer"></i>
             <div class="drawer__filter">
                 <input class="drawer__filter__searchbox" placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown', event: {keypress: closeInfoWindow}"></input>
@@ -34,7 +34,7 @@
                 <div id="firebaseui-auth-container"></div>
             </div>  
         </div>
-        <div class="create-location" data-bind="css:{'create-location--open': creatingPlace()}">
+        <div class="create-location absolute" data-bind="css:{'create-location--open': creatingPlace()}">
             <i class="fa fa-plus" aria-hidden="true" data-bind="click: toggleCreatingPlace"></i>
             <i class="fa fa-minus" aria-hidden="true" data-bind="click: toggleCreatingPlace"></i>
             <span class="create-location__title">Add Location</span>
@@ -46,7 +46,7 @@
             </form>
         </div>
         <div id="map"></div>
-        <div  class="large-info-window" id="large-info-window" data-bind="with: selectedPlace, css:{'large-info-window--open': $root.showLargeInfoWindow()}">
+        <div  class="large-info-window absolute" id="large-info-window" data-bind="with: selectedPlace, css:{'large-info-window--open': $root.showLargeInfoWindow()}">
             <span class="large-info-window__toggle" data-bind="click: $root.toggleShowLargeInfoWindow">More Info</span>
             <span class="large-info-window__bottom-toggle" data-bind="click: $root.toggleShowLargeInfoWindow">Show Map</span>
             <div class="large-info-window__info info" id="info-wrapper">
@@ -70,7 +70,7 @@
                     <h3>Add Image</h3>
                     <input type="file" name="imageFile" id="imageFile" class="upload-image__input" 
                     accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />
-                    <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
+                    <label for="imageFile" data-bind="click: $root.hideAbsoluteElements, visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
                     <!--<input class='session__image-caption-input' placeholder="Add a caption to the image" data-bind="value: caption, valueUpdate: 'afterkeydown', enterKey: saveEditing, escapeKey: undoEditing"></input>-->
                     <div class="line-break"></div>
                     <img src="" id="previewImg" class="upload-image__image">
