@@ -460,7 +460,6 @@ var module = (function(){
                 return; 
         }
 
-        self.showAbsoluteElements();
         //preview images, show upload button, and start resizing image for upload
         var reader = new FileReader();
         reader.onload = function(event) {
