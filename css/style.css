@@ -262,6 +262,7 @@ header {
   z-index: 2;
   top: 0;
   display: flex;
+  display: flexbox;
   justify-content: center; }
 
 .log-out-btn {
