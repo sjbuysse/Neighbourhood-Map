@@ -7,7 +7,9 @@ var imageResizer = ( function(){
          img.src = data;
 
          var width = img.width;
+         console.log(width);
          var height = img.height;
+         console.log(height);
 
          if (width > height) {
              if (width > maxWidth) {
