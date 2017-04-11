@@ -3,7 +3,7 @@ var imageResizer = ( function(){
     var methods = {};
     //resizeImage accepts an imageblob as input optional 'result' variable to save the resized image to.
     methods.resizeImage = function(data, callback, maxWidth = 400, maxHeight = 300){
-        console.log("resize data :" + data)
+        console.log("resize data :" + data.length);
          var img = document.createElement("img");
          img.src = data;
 
@@ -70,7 +70,7 @@ var imageResizer = ( function(){
      * (args are for source and destination).
      */
     function drawImageIOSFix(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
-        console.log("img :" + img);
+        console.log("img :" + img.length);
         var vertSquashRatio = detectVerticalSquash(img);
         console.log("Vertical Squash Ration: " + vertSquashRatio);
      // Works only if whole image is displayed:
