@@ -56,11 +56,11 @@ var module = (function(){
         });
         ko.computed(function(){
             if(self.draggable()){
-                marker.setIcon( 'http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+                marker.setIcon( 'https://maps.google.com/mapfiles/ms/icons/green-dot.png');
             } else if(self.selected()) {
-                marker.setIcon( 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+                marker.setIcon( 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png');
             } else {
-                marker.setIcon( 'http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+                marker.setIcon( 'https://maps.google.com/mapfiles/ms/icons/red-dot.png');
             }
         });
         marker.addListener('click', (function(self){
@@ -587,7 +587,6 @@ var module = (function(){
         firebase.auth().onAuthStateChanged(function(loggedInUser) {
             if(loggedInUser){
                 // Set the global user variable to the logged in user
-                console.log(loggedInUser.uid);
                 self.user(loggedInUser);
                 authModal.className += " hidden";
                 
@@ -621,7 +620,6 @@ var module = (function(){
                 });
             } else {
               // User not logged out, so show authorization modal. 
-              console.log("User logged out");
               authModal.classList.remove('hidden');
               ui.start('#firebaseui-auth-container', uiConfig);
             }
