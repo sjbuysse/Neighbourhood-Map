@@ -13,6 +13,7 @@
 $(document).ready(
     function() {
         var potentialHeight = $('#filter-list').getPotentialHeight();
+        console.log(potentialHeight);
         $('#filter-list').css('height', potentialHeight);
         $('#info-wrapper').css('height', potentialHeight + 32);
     }

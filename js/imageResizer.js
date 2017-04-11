@@ -7,9 +7,7 @@ var imageResizer = ( function(){
 
          img.onload = function(){
              var width = img.width;
-             console.log(width);
              var height = img.height;
-             console.log(height);
 
              if (width > height) {
                  if (width > maxWidth) {
@@ -31,7 +29,6 @@ var imageResizer = ( function(){
              drawImageIOSFix(ctx, img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, width, height);
 
              canvas.toBlob(function(blob){
-                 console.log("blob :" + typeof blob);
                  callback(blob);
              }, "image/png");
          };
@@ -46,10 +43,7 @@ var imageResizer = ( function(){
      * 
      */
     function detectVerticalSquash(img) {
-        console.log("img :" + img.src.length);
         var iw = img.naturalWidth, ih = img.naturalHeight;
-        console.log("iw :" + iw);
-        console.log("ih :" + ih);
         var canvas = document.createElement('canvas');
         canvas.width = 1;
         canvas.height = ih;
