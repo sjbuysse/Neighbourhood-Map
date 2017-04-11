@@ -454,6 +454,7 @@ var module = (function(){
                 self.resizedImage = null;
             }
             // start processing image in background (worker?)
+            console.log("event data :" + event.target.result);
             imageResizer.resizeImage(event.target.result, function(result){self.resizedImage = result;});
             // if they click upload image before finished (processedImage = false), then it should wait
         };
