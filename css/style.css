@@ -24,8 +24,7 @@ h3 {
   display: none; }
 
 .auth-modal {
-  position: fixed;
-  /* Stay in place */
+  /*position: fixed; [> Stay in place <]*/
   z-index: 12;
   /* Sit on top */
   left: 0;
@@ -110,8 +109,7 @@ h3 {
     transition: transform 0.3s ease-out; }
 
 .img-modal {
-  position: fixed;
-  /* Stay in place */
+  /*position: fixed; [> Stay in place <]*/
   z-index: 12;
   /* Sit on top */
   left: 0;
