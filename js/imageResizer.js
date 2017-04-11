@@ -6,33 +6,35 @@ var imageResizer = ( function(){
          var img = document.createElement("img");
          img.src = data;
 
-         var width = img.width;
-         console.log(width);
-         var height = img.height;
-         console.log(height);
+         img.onLoad = function(){
+             var width = img.width;
+             console.log(width);
+             var height = img.height;
+             console.log(height);
 
-         if (width > height) {
-             if (width > maxWidth) {
-               height *= maxWidth / width;
-               width = maxWidth;
+             if (width > height) {
+                 if (width > maxWidth) {
+                   height *= maxWidth / width;
+                   width = maxWidth;
+                 }
+             } else {
+                 if (height > maxHeight) {
+                     width *= maxHeight / height;
+                     height = maxHeight;
+                 }
              }
-         } else {
-             if (height > maxHeight) {
-                 width *= maxHeight / height;
-                 height = maxHeight;
-             }
-         }
 
-         //Add a canvas, and draw image on it with right dimensions, then export the image
-         var canvas = document.createElement('canvas');
-         canvas.width = width;
-         canvas.height = height;
-         var ctx = canvas.getContext("2d");
-         drawImageIOSFix(ctx, img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, width, height);
+             //Add a canvas, and draw image on it with right dimensions, then export the image
+             var canvas = document.createElement('canvas');
+             canvas.width = width;
+             canvas.height = height;
+             var ctx = canvas.getContext("2d");
+             drawImageIOSFix(ctx, img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, width, height);
 
-         canvas.toBlob(function(blob){
-             callback(blob);
-         }, "image/png");
+             canvas.toBlob(function(blob){
+                 callback(blob);
+             }, "image/png");
+         };
     };
 
     /**
