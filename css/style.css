@@ -10,7 +10,6 @@ h3 {
   height: 100%;
   margin-top: 2rem; }
 
-.drawer
 #export-locations {
   position: absolute;
   right: 0;
@@ -24,7 +23,7 @@ h3 {
   display: none; }
 
 .auth-modal {
-  position: relative;
+  position: fixed;
   /* Stay in place */
   z-index: 12;
   /* Sit on top */
@@ -67,7 +66,9 @@ h3 {
   position: absolute;
   bottom: 0px;
   transform: translate(0, 100%);
-  transition: transform 0.3s ease-out; }
+  -webkit-transform: translate(0, 100%);
+  transition: transform 0.3s ease-out;
+  -webkit-transition: transform 0.3s ease-out; }
   .large-info-window__toggle {
     position: absolute;
     line-height: 2rem;
@@ -107,10 +108,12 @@ h3 {
       transform: rotate(90deg); }
   .large-info-window--open {
     transform: translate(0, 0);
-    transition: transform 0.3s ease-out; }
+    -webkit-transform: translate(0, 0);
+    transition: transform 0.3s ease-out;
+    -webkit-transition: transform 0.3s ease-out; }
 
 .img-modal {
-  position: relative;
+  position: fixed;
   /* Stay in place */
   z-index: 12;
   /* Sit on top */
@@ -283,10 +286,12 @@ header {
   width: 200px;
   background-color: #1C262F;
   position: absolute;
+  -webkit-transition: transform 0.3s ease-out;
   transition: transform 0.3s ease-out;
   z-index: 2;
   left: 0;
-  transform: translate(-200px); }
+  transform: translate(-200px);
+  -webkit-transform: translate(-200px); }
   .drawer .fa-bars {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -295,8 +300,11 @@ header {
     right: -30px; }
   .drawer--open {
     transform: translate(0);
-    transition: transform 0.3s ease-out; }
+    -webkit-transform: translate(0);
+    transition: transform 0.3s ease-out;
+    -webkit-transition: transform 0.3s ease-out; }
     .drawer--open .fa-bars {
+      -webkit-transform: rotate(90deg);
       transform: rotate(90deg); }
 
 .create-location {
@@ -306,9 +314,11 @@ header {
   width: 200px;
   background-color: #1C262F;
   position: absolute;
+  -webkit-transition: transform 0.3s ease-out;
   transition: transform 0.3s ease-out;
   z-index: 2;
   right: 0;
+  -webkit-transform: translate(200px);
   transform: translate(200px); }
   .create-location .fa-plus, .create-location .fa-minus {
     font-size: 1.4rem;
@@ -330,7 +340,9 @@ header {
     background-color: #1C262F; }
   .create-location--open {
     transform: translate(0);
-    transition: transform 0.3s ease-out; }
+    -webkit-transform: translate(0);
+    transition: transform 0.3s ease-out;
+    -webkit-transition: transform 0.3s ease-out; }
     .create-location--open .fa-plus {
       display: none; }
     .create-location--open .fa-minus {

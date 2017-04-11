@@ -43,6 +43,7 @@ $gallery: #EEE;
     width: 200px;
     background-color: $mirage;
     position: absolute;
+    -webkit-transition: transform 0.3s ease-out;
     transition: transform 0.3s ease-out;
     z-index: 2;
 }
@@ -67,7 +68,7 @@ $gallery: #EEE;
 }
 
 @mixin modal($background-color: rgba(0,0,0,0.4)){
-    position: relative; /* Stay in place */
+    position: fixed; /* Stay in place */
     z-index: 12; /* Sit on top */
     left: 0;
     top: 0;
@@ -96,7 +97,6 @@ h3 {
     margin-top: 2rem;
 }
 
-.drawer
 #export-locations {
     position: absolute;
     right: 0;
@@ -143,7 +143,9 @@ h3 {
     position: absolute;
     bottom: 0px;
     transform: translate(0, 100%);
+    -webkit-transform: translate(0, 100%);
     transition: transform 0.3s ease-out;
+    -webkit-transition: transform 0.3s ease-out;
     &__toggle {
         @include info-window-toggle;
         top: -2rem;
@@ -165,7 +167,9 @@ h3 {
     }
     &--open {
         transform: translate(0, 0);
+        -webkit-transform: translate(0, 0);
         transition: transform 0.3s ease-out;
+        -webkit-transition: transform 0.3s ease-out;
     }
 }
 
@@ -329,6 +333,7 @@ header {
     @include drawers;
     left: 0;
     transform: translate(-200px);
+    -webkit-transform: translate(-200px);
     .fa-bars {
         font-size: 1.5rem;
         line-height: 2rem;
@@ -338,8 +343,11 @@ header {
     }
     &--open {
         transform: translate(0);
+        -webkit-transform: translate(0);
         transition: transform 0.3s ease-out;
+        -webkit-transition: transform 0.3s ease-out;
         .fa-bars{
+            -webkit-transform: rotate(90deg);
             transform: rotate(90deg);
         }
     }
@@ -348,6 +356,7 @@ header {
 .create-location{
     @include drawers;
     right: 0; 
+    -webkit-transform: translate(200px);
     transform: translate(200px);
     .fa-plus, .fa-minus {
         font-size: 1.4rem;
@@ -372,7 +381,9 @@ header {
     }
     &--open {
         transform: translate(0);
+        -webkit-transform: translate(0);
         transition: transform 0.3s ease-out;
+        -webkit-transition: transform 0.3s ease-out;
         .fa-plus {
             display: none;
         }
