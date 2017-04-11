@@ -45,7 +45,7 @@
                 <p>When you submit this form, a green pin will be added to the center of the map. You can then drag it to its correct location.</p>
             </form>
         </div>
-        <div id="map"></div>
+        <div id="map" class="absolute"></div>
         <div  class="large-info-window absolute" id="large-info-window" data-bind="with: selectedPlace, css:{'large-info-window--open': $root.showLargeInfoWindow()}">
             <span class="large-info-window__toggle" data-bind="click: $root.toggleShowLargeInfoWindow">More Info</span>
             <span class="large-info-window__bottom-toggle" data-bind="click: $root.toggleShowLargeInfoWindow">Show Map</span>
