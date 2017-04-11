@@ -1,8 +1,16 @@
--Modularize that geocode request loop, and delete from app
--start with world map and add locations by markers, save this data in localstorage, figure out a way to export this data and then a way to use this data as initial data for udacity coaches
--Make function to export locations to json
 -use a fun style on your map, also different marker. something opaque? 
--when adding a new location, the button 'add location' (a 2nd one) should not work untill half a second after the marker is displayed (so the marker is actually created). Maybe even add a loading sign or something like that.
 -Remove small infowindow from mobile devices
--When clicking on name, zoom to center like in google maps class (setcenter and zoom to location)
-!create init function that sets up this.places and selectedplace and newplace and so on... (declutter the viewmodel)
+-use css for hamburger icon
+
+We might want to turn off the handler for uploadTask after uploading the image.  
+
+make sure the stillResizing thing is implemented and working
+
+make sure we don't get in trouble with uploading images with same name (change name with affix?)
+
+add edit button, and delete button in largeInfoWindow
+add remove image button
+
+Make loading screen untill all places are loaded
+
+get loading screen ('please don't close window'), when importing json (and deleting all images)
