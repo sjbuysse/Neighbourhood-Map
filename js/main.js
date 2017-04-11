@@ -4,6 +4,10 @@ var module = (function(){
     var map;
     var infoWindow;
     var vm;
+    var authModal = document.getElementById('auth-modal');
+    var imgModal = document.getElementById('img-modal');
+    var imgModalImage = document.getElementById('img-modal__image');
+    var imgModalCaption = document.getElementById('img-modal__caption');
 
     //Object that holds the methods that we need to access from outside this module
     var methods = {};
@@ -324,6 +328,19 @@ var module = (function(){
             }
             return true;
         };
+
+        this.closeImgModal = function(){
+          imgModal.classList.add('hidden');
+        };
+
+        this.openImgModal = function(image) {
+          //set img src to clicked image
+          imgModalImage.src = image.url();
+          //set caption to appropriate caption
+          imgModalCaption.innerHTML = image.caption();
+          //unhide modal
+          imgModal.classList.remove("hidden");
+        };
     };
 
     //Return true if browser supports the File API
@@ -538,7 +555,7 @@ var module = (function(){
             .catch(handleSignOutError);
 
         function handleSignOut(){
-              document.getElementById('auth-modal').classList.remove('hidden');
+              authModal.classList.remove('hidden');
               self.userRef = null;
               self.user(null);
               self.places().forEach(hideMarker);
@@ -572,7 +589,7 @@ var module = (function(){
                 // Set the global user variable to the logged in user
                 console.log(loggedInUser.uid);
                 self.user(loggedInUser);
-                document.getElementById('auth-modal').className += " hidden";
+                authModal.className += " hidden";
                 
                 self.databaseRef = firebase.database().ref();
                 self.userRef = self.databaseRef.child('users').child(self.user().uid);
@@ -605,7 +622,7 @@ var module = (function(){
             } else {
               // User not logged out, so show authorization modal. 
               console.log("User logged out");
-              document.getElementById('auth-modal').classList.remove('hidden');
+              authModal.classList.remove('hidden');
               ui.start('#firebaseui-auth-container', uiConfig);
             }
         });

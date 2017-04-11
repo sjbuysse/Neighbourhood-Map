@@ -29,8 +29,8 @@
                 <label for="file" data-bind="visible: supportFileAPI" class="drawer__filter__import-btn">Import locations</label>
             </div>
         </nav>
-        <div id="auth-modal" class="modal hidden">
-            <div class="modal-content">
+        <div id="auth-modal" class="auth-modal hidden">
+            <div class="auth-modal__content">
                 <div id="firebaseui-auth-container"></div>
             </div>  
         </div>
@@ -57,27 +57,27 @@
                 <label class="info__latlng">lng: <span data-bind='text: latlng().lng'></span> </label>
                 <p class="info__info" data-bind='text: info, visible: !editing(),event: { dblclick: setEditing }, doubleTap: setEditing'></p> 
                 <textarea class='info__info--edit' data-bind="value: info, visible: editing,  valueUpdate: 'afterkeydown', escapeKey: undoEditing"></textarea>
-                <h3>Images</h3>
+                <h2 data-bind="visible: (images().length > 0)">Images</h2>
                 <div class="info__images images">
                     <!-- ko foreach: images -->
-                      <img data-bind='attr: {src: url}' class="images__image"/>
+                      <img data-bind='attr: {src: url}, click: $root.openImgModal' class="images__image"/>
                       <p class="images__image-caption" data-bind='text: caption, 
                       visible: !($parent.editing()), event: { dblclick: $parent.setEditing.bind($parent) }, 
                       doubleTap: $parent.setEditing.bind($parent)'></p>
                       <input class='images__image-caption--edit' data-bind="value: caption, visible: $parent.editing,  valueUpdate: 'afterkeydown', enterKey: $parent.saveEditing.bind($parent), escapeKey: $parent.undoEditing.bind($parent)"></input>
                     <!-- /ko -->
                 </div>
-                <div data-bind="visible: !editing()">
-                    <input type="file" name="imageFile" id="imageFile" class="info__image-input" 
+                <div data-bind="visible: !editing()" class="info__upload-image upload-image">
+                    <h3>Add Image</h3>
+                    <input type="file" name="imageFile" id="imageFile" class="upload-image__input" 
                     accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />
-                    <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="info__image-select-btn">Select image</label> 
+                    <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
                     <!--<input class='session__image-caption-input' placeholder="Add a caption to the image" data-bind="value: caption, valueUpdate: 'afterkeydown', enterKey: saveEditing, escapeKey: undoEditing"></input>-->
                     <div class="line-break"></div>
-                    <img src="" id="previewImg" class="info__preview-image">
+                    <img src="" id="previewImg" class="upload-image__image">
+                    <textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="upload-image__caption hidden"></textarea>
                     <div class="line-break"></div>
-                    <textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="info__image-caption hidden"></textarea>
-                    <div class="line-break"></div>
-                    <button id="images-upload-btn" class="info__image-upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>
+                    <button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>
                 </div>
                 <button data-bind='click: saveEditing, visible: (editing())'>
                     Update
@@ -87,11 +87,14 @@
                 </button>
             </div>
         </div>
-        <script type="text/template" id="info-window-template">
-            "<h2 data-bind='text: name'></h2>"+
-            "lat: " + "<span data-bind='text: latlng().lat'></span>"+
-            "lng: " + "<span data-bind='text: latlng().lng'></span>"
-        </script>
+        <div id="img-modal" class="img-modal hidden">
+            <!-- The Close Button -->
+            <span class="img-modal__close" data-bind="click: closeImgModal">&times;</span>
+            <!-- Modal Content (The Image) -->
+            <img id="img-modal__image" class="img-modal__image">
+            <!-- Modal Caption (Image Text) -->
+            <div id="img-modal__caption" class="img-modal__caption"></div>
+        </div>
         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
         <script src="js/plugins.js"></script>
