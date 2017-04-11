@@ -67,7 +67,7 @@ $gallery: #EEE;
 }
 
 @mixin modal($background-color: rgba(0,0,0,0.4)){
-    position: fixed; /* Stay in place */
+    position: relative; /* Stay in place */
     z-index: 12; /* Sit on top */
     left: 0;
     top: 0;
