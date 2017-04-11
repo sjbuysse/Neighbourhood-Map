@@ -4,7 +4,6 @@ var imageResizer = ( function(){
     //resizeImage accepts an imageblob as input optional 'result' variable to save the resized image to.
     methods.resizeImage = function(data, callback, maxWidth = 400, maxHeight = 300){
          var img = document.createElement("img");
-         img.src = data;
 
          img.onLoad = function(){
              var width = img.width;
@@ -35,6 +34,8 @@ var imageResizer = ( function(){
                  callback(blob);
              }, "image/png");
          };
+
+         img.src = data;
     };
 
     /**
