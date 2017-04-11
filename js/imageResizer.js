@@ -40,7 +40,10 @@ var imageResizer = ( function(){
      * 
      */
     function detectVerticalSquash(img) {
+        console.log("img :" + img.src.length);
         var iw = img.naturalWidth, ih = img.naturalHeight;
+        console.log("iw :" + iw);
+        console.log("ih :" + ih);
         var canvas = document.createElement('canvas');
         canvas.width = 1;
         canvas.height = ih;
@@ -69,7 +72,6 @@ var imageResizer = ( function(){
      * (args are for source and destination).
      */
     function drawImageIOSFix(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) {
-        console.log("img :" + img.src.length);
         var vertSquashRatio = detectVerticalSquash(img);
         console.log("Vertical Squash Ration: " + vertSquashRatio);
      // Works only if whole image is displayed:
