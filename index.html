@@ -46,7 +46,6 @@
             </form>
         </div>
         <div id="map"></div>
-        </div>
         <div  class="large-info-window" id="large-info-window" data-bind="with: selectedPlace, css:{'large-info-window--open': $root.showLargeInfoWindow()}">
             <span class="large-info-window__toggle" data-bind="click: $root.toggleShowLargeInfoWindow">More Info</span>
             <span class="large-info-window__bottom-toggle" data-bind="click: $root.toggleShowLargeInfoWindow">Show Map</span>
@@ -99,6 +98,7 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
         <script src="js/plugins.js"></script>
         <script src="bower_components/knockout/dist/knockout.js"></script>
+        <script src="bower_components/es6-promise-polyfill/promise.min.js"></script>
         <script src="js/keyhandling.js"></script>
         <script src="js/doubletap.js"></script>
         <script src="js/console-save.js"></script>
