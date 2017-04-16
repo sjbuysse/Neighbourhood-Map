@@ -97,9 +97,9 @@ var module = (function(){
         this.editing(false);
         this.name(this.previousName);
         this.info(this.previousInfo);
-        // Reset caption
+        // Reset caption for all place images
         this.previousImages.forEach(function(prevImage){
-            var image = this.images.filter(function(image){
+            var image = self.images().find(function(image){
                 return image.key === prevImage.key;
             });
             image.caption(prevImage.caption);
