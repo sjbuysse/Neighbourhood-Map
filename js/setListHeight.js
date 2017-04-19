@@ -2,7 +2,7 @@
 (function($) {
   $.fn.getPotentialHeight = function() {
         var $element = this;
-        //heightOfParent is the height of parents content (inside the padding!)
+        //heightOfParent is the height of parents content (inside the padding)
         var heightOfParent = $element.parent().height();
         offset = $element.offset();
         topOfElement = offset.top;
