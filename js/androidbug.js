@@ -6,4 +6,4 @@ window.addEventListener("resize", function() {
         document.activeElement.scrollIntoViewIfNeeded();
      },0);
   }
-})
+});
