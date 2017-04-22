@@ -1,5 +1,15 @@
 $mirage: #1C262F;
 $gallery: #EEE;
+$headerHeight: 32px;
+
+@mixin fullHeight {
+    height: 100%;
+}
+
+@mixin viewportHeight {
+    height: 100vh;
+}
+
 @mixin hide-input{
     width: 0.1px;
     height: 0.1px;
@@ -8,18 +18,20 @@ $gallery: #EEE;
     position: absolute;
     z-index: -1;
 }
+
 @mixin button {
     padding: 1px 6px;
     box-sizing: border-box;
     text-transform: uppercase;
     text-align: left;
     outline: none;
+    cursor: pointer;
 }
 @mixin drawer-button {
     @include button;
     color: $gallery;
-    line-height: 2rem;
-    height: 2rem;
+    line-height: $headerHeight;
+    height: $headerHeight;
     background-color: $mirage;
     border: 1px solid $gallery;
     outline: none;
@@ -37,34 +49,15 @@ $gallery: #EEE;
 }
 
 @mixin drawers {
+    @include viewportHeight;
     text-align: left;
     color: $gallery;
-    height: 100vh;
     width: 200px;
     background-color: $mirage;
     position: absolute;
-    -webkit-transition: transform 0.3s ease-out;
+    top: 0;
     transition: transform 0.3s ease-out;
     z-index: 2;
-}
-
-@mixin info-window-toggle {
-    position: absolute;
-    line-height: 2rem;
-    text-transform: uppercase;
-    background-color: white;
-    display: block;
-    width: 100%;
-    padding-left: 10px;
-}
-
-@mixin double-arrow{
-    position: absolute;
-    right: 20px;
-    display: inline-block;
-    font-size: 1.2rem;
-    content: "\00BB";
-    text-shadow: 0 -1px 0 #bfbfbf;
 }
 
 @mixin modal($background-color: rgba(0,0,0,0.4)){
@@ -82,34 +75,36 @@ $gallery: #EEE;
     justify-content: center;
 }
 
-html, body{
-    height: 100vh;
-    position: relative;
+@mixin popup__toggle {
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    line-height: 2rem;
+    text-transform: uppercase;
+    right: 0px;
+}
+
+html, body {
+    height: 100%;
     overflow: hidden;
 }
 
-h3 {
+header {
+    height: $headerHeight;
     width: 100%;
-}
-
-#map {
-    height: 100%;
-    margin-top: 2rem;
-}
-
-#export-locations {
+    background-color: $mirage;
     position: absolute;
-    right: 0;
-    top: 2rem; 
-    height: 2rem;
+    z-index: 2;
+    top: 0;
+    display: flex;
+    justify-content: center;
 }
 
-.line-break {
+.background {
+    @include fullHeight;
     width: 100%;
-}
-
-.hidden{
-    display: none;
+    background-color: green;
+    padding-top: $headerHeight;
 }
 
 .auth-modal {
@@ -124,108 +119,162 @@ h3 {
     }
 }
 
-
-.info-window {
-        text-align: center;
-    &__name {
+// left drawer with the filter feature
+.filter-drawer {
+    @include drawers;
+    box-sizing: border-box;
+    transform: translate(-200px,0);
+    // bottom padding is where the export and import btn rest
+    padding: 6px 6px (2 * $headerHeight + 4);
+    // move drawer to right
+    &--open {
+        transform: translate(0, 0);
+        transition: transform 0.3s ease-out;
+    }
+    &__searchbox {
+        @include form-fields;
+    }
+    // list of places that can be filterd
+    &__list{
+        height: 100%;
+        overflow-y: scroll;
+        list-style: none;
         text-transform: uppercase;
-        font-size: 1.2rem;
-        padding: 0.5rem;
-        font-weight: bold;
-        display: block;
+        padding: 6px 0 0;
+        // customize scrollbar
+        &::-webkit-scrollbar {
+            width: 10px;
+            right: 2px;
+        }
+        &::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: rgba(93,93,93, 0.7);
+        }
+        &__item{
+            cursor: pointer;
+        }
+    }
+    &__export-btn, &__import-btn {
+        position: absolute;
+        left: 0;
+        @include full-width-drawer-button
+    }
+    &__export-btn {
+        bottom: $headerHeight; 
+    }
+    &__import-btn {
+        border-top: none;
+        bottom: 0rem; 
+    }
+    &__import-input {
+        @include hide-input;
+    }
+    // span that surrounds svg toggle icon
+    &__toggle {
+        position: absolute;
+        right: -$headerHeight;
+        top: 0;
+        width: $headerHeight;
+        height: $headerHeight;
+        display: inline-block;
+        cursor: pointer;
+    }
+    &__toggle-icon {
+        position: absolute;
+        right: 0.4rem;
+        top: 0.4rem;
+        filter: invert(100%);
+        height: 1.2rem;
+        width: 1.2rem;
     }
 }
 
-.large-info-window {
-    background-color: white;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    bottom: 0px;
-    transform: translate(0, 100%);
-    -webkit-transform: translate(0, 100%);
-    transition: transform 0.3s ease-out;
-    -webkit-transition: transform 0.3s ease-out;
+// drawer on the right to create new locations
+.create-drawer {
+    @include drawers;
+    right: 0; 
+    transform: translate(200px, 0);
     &__toggle {
-        @include info-window-toggle;
-        top: -2rem;
-        &:after {
-            @include double-arrow;
-            -webkit-transform: rotate(-90deg);
-            transform: rotate(-90deg);
+        position: absolute;
+        left: -$headerHeight;
+        top: 0;
+        width: $headerHeight;
+        height: $headerHeight;
+        display: inline-block;
+        color: #FFF;
+        cursor: pointer;
+        // plus sign when create drawer is closed
+        &:after{
+            content: '+';
+            position: absolute;
+            font-size: $headerHeight;
+            line-height: $headerHeight;
         }
-    }
-    &__bottom-toggle {
-        border-top: 1px solid $mirage;
-        @include info-window-toggle;
-        bottom: 0;
-        &:after {
-            @include double-arrow;
-            -webkit-transform: rotate(90deg);
-            transform: rotate(90deg)
+        // minus sign when create drawer is open
+        .create-drawer--open &:after {
+            content: '\2212';
         }
     }
     &--open {
         transform: translate(0, 0);
-        -webkit-transform: translate(0, 0);
         transition: transform 0.3s ease-out;
-        -webkit-transition: transform 0.3s ease-out;
+    }
+    &__title {
+        text-align: right;
+        padding: 0px 6px;
+        box-sizing: border-box;
+        display: block;
+        text-transform: uppercase;
+        line-height: $headerHeight;
+        width: 100%;
+        height: $headerHeight;
+        background-color: $mirage;
     }
 }
 
-.img-modal{
-    @include modal($background-color: rgba(0,0,0,0.9));
-    &__close{
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: #f1f1f1;
-        font-size: 40px;
-        font-weight: bold;
-        transition: 0.3s;
-        &:hover, &:focus{
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    }    
-    /* Modal Content (Image) */
-    &__image {
-        align-self: flex-start;
-        justify-content: center;
-        margin-top: 15%;
-        width: 80%;
-        /*max-width: 700px;*/
+.location-form {
+    margin: 0px 6px;
+    &__name, &__info{
+        @include form-fields;
     }
-
-    /* Caption of Modal Image (Image Text) - Same Width as the Image */
-    &__caption {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
-        text-align: center;
-        color: #ccc;
-        padding: 10px 0;
-        height: 150px;
+    &__info{
+        height: 10rem;
     }
-
-    /* Add Animation - Zoom in the Modal */
-    &__image, &__caption { 
-        -webkit-animation-name: zoom;
-        -webkit-animation-duration: 0.6s;
-        animation-name: zoom;
-        animation-duration: 0.6s;
+    &__submit {
+        @include full-width-drawer-button
     }
+}
 
-    @-webkit-keyframes zoom {
-        from {-webkit-transform:scale(0)} 
-        to {-webkit-transform:scale(1)}
+.popup {
+    box-sizing: border-box;
+    @include fullHeight;
+    width: 100%;
+    background-color: blue;
+    position: absolute;
+    bottom: 0;
+    transform: translate(0,100%);
+    transition: transform 0.3s ease-out;
+    // add 2rem space on the bottom for the toggle-down button 
+    padding-bottom: 2rem;
+    &--open {
+        transform: translate(0, 0);
+        transition: transform 0.3s ease-out;
     }
-
-    @keyframes zoom {
-        from {transform:scale(0)} 
-        to {transform:scale(1)}
+    &__toggle-up{
+        @include popup__toggle;
+        top: -2rem;
+    }
+    &__toggle-down{
+        @include popup__toggle;
+        bottom: 0px;
+    }
+    &__info-wrapper {
+        // push info-wrapper 2 rem down so that it rests under header
+        margin: 2rem 0 0;
+        @include fullHeight;
+        overflow-y: scroll;
     }
 }
 
@@ -256,203 +305,22 @@ h3 {
         padding: 0.4rem 0 0;
         font-weight: bold;
     }
-    &__info {
+    &__details {
         width: 100%;
     }
-    &__info--edit {
+    &__details--edit {
         width: 100%;
         height: 40%;
     }
 }
-.images{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+
+.preview-img {
+    max-width: 200px;
+    max-height: 200px;
+}
+
+#map {
     width: 100%;
-    &__image{
-        width: 47%;
-        max-height: 300px;
-        align-self: center;
-        margin-top: 0.7rem;
-        cursor: pointer;
-        transition: 0.3s;
-        &:hover{
-            opacity: 0.7;
-        }
-    }
-    &__image-caption{
-        width: 47%;
-        /*text-align: right;*/
-    }
-}
-
-.upload-image {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    &__input {
-        @include hide-input;
-    }
-    &__upload-btn, &__select-btn {
-        @include button;
-        align-self: flex-start;
-        display: inline-block;
-        border: 1px solid $mirage;
-        padding: 0.3rem;
-        margin: 1rem 0;
-        border-radius: 4px;
-    }
-    &__image{
-        align-self: flex-start;
-        max-width: 45%;
-    }
-    &__caption{
-        width: 45%;
-        height: 7rem;
-    }
-}
-
-header {
-    height: 2rem;
-    width: 100%;
-    background-color: $mirage;
-    position: absolute;
-    z-index: 2;
-    top: 0;
-    display: flex;
-    justify-content: center;
-}
-
-.log-out-btn {
-    @include drawer-button;
-    border: 0px;
-    margin: 0 auto;
-}
-
-.drawer {
-    @include drawers;
-    left: 0;
-    transform: translate(-200px);
-    -webkit-transform: translate(-200px);
-    .fa-bars {
-        font-size: 1.5rem;
-        line-height: 2rem;
-        position: absolute;
-        color: #FFF;
-        right: -30px;
-    }
-    &--open {
-        transform: translate(0);
-        -webkit-transform: translate(0);
-        transition: transform 0.3s ease-out;
-        -webkit-transition: transform 0.3s ease-out;
-        .fa-bars{
-            -webkit-transform: rotate(90deg);
-            transform: rotate(90deg);
-        }
-    }
-}
-
-.create-location{
-    @include drawers;
-    right: 0; 
-    -webkit-transform: translate(200px);
-    transform: translate(200px);
-    .fa-plus, .fa-minus {
-        font-size: 1.4rem;
-        line-height: 2rem;
-        position: absolute;
-        color: #FFF;
-        left: -30px;
-    }
-    .fa-minus {
-        display:none;
-    }
-    &__title {
-        text-align: right;
-        padding: 0px 6px;
-        box-sizing: border-box;
-        display: block;
-        text-transform: uppercase;
-        line-height: 2rem;
-        width: 100%;
-        height: 2rem;
-        background-color: $mirage;
-    }
-    &--open {
-        transform: translate(0);
-        -webkit-transform: translate(0);
-        transition: transform 0.3s ease-out;
-        -webkit-transition: transform 0.3s ease-out;
-        .fa-plus {
-            display: none;
-        }
-        .fa-minus {
-            display: inline-block;
-        }
-    }
-}
-
-.location-form {
-    margin: 0px 6px;
-    &__name, &__info{
-        @include form-fields;
-    }
-    &__info{
-        height: 10rem;
-    }
-    &__submit {
-        @include full-width-drawer-button
-    }
-}
-
-.drawer__filter {
-    box-sizing: border-box;
-    height: 100%;
-    position: absolute;
-    margin: 0px;
-    color: $gallery;
-    padding: 6px;
-    padding-bottom: 4.2rem;
-    &__searchbox {
-        @include form-fields;
-    }
-    &__list {
-        margin-bottom: 2rem;
-        height: 100%;
-        box-sizing: border-box;
-        overflow-y: scroll;
-        list-style: none;
-        text-transform: uppercase;
-        padding: 6px 0 0;
-        &::-webkit-scrollbar {
-            width: 10px;
-            right: 2px;
-        }
-        &::-webkit-scrollbar-track {
-            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-        }
-        &::-webkit-scrollbar-thumb {
-            background-color: rgba(93,93,93, 0.7);
-        }
-    }
-    &__list-item{
-        cursor: pointer;
-    }
-    &__export-btn, &__import-btn {
-        position: absolute;
-        left: 0;
-        @include full-width-drawer-button
-    }
-    &__export-btn {
-        bottom: 2rem; 
-    }
-    &__import-btn {
-        border-top: none;
-        bottom: 0rem; 
-        cursor: pointer;
-    }
-    &__import-input {
-        @include hide-input;
-    }
+    @include fullHeight;
+    margin-top: $headerHeight;
 }
