@@ -109,7 +109,7 @@ header {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
-    overflow: hidden;
+    /*overflow: hidden;*/
     position: absolute;
     z-index: -1; }
   .filter-drawer__toggle {
@@ -282,7 +282,7 @@ header {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
-    overflow: hidden;
+    /*overflow: hidden;*/
     position: absolute;
     z-index: -1; }
   .upload-image__upload-btn, .upload-image__select-btn {
