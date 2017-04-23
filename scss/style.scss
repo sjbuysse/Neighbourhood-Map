@@ -100,8 +100,18 @@ header {
     justify-content: center;
 }
 
+.log-out-btn {
+    @include drawer-button;
+    border: 0px;
+    margin: 0 auto;
+}
+
 .line-break {
     width: 100%;
+}
+
+.hidden{
+    display: none;
 }
 
 .background {

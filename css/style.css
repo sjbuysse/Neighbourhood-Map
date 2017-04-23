@@ -12,8 +12,27 @@ header {
   display: flex;
   justify-content: center; }
 
+.log-out-btn {
+  padding: 1px 6px;
+  box-sizing: border-box;
+  text-transform: uppercase;
+  text-align: left;
+  outline: none;
+  cursor: pointer;
+  color: #EEE;
+  line-height: 32px;
+  height: 32px;
+  background-color: #1C262F;
+  border: 1px solid #EEE;
+  outline: none;
+  border: 0px;
+  margin: 0 auto; }
+
 .line-break {
   width: 100%; }
+
+.hidden {
+  display: none; }
 
 .background {
   height: 100%;
