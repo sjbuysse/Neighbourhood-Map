@@ -114,7 +114,7 @@
             <label class="info__latlng">lng: <span data-bind='text: latlng().lng'></span> </label>
             <p class="info__details" data-bind='text: info, visible: !editing(),event: { dblclick: setEditing }, doubleTap: setEditing'></p> 
             <textarea class='info__details--edit' data-bind="value: info, visible: editing,  valueUpdate: 'afterkeydown', escapeKey: undoEditing"></textarea>
-            <div class="info__images images">
+            <div class="info__images images" id="image-wrapper">
                 <h2 data-bind="visible: (images().length > 0)">Images</h2>
                 <div class="line-break"></div>
                 <!-- ko foreach: images -->
@@ -125,21 +125,9 @@
                   <input class='images__image-caption--edit' data-bind="value: caption, visible: $parent.editing,  valueUpdate: 'afterkeydown', enterKey: $parent.saveEditing.bind($parent), escapeKey: $parent.undoEditing.bind($parent)"></input>
                 <!-- /ko -->
             </div>
-            <div data-bind="visible: !editing()" class="info__upload-image upload-image">
-                <h3>Add Image</h3>
-                <input type="file" name="imageFile" id="imageFile" class="upload-image__input" 
-                accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />
-                <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
-                <!--<input class='session__image-caption-input' placeholder="Add a caption to the image" data-bind="value: caption, valueUpdate: 'afterkeydown', enterKey: saveEditing, escapeKey: undoEditing"></input>-->
-                <div class="line-break"></div>
-                <img src="" id="previewImg" class="upload-image__image">
-                <textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="upload-image__caption hidden"></textarea>
-                <div class="line-break"></div>
-                <button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>
-            </div>
-            <!--<input id="file" type="file">-->
-            <!--<img id="preview-img" class="preview-img" src='#' alt="Your image"/>-->
-            <!--<button id="submit-img">Submit</button>-->
+            <input id="file" type="file">
+            <img id="preview-img" class="preview-img" src='#' alt="Your image"/>
+            <button id="submit-img">Submit</button>
         </div>
 </div>
 </div>

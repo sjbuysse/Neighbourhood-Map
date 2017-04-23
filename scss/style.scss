@@ -340,30 +340,9 @@ header {
     }
 }
 
-.upload-image {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    &__input {
-        @include hide-input;
-    }
-    &__upload-btn, &__select-btn {
-        @include button;
-        align-self: flex-start;
-        display: inline-block;
-        border: 1px solid $mirage;
-        padding: 0.3rem;
-        margin: 1rem 0;
-        border-radius: 4px;
-    }
-    &__image{
-        align-self: flex-start;
-        max-width: 45%;
-    }
-    &__caption{
-        width: 45%;
-        height: 7rem;
-    }
+.preview-img {
+    max-width: 200px;
+    max-height: 200px;
 }
 
 #map {
