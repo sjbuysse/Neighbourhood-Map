@@ -109,8 +109,8 @@ header {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
-    /*overflow: hidden;*/
-    position: absolute;
+    overflow: hidden;
+    /*position: absolute;*/
     z-index: -1; }
   .filter-drawer__toggle {
     position: absolute;
@@ -282,8 +282,8 @@ header {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
-    /*overflow: hidden;*/
-    position: absolute;
+    overflow: hidden;
+    /*position: absolute;*/
     z-index: -1; }
   .upload-image__upload-btn, .upload-image__select-btn {
     padding: 1px 6px;
