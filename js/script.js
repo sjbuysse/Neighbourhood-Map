@@ -1,5 +1,4 @@
 $(document).ready(function(){
-    $('.filter-drawer__toggle').on('click', openFilterDrawer);
     $('.create-drawer__toggle').on('click', openCreateDrawer);
     function popup() {
         $('#popup').toggleClass("popup--open");
