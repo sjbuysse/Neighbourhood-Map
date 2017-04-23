@@ -279,12 +279,7 @@ header {
   flex-wrap: wrap;
   justify-content: space-between; }
   .upload-image__input {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1; }
+    /*@include hide-input;*/ }
   .upload-image__upload-btn, .upload-image__select-btn {
     padding: 1px 6px;
     box-sizing: border-box;

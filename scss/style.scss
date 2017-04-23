@@ -345,7 +345,7 @@ header {
     flex-wrap: wrap;
     justify-content: space-between;
     &__input {
-        @include hide-input;
+        /*@include hide-input;*/
     }
     &__upload-btn, &__select-btn {
         @include button;
