@@ -18,12 +18,12 @@ $(document).ready(
     function() {
         $filterList = $('#filter-list');
         var phFilterList = $filterList.getPotentialHeight();
-        console.log("phFilterList " + phFilterList);
+        console.log(phFilterList);
         $filterList.css('height', phFilterList);
 
         $infoWrapper = $('#info-wrapper');
         var phInfoWrapper = $infoWrapper.getPotentialHeight();
-        console.log("phInfoWrapper " + phInfoWrapper);
+        console.log(phInfoWrapper);
         $infoWrapper.css('height', phInfoWrapper);
     }
 );

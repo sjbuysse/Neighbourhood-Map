@@ -252,6 +252,7 @@ var module = (function(){
         this.setSelectedPlace = function(place){
             if(!place) {
                 // We deleted the last selected place
+                console.log("saaa");
                 this.selectedPlace(place);
                 return true;
             } else if (!this.selectedPlace()){

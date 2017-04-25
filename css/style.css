@@ -12,27 +12,8 @@ header {
   display: flex;
   justify-content: center; }
 
-.log-out-btn {
-  padding: 1px 6px;
-  box-sizing: border-box;
-  text-transform: uppercase;
-  text-align: left;
-  outline: none;
-  cursor: pointer;
-  color: #EEE;
-  line-height: 32px;
-  height: 32px;
-  background-color: #1C262F;
-  border: 1px solid #EEE;
-  outline: none;
-  border: 0px;
-  margin: 0 auto; }
-
 .line-break {
   width: 100%; }
-
-.hidden {
-  display: none; }
 
 .background {
   height: 100%;
@@ -129,7 +110,7 @@ header {
     height: 0.1px;
     opacity: 0;
     overflow: hidden;
-    /*position: absolute;*/
+    position: absolute;
     z-index: -1; }
   .filter-drawer__toggle {
     position: absolute;
@@ -211,15 +192,6 @@ header {
     border: 1px solid #EEE;
     outline: none;
     width: 100%; }
-
-.info-window {
-  text-align: center; }
-  .info-window__name {
-    text-transform: uppercase;
-    font-size: 1.2rem;
-    padding: 0.5rem;
-    font-weight: bold;
-    display: block; }
 
 .popup {
   box-sizing: border-box;
@@ -311,7 +283,7 @@ header {
     height: 0.1px;
     opacity: 0;
     overflow: hidden;
-    /*position: absolute;*/
+    position: absolute;
     z-index: -1; }
   .upload-image__upload-btn, .upload-image__select-btn {
     padding: 1px 6px;

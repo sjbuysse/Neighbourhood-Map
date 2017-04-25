@@ -22,46 +22,81 @@
 
         <!-- Add your site or application content here -->
 
-        <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-        <symbol id="icon-filter" viewBox="0 0 32 32">
-        <title>filter</title>
-        <path d="M16 0c-8.837 0-16 2.239-16 5v3l12 12v10c0 1.105 1.791 2 4 2s4-0.895 4-2v-10l12-12v-3c0-2.761-7.163-5-16-5zM2.95 4.338c0.748-0.427 1.799-0.832 3.040-1.171 2.748-0.752 6.303-1.167 10.011-1.167s7.262 0.414 10.011 1.167c1.241 0.34 2.292 0.745 3.040 1.171 0.494 0.281 0.76 0.519 0.884 0.662-0.124 0.142-0.391 0.38-0.884 0.662-0.748 0.427-1.8 0.832-3.040 1.171-2.748 0.752-6.303 1.167-10.011 1.167s-7.262-0.414-10.011-1.167c-1.24-0.34-2.292-0.745-3.040-1.171-0.494-0.282-0.76-0.519-0.884-0.662 0.124-0.142 0.391-0.38 0.884-0.662z"></path>
-        </symbol>
-        </defs>
-        </svg>
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<symbol id="icon-filter" viewBox="0 0 32 32">
+<title>filter</title>
+<path d="M16 0c-8.837 0-16 2.239-16 5v3l12 12v10c0 1.105 1.791 2 4 2s4-0.895 4-2v-10l12-12v-3c0-2.761-7.163-5-16-5zM2.95 4.338c0.748-0.427 1.799-0.832 3.040-1.171 2.748-0.752 6.303-1.167 10.011-1.167s7.262 0.414 10.011 1.167c1.241 0.34 2.292 0.745 3.040 1.171 0.494 0.281 0.76 0.519 0.884 0.662-0.124 0.142-0.391 0.38-0.884 0.662-0.748 0.427-1.8 0.832-3.040 1.171-2.748 0.752-6.303 1.167-10.011 1.167s-7.262-0.414-10.011-1.167c-1.24-0.34-2.292-0.745-3.040-1.171-0.494-0.282-0.76-0.519-0.884-0.662 0.124-0.142 0.391-0.38 0.884-0.662z"></path>
+</symbol>
+</defs>
+</svg>
 
 
-        <header>
-            <button data-bind="visible: (user() && !showDrawer() && !creatingPlace()), click: signOut" 
-                class="log-out-btn">Log Out</button>
-        </header>
-        <div id="map"></div>
-        <div id="auth-modal" class="auth-modal hidden">
-            <div class="auth-modal__content">
-                <div id="firebaseui-auth-container"></div>
-            </div>  
-        </div>
-        <div id="filter-drawer" class="filter-drawer" data-bind="css:{'filter-drawer--open': showDrawer()}">
-            <span class="filter-drawer__toggle" data-bind="click: toggleShowDrawer">
-                <svg class="filter-drawer__toggle-icon"><use xlink:href="#icon-filter"></use></svg>
-            </span>
-            <input class="filter-drawer__searchbox" placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown', event: {keypress: closeInfoWindow}"></input>
-            <ul class="filter-drawer__list" id="filter-list" data-bind="foreach: places">
-                <li data-bind="text: name(), visible: visible(), click: $root.chooseListItem" 
-                class="filter-drawer__list-item"></li>
-            </ul>
-            <button class="filter-drawer__export-btn" data-bind="click: exportLocations">Export locations</button>
-            <input type="file" name="file" id="file" class="filter-drawer__import-input" data-bind="visible: supportFileAPI, event: {change: handleJSONSelect}"/>
-            <label for="file" class="filter-drawer__import-btn" data-bind="visible: supportFileAPI">Import locations</label>
-        </div>
-<div id="create-drawer" class="create-drawer" data-bind="css:{'create-drawer--open': creatingPlace()}">
-    <span class="create-drawer__toggle" data-bind="click: toggleCreatingPlace">
+    <header><button data-bind="visible: (user && !showDrawer() && !creatingPlace()), click: signOut" class="log-out-btn">Log Out</button></header>
+<div id="map"></div>
+<div id="auth-modal" class="auth-modal hidden">
+    <div class="auth-modal__content">
+        <div id="firebaseui-auth-container"></div>
+    </div>  
+</div>
+<div id="filter-drawer" class="filter-drawer">
+    <span class="filter-drawer__toggle">
+        <svg class="filter-drawer__toggle-icon"><use xlink:href="#icon-filter"></use></svg>
+    </span>
+    <input class="filter-drawer__searchbox" placeholder="Search for a place"></input>
+    <ul class="filter-drawer__list" id="filter-list">
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">Shisha</li>
+        <li class="filter-drawer__list__item">Sha</li>
+        <li class="filter-drawer__list__item">Shi</li>
+        <li class="filter-drawer__list__item">keis</li>
+        <li class="filter-drawer__list__item">keis</li>
+        <li class="filter-drawer__list__item">keis</li>
+        <li class="filter-drawer__list__item">hesp</li>
+        <li class="filter-drawer__list__item">hesp</li>
+        <li class="filter-drawer__list__item">heps</li>
+    </ul>
+    <button class="filter-drawer__export-btn">Export locations</button>
+    <input type="file" name="file" id="file" class="filter-drawer__import-input"/>
+    <label for="file" class="filter-drawer__import-btn">Import locations</label>
+</div>
+<div id="create-drawer" class="create-drawer">
+    <span class="create-drawer__toggle">
     </span>
     <span class="create-drawer__title">Add Location</span>
-    <form class="create-drawer__form location-form" data-bind="submit: $root.addLocation,  with: $root.newPlace">
-        <input class="location-form__name" placeholder="Name" data-bind="textInput: name"></input>
-        <textarea class="location-form__info" data-bind="textInput: info" placeholder="Write down some information about your session at this spot"></textarea>
+    <form class="create-drawer__form location-form">
+        <input class="location-form__name" placeholder="Name"></input>
+        <textarea class="location-form__info" placeholder="Write down some information about your session at this spot"></textarea>
         <button type="submit" class="location-form__submit">Pin to center</button>
         <p>When you submit this form, a green pin will be added to the center of the map. You can then drag it to its correct location.</p>
     </form>
@@ -89,14 +124,18 @@
             </div>
             <div data-bind="visible: !editing()" class="info__upload-image upload-image">
                 <h3>Add Image</h3>
-                <input type="file" name="imageFile" id="imageFile" class="upload-image__input" 
-                accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />
-                <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
-                <div class="line-break"></div>
-                <img src="" id="previewImg" class="upload-image__image">
-                <textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="upload-image__caption hidden"></textarea>
-                <div class="line-break"></div>
-                <button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>
+                <input id="file" type="file">
+                <img id="preview-img" class="preview-img" src='#' alt="Your image"/>
+                <button id="submit-img">Submit</button>
+                <!--<input type="file" name="imageFile" id="imageFile" class="upload-image__input" -->
+                <!--accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />-->
+                <!--<label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> -->
+                <!--[><input class='session__image-caption-input' placeholder="Add a caption to the image" data-bind="value: caption, valueUpdate: 'afterkeydown', enterKey: saveEditing, escapeKey: undoEditing"></input><]-->
+                <!--<div class="line-break"></div>-->
+                <!--<img src="" id="previewImg" class="upload-image__image">-->
+                <!--<textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="upload-image__caption hidden"></textarea>-->
+                <!--<div class="line-break"></div>-->
+                <!--<button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>-->
             </div>
         </div>
 </div>
