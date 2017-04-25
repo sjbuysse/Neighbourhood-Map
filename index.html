@@ -34,6 +34,9 @@
 
     <header><button data-bind="visible: (user && !showDrawer() && !creatingPlace()), click: signOut" class="log-out-btn">Log Out</button></header>
 <div id="map"></div>
+<!--<div class="background">-->
+    <!--Kaasjes-->
+<!--</div>-->
 <div id="auth-modal" class="auth-modal hidden">
     <div class="auth-modal__content">
         <div id="firebaseui-auth-container"></div>
@@ -105,38 +108,22 @@
     <div class="popup__toggle popup__toggle-up" data-bind="click: $root.toggleShowLargeInfoWindow">Pop Up!</div>
     <div class="popup__toggle popup__toggle-down" data-bind="click: $root.toggleShowLargeInfoWindow">Pop Down!</div>
         <div class="popup__info-wrapper info" id="info-wrapper">
-            <label class="info__name" data-bind='text: name, visible: !editing(),event: { dblclick: setEditing }, doubleTap: setEditing'>info__name</label> 
-            <input class='info__name--edit' data-bind="value: name, visible: editing,  valueUpdate: 'afterkeydown', enterKey: saveEditing, escapeKey: undoEditing"></input>
-            <label class="info__latlng">lat: <span data-bind='text: latlng().lat'></span></label> 
-            <label class="info__latlng">lng: <span data-bind='text: latlng().lng'></span> </label>
-            <p class="info__details" data-bind='text: info, visible: !editing(),event: { dblclick: setEditing }, doubleTap: setEditing'></p> 
-            <textarea class='info__details--edit' data-bind="value: info, visible: editing,  valueUpdate: 'afterkeydown', escapeKey: undoEditing"></textarea>
-            <div class="info__images images" id="image-wrapper">
-                <h2 data-bind="visible: (images().length > 0)">Images</h2>
-                <div class="line-break"></div>
-                <!-- ko foreach: images -->
-                  <img data-bind='attr: {src: url}, click: $root.openImgModal' class="images__image"/>
-                  <p class="images__image-caption" data-bind='text: caption, 
-                  visible: !($parent.editing()), event: { dblclick: $parent.setEditing.bind($parent) }, 
-                  doubleTap: $parent.setEditing.bind($parent)'></p>
-                  <input class='images__image-caption--edit' data-bind="value: caption, visible: $parent.editing,  valueUpdate: 'afterkeydown', enterKey: $parent.saveEditing.bind($parent), escapeKey: $parent.undoEditing.bind($parent)"></input>
-                <!-- /ko -->
-            </div>
-            <div data-bind="visible: !editing()" class="info__upload-image upload-image">
-                <h3>Add Image</h3>
-                <input id="file" type="file">
-                <img id="preview-img" class="preview-img" src='#' alt="Your image"/>
-                <button id="submit-img">Submit</button>
-                <!--<input type="file" name="imageFile" id="imageFile" class="upload-image__input" -->
-                <!--accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />-->
-                <!--<label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> -->
-                <!--[><input class='session__image-caption-input' placeholder="Add a caption to the image" data-bind="value: caption, valueUpdate: 'afterkeydown', enterKey: saveEditing, escapeKey: undoEditing"></input><]-->
-                <!--<div class="line-break"></div>-->
-                <!--<img src="" id="previewImg" class="upload-image__image">-->
-                <!--<textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="upload-image__caption hidden"></textarea>-->
-                <!--<div class="line-break"></div>-->
-                <!--<button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>-->
-            </div>
+            <label class="info__name">info__name</label> 
+            <input class='info__name--edit'></input>
+            <label class="info__latlng">lat: <span></span></label> 
+            <label class="info__latlng">lng: <span></span> </label>
+            <p class="info__details" >Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam eleifend dui at ex gravida blandit. Maecenas et diam sapien. Phasellus in aliquet nunc, in molestie metus. In commodo eget lacus sit amet gravida. In sagittis orci ut sem cursus porttitor. Aenean eget hendrerit odio, in dictum nunc. Fusce vulputate venenatis orci, eu dictum lectus dignissim eu. Suspendisse tellus eros, condimentum eu libero eu, vehicula mattis ligula. Nullam at massa risus. Pellentesque finibus ex in lorem fermentum, vitae lobortis erat volutpat. Duis sed eros vitae enim aliquam mattis.
+
+Maecenas sed ipsum sit amet est sagittis hendrerit non vel turpis. Phasellus porttitor sem vitae tortor sodales tristique. Nam consequat aliquam purus, et auctor justo placerat nec. Curabitur consectetur diam a erat viverra faucibus. Sed euismod risus a nulla facilisis efficitur sit amet in diam. Nullam at lectus est. Nullam iaculis eu ipsum sed consequat. Etiam ac pharetra orci. Fusce lorem nulla, congue vitae dui a, cursus euismod neque. Phasellus vitae erat id odio laoreet porttitor. Nam aliquam laoreet justo id pellentesque. Aenean condimentum mollis lacus, imperdiet mattis sem vulputate non.
+
+Sed mattis augue ante, tincidunt eleifend magna dignissim et. Donec venenatis pellentesque quam ac tristique. Sed vehicula dapibus tempus. Mauris id diam dolor. Quisque tincidunt interdum lectus at euismod. Integer aliquam suscipit ligula ut mollis. Nunc sit amet porta felis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt, tellus ut viverra venenatis, elit ex porttitor dui, condimentum condimentum felis nunc eget quam.</p> 
+            <textarea class='info__details--edit'></textarea>
+            <h2 >Images</h2>
+            <br>
+            <div class="image-wrapper" id="image-wrapper"></div>
+            <input id="file" type="file">
+            <img id="preview-img" class="preview-img" src='#' alt="Your image"/>
+            <button id="submit-img">Submit</button>
         </div>
 </div>
 </div>
