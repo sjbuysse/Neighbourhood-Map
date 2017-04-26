@@ -107,7 +107,7 @@ header {
     height: 0.1px;
     opacity: 0;
     overflow: hidden;
-    position: absolute;
+    /*position: absolute;*/
     z-index: -1; }
   .filter-drawer__toggle {
     position: absolute;
