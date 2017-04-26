@@ -169,7 +169,7 @@ header {
         bottom: 0rem; 
     }
     &__import-input {
-        @include hide-input;
+        /*@include hide-input;*/
     }
     // span that surrounds svg toggle icon
     &__toggle {
