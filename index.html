@@ -126,61 +126,15 @@ Sed mattis augue ante, tincidunt eleifend magna dignissim et. Donec venenatis pe
         </div>
 </div>
 </div>
-    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
-    <script src="js/setListHeight.js"></script>
-    <script src="js/plugins.js"></script>
-    <!--temporary script to handle ui-->
+    <!--<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>-->
+    <!--<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>-->
+    <script src="js/vendor/jquery-1.12.0.min.js"></script>
     <script src="js/script.js"></script>
     <script src="bower_components/knockout/dist/knockout.js"></script>
-    <script src="bower_components/es6-promise-polyfill/promise.min.js"></script>
-    <!--custom knockout bindings for escape and enter key while editing-->
-    <script src="js/keyhandling.js"></script>
-    <!--custom knockout bindings for double tapping to edit field-->
-    <script src="js/doubletap.js"></script>
-    <!--module to save .json files from the console-->
-    <script src="js/console-save.js"></script>
-    <!--module to resize iages before uploading-->
-    <script src="js/imageResizer.js"></script>
-    <script src="js/main.js"></script>
-    <!--script to set the height of the popup screen and the filter drawer-->
     <script src="js/setListHeight.js"></script>
-    <!--script to deal with bug on android when editing text-->
-    <script src="js/androidbug.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-storage.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-auth.js"></script>
-    <script>
-      // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyDCYpUjurtGKHJ3mIpMik5_mLhRrVgM33E",
-        authDomain: "surf-sessions-7accd.firebaseapp.com",
-        databaseURL: "https://surf-sessions-7accd.firebaseio.com",
-        storageBucket: "surf-sessions-7accd.appspot.com",
-        messagingSenderId: "246363609320"
-      };
-      firebase.initializeApp(config);
-    </script>
-    <!--module for handling OAuth-->
-    <script src="bower_components/firebaseui/dist/firebaseui.js"></script>
-    <script type="text/javascript">
-        // FirebaseUI config.
-        var uiConfig = {
-            signInFlow: 'popup',
-            signInOptions: [
-                // Leave the lines as is for the providers you want to offer your users.
-                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-                firebase.auth.EmailAuthProvider.PROVIDER_ID
-            ]
-        };
-
-        // Initialize the FirebaseUI Widget using Firebase.
-        var ui = new firebaseui.auth.AuthUI(firebase.auth());
-        // The start method will wait until the DOM is loaded.
-        ui.start('#firebaseui-auth-container', uiConfig);
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=module.initMap" onerror="module.initWithoutMap()" async defer></script>
     </body>
+    <script async defer
+        src=
+        "https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&v=3&callback=initMap">
+    </script>
 </html>
