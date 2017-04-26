@@ -30,7 +30,7 @@
 </svg>
 
 
-    <header></header>
+    <header><button data-bind="visible: (user && !showDrawer() && !creatingPlace()), click: signOut" class="log-out-btn">Log Out</button></header>
 <div id="map"></div>
 <!--<div class="background">-->
     <!--Kaasjes-->
@@ -102,9 +102,9 @@
         <p>When you submit this form, a green pin will be added to the center of the map. You can then drag it to its correct location.</p>
     </form>
 </div>
-<div class="popup" id="popup">
-    <div class="popup__toggle popup__toggle-up">Pop Up!</div>
-    <div class="popup__toggle popup__toggle-down">Pop Down!</div>
+<div class="popup" id="popup" data-bind="with: selectedPlace, css:{'popup--open': $root.showLargeInfoWindow()}">
+    <div class="popup__toggle popup__toggle-up" data-bind="click: $root.toggleShowLargeInfoWindow">Pop Up!</div>
+    <div class="popup__toggle popup__toggle-down" data-bind="click: $root.toggleShowLargeInfoWindow">Pop Down!</div>
         <div class="popup__info-wrapper info" id="info-wrapper">
             <label class="info__name">info__name</label> 
             <input class='info__name--edit'></input>
