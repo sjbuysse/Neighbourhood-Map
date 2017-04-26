@@ -138,6 +138,21 @@ Sed mattis augue ante, tincidunt eleifend magna dignissim et. Donec venenatis pe
     <script src="js/keyhandling.js"></script>
     <!--custom knockout bindings for double tapping to edit field-->
     <script src="js/doubletap.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-auth.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDCYpUjurtGKHJ3mIpMik5_mLhRrVgM33E",
+        authDomain: "surf-sessions-7accd.firebaseapp.com",
+        databaseURL: "https://surf-sessions-7accd.firebaseio.com",
+        storageBucket: "surf-sessions-7accd.appspot.com",
+        messagingSenderId: "246363609320"
+      };
+      firebase.initializeApp(config);
+    </script>
     </body>
     <script async defer
         src=
