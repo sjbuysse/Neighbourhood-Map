@@ -129,6 +129,8 @@ Sed mattis augue ante, tincidunt eleifend magna dignissim et. Donec venenatis pe
     <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
     <script src="js/setListHeight.js"></script>
+    <!--script to deal with bug on android when editing text-->
+    <script src="js/androidbug.js"></script>
     <script src="js/main.js"></script>
     <script src="js/plugins.js"></script>
     <!--temporary script to handle ui-->
@@ -177,6 +179,9 @@ Sed mattis augue ante, tincidunt eleifend magna dignissim et. Donec venenatis pe
         // The start method will wait until the DOM is loaded.
         ui.start('#firebaseui-auth-container', uiConfig);
     </script>
-    script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=module.initMap" onerror="module.initWithoutMap()" async defer></script>
     </body>
+    <script async defer
+        src=
+        "https://maps.googleapis.com/maps/api/js?libraries=geometry,drawing&key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&v=3&callback=initMap">
+    </script>
 </html>
