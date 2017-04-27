@@ -298,7 +298,7 @@ header {
     transition: 0.3s; }
     .images__image:hover {
       opacity: 0.7; }
-  .images__image-caption {
+  .images__image-caption, .images__image-caption--edit {
     width: 47%;
     /*text-align: right;*/ }
 
