@@ -98,6 +98,12 @@
                 <div class="line-break"></div>
                 <button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>
             </div>
+            <button data-bind='click: saveEditing, visible: (editing())'>
+                Update
+            </button>
+            <button data-bind='click: undoEditing, visible: (editing())'>
+                Cancel
+            </button>
         </div>
 </div>
 </div>
