@@ -3,13 +3,11 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>Sessions</title>
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/style.css">
-        <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
-
+        <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
         <link rel="apple-touch-icon" href="apple-touch-icon.png">
         <!-- Place favicon.ico in the root directory -->
 
@@ -124,12 +122,14 @@ Sed mattis augue ante, tincidunt eleifend magna dignissim et. Donec venenatis pe
             <input id="file" type="file">
             <img id="preview-img" class="preview-img" src='#' alt="Your image"/>
             <button id="submit-img">Submit</button>
+            <textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="upload-image__caption"></textarea>
         </div>
 </div>
 </div>
     <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
     <script src="js/setListHeight.js"></script>
+    <script src="js/main.js"></script>
     <script src="js/plugins.js"></script>
     <!--temporary script to handle ui-->
     <script src="js/script.js"></script>
@@ -143,11 +143,6 @@ Sed mattis augue ante, tincidunt eleifend magna dignissim et. Donec venenatis pe
     <script src="js/console-save.js"></script>
     <!--module to resize iages before uploading-->
     <script src="js/imageResizer.js"></script>
-    <script src="js/main.js"></script>
-    <!--script to set the height of the popup screen and the filter drawer-->
-    <script src="js/setListHeight.js"></script>
-    <!--script to deal with bug on android when editing text-->
-    <script src="js/androidbug.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-storage.js"></script>
@@ -182,7 +177,6 @@ Sed mattis augue ante, tincidunt eleifend magna dignissim et. Donec venenatis pe
         // The start method will wait until the DOM is loaded.
         ui.start('#firebaseui-auth-container', uiConfig);
     </script>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=module.initMap" onerror="module.initWithoutMap()" async defer></script>
+    script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=module.initMap" onerror="module.initWithoutMap()" async defer></script>
     </body>
 </html>
