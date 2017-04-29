@@ -89,6 +89,7 @@
             </div>
             <div data-bind="visible: !editing()" class="info__upload-image upload-image">
                 <h3>Add Image</h3>
+                <div class="line-break"></div>
                 <input type="file" name="imageFile" id="imageFile" class="upload-image__input" 
                 accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />
                 <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
@@ -98,10 +99,10 @@
                 <div class="line-break"></div>
                 <button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>
             </div>
-            <button data-bind='click: saveEditing, visible: (editing())'>
+            <button data-bind='click: saveEditing, visible: (editing())' class="info__update-btn">
                 Update
             </button>
-            <button data-bind='click: undoEditing, visible: (editing())'>
+            <button data-bind='click: undoEditing, visible: (editing())' class="info__cancel-btn">
                 Cancel
             </button>
         </div>
