@@ -31,7 +31,7 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            css: {
+            scss: {
                 options: {
                     cwd: {
                         files: config.scssDir
@@ -39,6 +39,15 @@ module.exports = function(grunt) {
                 },
                 files: '**/*.scss',
                 tasks: ['sass']
+            },
+            postcss: {
+                options: {
+                    cwd: {
+                        files: config.cssDir
+                    }
+                },
+                files: '**/*.css',
+                tasks: ['postcss']
             }
         } 
     });
