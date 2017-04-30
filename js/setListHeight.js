@@ -4,17 +4,26 @@
         var $element = this;
         //heightOfParent is the height of parents content (inside the padding)
         var heightOfParent = $element.parent().height();
-        offset = $element.offset();
-        topOfElement = offset.top;
-        return (heightOfParent - topOfElement);
+        var offset = $element.position();
+        var topOfElement = offset.top;
+        // potential height of element including the elements margin
+        var phInclMargin = heightOfParent - topOfElement;
+        // potential height of element excluding the elements margin
+        var phExclMargin = phInclMargin - parseInt($element.css('margin-top')) - parseInt($element.css('margin-bottom'));
+        return phExclMargin;
   };
 })(jQuery);
 
 $(document).ready(
     function() {
-        var potentialHeight = $('#filter-list').getPotentialHeight();
-        console.log(potentialHeight);
-        $('#filter-list').css('height', potentialHeight);
-        $('#info-wrapper').css('height', potentialHeight + 32);
+        $filterList = $('#filter-list');
+        var phFilterList = $filterList.getPotentialHeight();
+        console.log("phFilterList " + phFilterList);
+        $filterList.css('height', phFilterList);
+
+        $infoWrapper = $('#info-wrapper');
+        var phInfoWrapper = $infoWrapper.getPotentialHeight();
+        console.log("phInfoWrapper " + phInfoWrapper);
+        $infoWrapper.css('height', phInfoWrapper);
     }
 );

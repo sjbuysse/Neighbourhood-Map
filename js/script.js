@@ -1,7 +1,4 @@
 $(document).ready(function(){
-    $('.popup__toggle').on('click', popup);
-    $('.filter-drawer__toggle').on('click', openFilterDrawer);
-    $('.create-drawer__toggle').on('click', openCreateDrawer);
     function popup() {
         $('#popup').toggleClass("popup--open");
     }
@@ -12,7 +9,6 @@ $(document).ready(function(){
         $('#create-drawer').toggleClass("create-drawer--open");
     }
     function fileHandler(event){
-        console.log("keis");
         var file = event.target.files[0]; //event.target references the object that dispatched the event (so here it is the input element)
         var reader = new FileReader();
         reader.onload = function(event){
@@ -27,7 +23,7 @@ $(document).ready(function(){
     }
 
     $('#popup').on("change", '#file', fileHandler);
-    $('#submit-img').on('click', addImgToInfo);
+    $('#popup').on('click', '#submit-img', addImgToInfo);
 });
 var map;
 function initMap() {
