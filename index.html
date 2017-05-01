@@ -6,7 +6,8 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/style.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
         <link rel="apple-touch-icon" href="apple-touch-icon.png">
         <!-- Place favicon.ico in the root directory -->
@@ -144,12 +145,26 @@ Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis massa mauris,
         </div>
 </div>
 </div>
-    <!--<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>-->
-    <!--<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>-->
-    <script src="js/vendor/jquery-1.12.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+    <script src="js/plugins.js"></script>
+    <!--temporary script to handle ui-->
     <script src="js/script.js"></script>
-    <script src="js/androidbug.js"></script>
+    <script src="bower_components/knockout/dist/knockout.js"></script>
+    <script src="bower_components/es6-promise-polyfill/promise.min.js"></script>
+    <!--custom knockout bindings for escape and enter key while editing-->
+    <script src="js/keyhandling.js"></script>
+    <!--custom knockout bindings for double tapping to edit field-->
+    <script src="js/doubletap.js"></script>
+    <!--module to save .json files from the console-->
+    <script src="js/console-save.js"></script>
+    <!--module to resize iages before uploading-->
+    <script src="js/imageResizer.js"></script>
+    <script src="js/main.js"></script>
+    <!--script to set the height of the popup screen and the filter drawer-->
     <script src="js/setListHeight.js"></script>
+    <!--script to deal with bug on android when editing text-->
+    <script src="js/androidbug.js"></script>
     </body>
     <!--<script async defer-->
         <!--src=-->
