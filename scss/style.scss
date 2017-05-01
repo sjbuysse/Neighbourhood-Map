@@ -393,9 +393,60 @@ header {
     }
 }
 
-.preview-img {
-    max-width: 200px;
-    max-height: 200px;
+.img-modal{
+    @include modal($background-color: rgba(0,0,0,0.9));
+    &__close{
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+        &:hover, &:focus{
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    }    
+    /* Modal Content (Image) */
+    &__image {
+        align-self: flex-start;
+        justify-content: center;
+        margin-top: 15%;
+        width: 80%;
+        /*max-width: 700px;*/
+    }
+
+    /* Caption of Modal Image (Image Text) - Same Width as the Image */
+    &__caption {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+        text-align: center;
+        color: #ccc;
+        padding: 10px 0;
+        height: 150px;
+    }
+
+    /* Add Animation - Zoom in the Modal */
+    &__image, &__caption { 
+        -webkit-animation-name: zoom;
+        -webkit-animation-duration: 0.6s;
+        animation-name: zoom;
+        animation-duration: 0.6s;
+    }
+
+    @-webkit-keyframes zoom {
+        from {-webkit-transform:scale(0)} 
+        to {-webkit-transform:scale(1)}
+    }
+
+    @keyframes zoom {
+        from {transform:scale(0)} 
+        to {transform:scale(1)}
+    }
 }
 
 #map {
