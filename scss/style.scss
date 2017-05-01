@@ -2,21 +2,21 @@ $mirage: #1C262F;
 $gallery: #EEE;
 $headerHeight: 32px;
 
-@mixin hide-input{
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    left: -500px;
-}
-
 @mixin fullHeight {
     height: 100%;
 }
 
 @mixin viewportHeight {
     height: 100vh;
+}
+
+@mixin hide-input{
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
 }
 
 @mixin button {
@@ -27,7 +27,6 @@ $headerHeight: 32px;
     outline: none;
     cursor: pointer;
 }
-
 @mixin drawer-button {
     @include button;
     color: $gallery;
@@ -61,6 +60,21 @@ $headerHeight: 32px;
     z-index: 2;
 }
 
+@mixin modal($background-color: rgba(0,0,0,0.4)){
+    position: fixed; /* Stay in place */
+    z-index: 12; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: $background-color; /* Black w/ opacity */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 @mixin popup__toggle {
     position: absolute;
     background-color: white;
@@ -72,8 +86,8 @@ $headerHeight: 32px;
 
 html, body {
     height: 100%;
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
 }
 
 header {
@@ -87,8 +101,18 @@ header {
     justify-content: center;
 }
 
+.log-out-btn {
+    @include drawer-button;
+    border: 0px;
+    margin: 0 auto;
+}
+
 .line-break {
     width: 100%;
+}
+
+.hidden{
+    display: none;
 }
 
 .background {
@@ -96,6 +120,18 @@ header {
     width: 100%;
     background-color: green;
     padding-top: $headerHeight;
+}
+
+.auth-modal {
+    @include modal;
+    &__content {
+        background-color: #fefefe;
+        align-self: flex-start;
+        margin-top: 15%;
+        padding: 20px;
+        border: 1px solid #888;
+        display: inline-block;
+    }
 }
 
 // left drawer with the filter feature
@@ -113,7 +149,7 @@ header {
     &__searchbox {
         @include form-fields;
     }
-    // list of places that can be filtered
+    // list of places that can be filterd
     &__list{
         height: 100%;
         overflow-y: scroll;
@@ -172,17 +208,7 @@ header {
 
 // drawer on the right to create new locations
 .create-drawer {
-    @include viewportHeight;
-    text-align: left;
-    color: $gallery;
-    width: 200px;
-    background-color: $mirage;
-    position: absolute;
-    top: 0;
-    transition: transform 0.3s ease-out;
-    z-index: 2;
-    /*@include drawers;*/
-    box-sizing: border-box;
+    @include drawers;
     right: 0; 
     transform: translate(200px, 0);
     &__toggle {
@@ -208,9 +234,7 @@ header {
     }
     &--open {
         transform: translate(0, 0);
-        -webkit-transform: translate(0, 0);
         transition: transform 0.3s ease-out;
-        -webkit-transition: transform 0.3s ease-out;
     }
     &__title {
         text-align: right;
@@ -238,18 +262,28 @@ header {
     }
 }
 
+.info-window {
+        text-align: center;
+    &__name {
+        text-transform: uppercase;
+        font-size: 1.2rem;
+        padding: 0.5rem;
+        font-weight: bold;
+        display: block;
+    }
+}
+
 .popup {
     box-sizing: border-box;
     // push content 2rem up and down so that it is positioned under the header and above the toggledown button
     padding: 2rem 0;
     @include fullHeight;
     width: 100%;
-    background-color: blue;
+    background-color: white;
     position: absolute;
     bottom: 0;
     transform: translate(0,100%);
     transition: transform 0.3s ease-out;
-    // add 2rem space on the bottom for the toggle-down button 
     &--open {
         transform: translate(0, 0);
         transition: transform 0.3s ease-out;
@@ -265,6 +299,70 @@ header {
     &__info-wrapper {
         @include fullHeight;
         overflow-y: scroll;
+    }
+}
+
+.info {
+    box-sizing: border-box;
+    padding: 0 10px;
+    width: 100%;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+        width: 8px;
+        right: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(200,200,200, 0.85);
+    }
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    &__name,  &__latlng, &__name--edit  {
+        width: 100%;
+        text-align: center;
+    }
+    &__name, &__name--edit {
+        text-transform: uppercase;
+        font-size: 1.2rem;
+        padding: 0.4rem 0 0;
+        font-weight: bold;
+    }
+    &__details {
+        width: 100%;
+    }
+    &__details--edit {
+        width: 100%;
+        height: 40%;
+    }
+    &__update-btn, &__cancel-btn {
+        @include button;
+        display: inline-block;
+        border: 1px solid $mirage;
+        padding: 0.3rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+    }
+}
+
+.images{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    &__image{
+        width: 47%;
+        max-height: 300px;
+        align-self: center;
+        margin-top: 0.7rem;
+        cursor: pointer;
+        transition: 0.3s;
+        &:hover{
+            opacity: 0.7;
+        }
+    }
+    &__image-caption, &__image-caption--edit{
+        width: 47%;
+        /*text-align: right;*/
     }
 }
 
@@ -303,5 +401,5 @@ header {
 #map {
     width: 100%;
     @include fullHeight;
-    padding-top: $headerHeight;
+    margin-top: $headerHeight;
 }
