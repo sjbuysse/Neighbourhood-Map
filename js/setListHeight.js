@@ -22,6 +22,6 @@ $(document).ready(
 
         $infoWrapper = $('#info-wrapper');
         var phInfoWrapper = $infoWrapper.getPotentialHeight();
-        $infoWrapper.css('height', phInfoWrapper);
+        //$infoWrapper.css('height', phInfoWrapper);
     }
 );
