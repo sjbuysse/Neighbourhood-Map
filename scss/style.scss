@@ -248,8 +248,7 @@ header {
     transform: translate(0,100%);
     transition: transform 0.3s ease-out;
     // add 2rem space on the bottom for the toggle-down button 
-    // and add 2rem because the info-info wrapper top margin pushes the whole thing 2 rem down
-    padding-bottom: 4rem;
+    padding-bottom: 2rem;
     &--open {
         transform: translate(0, 0);
         transition: transform 0.3s ease-out;
@@ -264,7 +263,7 @@ header {
     }
     &__info-wrapper {
         // push info-wrapper 2 rem down so that it rests under header
-        margin: 2rem 0;
+        margin: 2rem 0 0;
         @include fullHeight;
         overflow-y: scroll;
     }
