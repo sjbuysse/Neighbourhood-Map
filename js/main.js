@@ -333,6 +333,7 @@ var module = (function(){
         };
 
         this.openImgModal = function(image) {
+            console.log(image);
           //set img src to clicked image
           imgModalImage.src = image.url();
           //set caption to appropriate caption
@@ -340,23 +341,6 @@ var module = (function(){
           //unhide modal
           imgModal.classList.remove("hidden");
         };
-
-        //this.hideAbsoluteElements = function() {
-            //var absoluteElements = document.getElementsByClassName('absolute');
-            //for(var i = 0, len = absoluteElements.length; i<len; i++){
-                //console.log(absoluteElements[i]);
-                //absoluteElements[i].style.zIndex = '-1';
-            //}
-            //return true;
-        //}
-
-        //this.showAbsoluteElements = function() {
-            //var absoluteElements = document.getElementsByClassName('absolute');
-            //for(var i = 0, len = absoluteElements.length; i<len; i++){
-                //console.log(absoluteElements[i]);
-                //absoluteElements[i].style.zIndex = '1';
-            //}
-        //}
     };
 
     //Return true if browser supports the File API
