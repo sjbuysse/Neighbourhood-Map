@@ -240,6 +240,8 @@ header {
 
 .popup {
     box-sizing: border-box;
+    // push content 2rem up and down so that it is positioned under the header and above the toggledown button
+    padding: 2rem 0;
     @include fullHeight;
     width: 100%;
     background-color: blue;
@@ -248,7 +250,6 @@ header {
     transform: translate(0,100%);
     transition: transform 0.3s ease-out;
     // add 2rem space on the bottom for the toggle-down button 
-    padding-bottom: 2rem;
     &--open {
         transform: translate(0, 0);
         transition: transform 0.3s ease-out;
@@ -262,8 +263,6 @@ header {
         bottom: 0px;
     }
     &__info-wrapper {
-        // push info-wrapper 2 rem down so that it rests under header
-        margin: 2rem 0 0;
         @include fullHeight;
         overflow-y: scroll;
     }
