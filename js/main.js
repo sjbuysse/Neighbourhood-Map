@@ -465,7 +465,10 @@ var module = (function(){
         this.selectedFile = null;
         document.getElementById('previewImg').src = "";
         document.getElementById('image-caption').value = "";
-        document.getElementById('progress-wrapper').classList.add("hidden");
+        // hide progressbar after 1,5 sec
+        setTimeout(function(){
+            document.getElementById('progress-wrapper').classList.add("hidden");
+        }, 1500)
     };
 
     //upload selected images to firebase
@@ -492,10 +495,7 @@ var module = (function(){
         // 2. Error observer, called on failure
         // 3. Completion observer, called on successful completion
         uploadTask.on('state_changed', showUploadProgress, handleError, 
-                function onComplete(){
-                    uploadMetaData(selectedPlaceKey, self.selectedFile.name, caption);
-                    setTimeout(setProgressBar(0), 1000);
-                }
+                    uploadMetaData(selectedPlaceKey, self.selectedFile.name, caption)
         );
 
         function showUploadProgress(snapshot){
@@ -524,9 +524,7 @@ var module = (function(){
             // we calculate the width based on a progressbar that is maximum 200px wide
             var width = progress / 100.0 * 200; 
             width = Math.floor(width);
-            console.log(width);
             document.getElementById('progress-bar').style.width = width + "px";
-            
             document.getElementById('progress-caption').innerHTML = Math.floor(progress) + "% done";
         }
 
@@ -545,6 +543,7 @@ var module = (function(){
                     'key': imageKey
                 };
                 self.imagesRef.child(selectedPlaceKey).child(imageKey).update(imageData);
+
                 // Add imagedata to place instance
                 selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
                 self.resetUploadVariables();
