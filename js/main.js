@@ -333,7 +333,6 @@ var module = (function(){
         };
 
         this.openImgModal = function(image) {
-            console.log(image);
           //set img src to clicked image
           imgModalImage.src = image.url();
           //set caption to appropriate caption
@@ -466,6 +465,7 @@ var module = (function(){
         this.selectedFile = null;
         document.getElementById('previewImg').src = "";
         document.getElementById('image-caption').value = "";
+        document.getElementById('progress-wrapper').classList.add("hidden");
     };
 
     //upload selected images to firebase
@@ -473,6 +473,7 @@ var module = (function(){
         var self = this;
         document.getElementById('images-upload-btn').classList.add("hidden");
         document.getElementById('image-caption').classList.add("hidden");
+        document.getElementById('progress-wrapper').classList.remove("hidden");
         //if(this.resizedImage === null ){
             //console.log("Image is still resizing, will try again in 1 sec");
             //setTimeout(this.uploadImage, 1000);
@@ -491,13 +492,18 @@ var module = (function(){
         // 2. Error observer, called on failure
         // 3. Completion observer, called on successful completion
         uploadTask.on('state_changed', showUploadProgress, handleError, 
-        uploadMetaData(selectedPlaceKey, self.selectedFile.name, caption));
+                function onComplete(){
+                    uploadMetaData(selectedPlaceKey, self.selectedFile.name, caption);
+                    setTimeout(setProgressBar(0), 1000);
+                }
+        );
 
         function showUploadProgress(snapshot){
             // Observe state change events such as progress, pause, and resume
             // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log('Upload is ' + progress + '% done');
+            setProgressBar(progress);
             switch (snapshot.state) {
                 case firebase.storage.TaskState.PAUSED: // or 'paused'
                     console.log('Upload is paused');
@@ -512,6 +518,16 @@ var module = (function(){
             // Handle unsuccessful uploads
             console.log("There occured an error while uploading the file to the server :" + error);
             self.resetUploadVariables();
+        }
+
+        function setProgressBar(progress) {
+            // we calculate the width based on a progressbar that is maximum 200px wide
+            var width = progress / 100.0 * 200; 
+            width = Math.floor(width);
+            console.log(width);
+            document.getElementById('progress-bar').style.width = width + "px";
+            
+            document.getElementById('progress-caption').innerHTML = Math.floor(progress) + "% done";
         }
 
         function uploadMetaData(selectedPlaceKey, imageName, caption) {

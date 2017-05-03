@@ -391,6 +391,23 @@ header {
         width: 45%;
         height: 7rem;
     }
+    &__progress {
+        width: 200px;
+        border: 1px solid $mirage;
+        height: 20px;
+        &__bar{
+            overflow-x: visible;
+            width: 0;
+            height: 20px;
+            background-color: #4CAF50;
+        }
+        &__caption {
+            text-align: center;
+            text-transform: uppercase;
+            width: 200px;
+            display: inline-block;
+        }
+    }
 }
 
 .img-modal{
