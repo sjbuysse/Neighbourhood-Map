@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/style-496px.css">
         <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -80,11 +81,11 @@
                 <h2 data-bind="visible: (images().length > 0)">Images</h2>
                 <div class="line-break"></div>
                 <!-- ko foreach: images -->
-                  <img data-bind='attr: {src: url}, click: $root.openImgModal' class="images__image"/>
-                  <p class="images__image-caption" data-bind='text: caption, 
-                  visible: !($parent.editing()), event: { dblclick: $parent.setEditing.bind($parent) }, 
-                  doubleTap: $parent.setEditing.bind($parent)'></p>
-                  <input class='images__image-caption--edit' data-bind="value: caption, visible: $parent.editing,  valueUpdate: 'afterkeydown', enterKey: $parent.saveEditing.bind($parent), escapeKey: $parent.undoEditing.bind($parent)"></input>
+                    <img data-bind='attr: {src: url}, click: $root.openImgModal' class="images__image"/>
+                    <p class="images__image-caption" data-bind='text: caption, 
+                    visible: !($parent.editing()), event: { dblclick: $parent.setEditing.bind($parent) }, 
+                    doubleTap: $parent.setEditing.bind($parent)'></p>
+                    <input class='images__image-caption--edit' data-bind="value: caption, visible: $parent.editing,  valueUpdate: 'afterkeydown', enterKey: $parent.saveEditing.bind($parent), escapeKey: $parent.undoEditing.bind($parent)"></input>
                 <!-- /ko -->
             </div>
             <div data-bind="visible: !editing()" class="info__upload-image upload-image">
