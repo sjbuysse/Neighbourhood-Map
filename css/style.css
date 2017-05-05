@@ -1,3 +1,4 @@
+@charset "UTF-8";
 html, body {
   height: 100%;
   position: relative;
@@ -237,6 +238,7 @@ header {
     transition: transform 0.3s ease-out; }
   .popup__toggle-up {
     position: absolute;
+    text-align: center;
     background-color: white;
     width: 100%;
     line-height: 2rem;
@@ -245,29 +247,33 @@ header {
     top: -2rem; }
   .popup__toggle-down {
     position: absolute;
+    text-align: center;
     background-color: white;
     width: 100%;
     line-height: 2rem;
     text-transform: uppercase;
     right: 0px;
+    border-top: 1px solid #1C262F;
     bottom: 0px; }
-  .popup__info-wrapper {
-    height: 100%;
-    overflow-y: scroll; }
+  .popup__info {
+    height: 100%; }
+
+.info-wrapper {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll; }
+  .info-wrapper::-webkit-scrollbar {
+    width: 8px;
+    right: 10px; }
+  .info-wrapper::-webkit-scrollbar-thumb {
+    background-color: rgba(200, 200, 200, 0.85); }
 
 .info {
   box-sizing: border-box;
   padding: 0 10px;
-  width: 100%;
-  overflow-y: scroll;
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start; }
-  .info::-webkit-scrollbar {
-    width: 8px;
-    right: 10px; }
-  .info::-webkit-scrollbar-thumb {
-    background-color: rgba(200, 200, 200, 0.85); }
   .info__name, .info__latlng, .info__name--edit {
     width: 100%;
     text-align: center; }
@@ -299,17 +305,35 @@ header {
   flex-wrap: wrap;
   justify-content: space-between;
   width: 100%; }
-  .images__image {
+
+.image {
+  position: relative;
+  width: 100%; }
+  .image__pic {
     width: 47%;
     align-self: center;
     margin-top: 0.7rem;
     cursor: pointer;
     transition: 0.3s; }
-    .images__image:hover {
+    .image__pic:hover {
       opacity: 0.7; }
-  .images__image-caption, .images__image-caption--edit {
-    width: 47%;
-    /*text-align: right;*/ }
+  .image__caption, .image__caption--edit {
+    width: 47%; }
+  .image__destroy-btn:after {
+    content: '✖'; }
+  .image__destroy-btn, .image__edit-btn {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 10px;
+    bottom: 0;
+    width: 40px;
+    height: 40px;
+    margin: auto 0;
+    font-size: 22px;
+    color: #a88a8a;
+    -webkit-transition: all 0.2s;
+    transition: all 0.2s; }
 
 .upload-image {
   display: flex;

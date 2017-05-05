@@ -111,6 +111,7 @@ var module = (function(){
         this.editing(false);
         this.placeRef.set(self.export(), function(err){
             if(err){
+                console.log("hier");
                 console.log("error: " + err);
             }
         });
@@ -487,35 +488,23 @@ var module = (function(){
         //}
         var caption = document.getElementById('image-caption').value;
 
-        var uploadTask;
 
-        //local reference of selectedPlace, to make sure all async functions have access to it.
+        // local reference of selectedPlace, to make sure all async functions have access to it.
         var selectedPlace = this.selectedPlace;
         var selectedPlaceKey = this.selectedPlace().placeRef.key;
+        // add timestamp to name to avoid duplicate firebase references. 
+        var timestamp = Date.now();
         var imageStorageRef = this.storageRef.child('/images/' + selectedPlaceKey + "/" +
-                this.selectedFile.name);
+                timestamp + this.selectedFile.name);
 
-        // check if there is a downloadURL for this reference, and add timestamp if needed
-        imageStorageRef.getDownloadURL()
-            // the storage ref is already in use, so we need to change the name
-            .then(function addTimeStamp() {
-                var timestamp = Date.now();
-                imageStorageRef = self.storageRef.child('images/' + selectedPlaceKey + "/" + 
-                timestamp + self.selectedFile.name);
-            }).then(createUploadTask)
-            // didn't find the URL, so there is no file with this storage ref. 
-            .catch(createUploadTask);
-
-        function createUploadTask(){
-            uploadTask = imageStorageRef.put(self.resizedImage);
-            // Register three observers:
-            // 1. 'state_changed' observer, called any time the state changes
-            // 2. Error observer, called on failure
-            // 3. Completion observer, called on successful completion
-            uploadTask.on('state_changed', showUploadProgress, handleError, 
-                        uploadMetaData(selectedPlaceKey, self.selectedFile.name, caption)
-            );
-        }
+        uploadTask = imageStorageRef.put(self.resizedImage);
+        // Register three observers:
+        // 1. 'state_changed' observer, called any time the state changes
+        // 2. Error observer, called on failure
+        // 3. Completion observer, called on successful completion
+        uploadTask.on('state_changed', showUploadProgress, handleError, 
+                    uploadMetaData(selectedPlaceKey, self.selectedFile.name, caption)
+        );
 
         function showUploadProgress(snapshot){
             // Observe state change events such as progress, pause, and resume

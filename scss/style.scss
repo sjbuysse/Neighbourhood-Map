@@ -10,7 +10,7 @@ $headerHeight: 32px;
     height: 100vh;
 }
 
-@mixin hide-input{
+@mixin hide-input {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
@@ -77,6 +77,7 @@ $headerHeight: 32px;
 
 @mixin popup__toggle {
     position: absolute;
+    text-align: center;
     background-color: white;
     width: 100%;
     line-height: 2rem;
@@ -294,17 +295,16 @@ header {
     }
     &__toggle-down{
         @include popup__toggle;
+        border-top: 1px solid $mirage;
         bottom: 0px;
     }
-    &__info-wrapper {
+    &__info {
         @include fullHeight;
-        overflow-y: scroll;
     }
 }
 
-.info {
-    box-sizing: border-box;
-    padding: 0 10px;
+.info-wrapper{
+    @include fullHeight;
     width: 100%;
     overflow-y: scroll;
     &::-webkit-scrollbar {
@@ -314,6 +314,11 @@ header {
     &::-webkit-scrollbar-thumb {
         background-color: rgba(200,200,200, 0.85);
     }
+}
+
+.info {
+    box-sizing: border-box;
+    padding: 0 10px;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
@@ -349,7 +354,12 @@ header {
     flex-wrap: wrap;
     justify-content: space-between;
     width: 100%;
-    &__image{
+}
+
+.image {
+    position: relative;
+    width: 100%;
+    &__pic{
         width: 47%;
         align-self: center;
         margin-top: 0.7rem;
@@ -359,9 +369,27 @@ header {
             opacity: 0.7;
         }
     }
-    &__image-caption, &__image-caption--edit{
+    &__caption, &__caption--edit{
         width: 47%;
-        /*text-align: right;*/
+    }
+    &__destroy-btn:after {
+        content: '✖';
+
+    }
+    &__destroy-btn,
+    &__edit-btn {
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 10px;
+        bottom: 0;
+        width: 40px;
+        height: 40px;
+        margin: auto 0;
+        font-size: 22px;
+        color: #a88a8a;
+        -webkit-transition: all 0.2s;
+        transition: all 0.2s;
     }
 }
 
