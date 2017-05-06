@@ -111,12 +111,11 @@ var module = (function(){
         this.editing(false);
         this.placeRef.set(self.export(), function(err){
             if(err){
-                console.log("hier");
                 console.log("error: " + err);
             }
         });
         this.images().forEach(function(imageObject){
-            imageRef = firebase.database().ref().child('images/' + self.id + "/" + imageObject.key);
+            imageRef = firebase.database().ref().child('userObjects').child('images/' + vm.user().uid + "/" + self.id + "/" + imageObject.key);
             imageRef.set(imageObject.export());
         });
     };
