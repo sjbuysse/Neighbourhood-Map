@@ -100,7 +100,7 @@ var module = (function(){
         // Reset caption for all place images
         this.previousImages.forEach(function(prevImage){
             var image = self.images().find(function(image){
-                return image.key === prevImage.key;
+                return image.imageKey === prevImage.imageKey;
             });
             image.caption(prevImage.caption);
         });
@@ -115,7 +115,7 @@ var module = (function(){
             }
         });
         this.images().forEach(function(imageObject){
-            imageRef = firebase.database().ref().child('userObjects').child('images/' + vm.user().uid + "/" + self.id + "/" + imageObject.key);
+            imageRef = firebase.database().ref().child('userObjects').child('images/' + vm.user().uid + "/" + self.id + "/" + imageObject.imageKey);
             imageRef.set(imageObject.export());
         });
     };
@@ -148,12 +148,13 @@ var module = (function(){
         };
     };
 
-    var Image = function(url, caption, name, key){
+    var Image = function(url, caption, name, placeKey, imageKey) {
         this.url = ko.observable(url);
         this.caption = ko.observable(caption);
         this.name = ko.observable(name);
-        this.key = key;
-        this.imageRef = vm.imagesRef.child(this.key);
+        this.placeKey = placeKey;
+        this.imageKey = imageKey;
+        this.imageRef = vm.imagesRef.child(placeKey).child(this.imageKey);
     };
 
     Image.prototype.export = function() {
@@ -161,7 +162,7 @@ var module = (function(){
             url: this.url(),
             caption: this.caption(),
             name: this.name(),
-            key: this.key
+            imageKey: this.imageKey
         };
     };
 
@@ -289,6 +290,12 @@ var module = (function(){
             self.setSelectedPlace(null);
         };
 
+        this.removeImage = function(place, image) {
+          image.imageRef.once('value')
+              .then(self.removeSingleImage.bind(self));
+          place.images.remove(image);
+        };
+
         //Populate the infowindow with the correct marker information
         this.populateInfowindow = function(marker){
             if(infoWindow.marker != marker){
@@ -306,7 +313,8 @@ var module = (function(){
                     "Save location</button>" + 
                     "<button data-bind='visible: draggable(), click: toPreviousLocation' >" + 
                     "Reset location</button>" + 
-                    "<button data-bind='click: $parent.removeLocation," + 
+                    "<button data-bind='confirmClick: {message: &#39; Are you sure you want to " +
+                    "delete this place? &#39; , click: $parent.removeLocation}," + 
                     " visible: (!draggable())'>Remove spot</button>" +
                     "</div>";
                 infoWindow.setContent(contentHTML);
@@ -351,6 +359,43 @@ var module = (function(){
         }
     };
 
+    // Remove al images related to a user
+    // Accepts a firebase DataSnapshot of the users database node that stores all images metadata.
+    ViewModel.prototype.removeUserImages = function(snap) {
+        var self = this;
+        var removals = [];
+        snap.forEach(function(childSnapshot){
+            var promise = self.removePlaceImages(childSnapshot);
+            removals.push(promise);
+        });
+        return Promise.all(removals);
+    };
+
+    // Remove all images related to a place
+    ViewModel.prototype.removePlaceImages = function(snap) {
+        var self = this;
+        var removals = [];
+        snap.forEach(function(childSnapshot){
+            var promise = self.removeSingleImage(childSnapshot);
+            removals.push(promise);
+        });
+        return Promise.all(removals);
+    };
+
+    // Remove the image metadata and remove the actual image from the storage
+    ViewModel.prototype.removeSingleImage = function(snap){
+        var self = this;
+        var url = snap.val().url;
+        return Promise.all([snap.ref.remove(), self.removeImageWithUrl(url)]);
+    };
+
+    // Remove actual image from storage
+    ViewModel.prototype.removeImageWithUrl = function(url) {
+        // Request the firebase storage reference of the image
+        var httpRef = firebase.storage().refFromURL(url);
+        return httpRef.delete();
+    };
+
     //Handle imported location JSON file
     ViewModel.prototype.handleJSONSelect = function(data, evt) {
         var self = this;
@@ -363,7 +408,7 @@ var module = (function(){
             var data = event.target.result;
             var jsonData = JSON.parse(data);
 
-            self.imagesRef.once('value').then(removeUserImages)
+            self.imagesRef.once('value').then(self.removeUserImages.bind(self))
                 .then(function(){importPlacesToFirebase(jsonData);})
                 .catch(function(err){
                     console.log("An error occured :" + err);
@@ -380,45 +425,9 @@ var module = (function(){
             }
         };
 
-        // Remove al images related to a user
-        // Accepts a firebase DataSnapshot of the users database node that stores all images metadata.
-        function removeUserImages(snap) {
-            var removals = [];
-            snap.forEach(function(childSnapshot){
-                var promise = removePlaceImages(childSnapshot);
-                removals.push(promise);
-            });
-            return Promise.all(removals);
-        }
 
-        // Remove all images related to a place
-        function removePlaceImages(snap) {
-            var removals = [];
-            snap.forEach(function(childSnapshot){
-                var promise = removeSingleImage(childSnapshot);
-                removals.push(promise);
-            });
-            return Promise.all(removals);
-        }
-
-        // Remove the image metadata and remove the actual image from the storage
-        function removeSingleImage(snap){
-            var url = snap.val().url;
-            return Promise.all([snap.ref.remove(), removeImageWithUrl(url)]);
-        }
-
-        // Remove actual image from storage
-        function removeImageWithUrl(url) {
-            // Request the firebase storage reference of the image
-            var httpRef = firebase.storage().refFromURL(url);
-            return httpRef.delete();
-        }
-
-        // Read in the image file as a data URL.
-        if(confirm("Are you sure you want to load this file? \n"+
-                    "This will replace all your current data.")){
-                        reader.readAsText(file);
-                    }
+        // read in the image file as a data URL.
+        reader.readAsText(file);
     };
 
     //Handle image selecting
@@ -547,12 +556,12 @@ var module = (function(){
                     'url': downloadURL,
                     'caption': caption,
                     'name': imageName,
-                    'key': imageKey
+                    'imageKey': imageKey
                 };
                 self.imagesRef.child(selectedPlaceKey).child(imageKey).update(imageData);
 
                 // Add imagedata to place instance
-                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, imageKey));
+                selectedPlace().images.push(new Image(imageData.url, imageData.caption, imageData.name, selectedPlaceKey, imageKey));
                 self.resetUploadVariables();
             };
         }
@@ -629,7 +638,7 @@ var module = (function(){
                             return function(imagesSnap){
                                 imagesSnap.forEach(function(imageSnap){
                                     var imageObj = imageSnap.val();
-                                    currentPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name, imageObj.key));
+                                    currentPlace.images.push(new Image(imageObj.url, imageObj.caption, imageObj.name, currentPlace.id, imageObj.imageKey));
                                 });
                             };
                         })(currentPlace));
