@@ -98,10 +98,6 @@
                 <div data-bind="visible: !editing()" class="info__upload-image upload-image">
                     <h3>Add Image</h3>
                     <div class="line-break"></div>
-                    <input type="file" name="imageFile" id="imageFile" class="upload-image__input" 
-                    accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />
-                    <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
-                    <div class="line-break"></div>
                     <div class="upload-image__progress hidden" id="progress-wrapper">
                         <div class="upload-image__progress__bar" id="progress-bar">
                             <span class="upload-image__progress__caption" id="progress-caption"></span>
@@ -109,6 +105,10 @@
                     </div>
                     <img src="" id="previewImg" class="upload-image__image">
                     <textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="upload-image__caption hidden"></textarea>
+                    <div class="line-break"></div>
+                    <input type="file" name="imageFile" id="imageFile" class="upload-image__input" 
+                    accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}" />
+                    <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
                     <div class="line-break"></div>
                     <button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>
                 </div>

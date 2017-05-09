@@ -180,7 +180,6 @@ var module = (function(){
             // toggle should work if there are no places, if there is no selected place, or if the selected place is not in edit/drag-mode
             if(self.places().length === 0 || !self.selectedPlace() || !(self.selectedPlace().draggable())) {
                 self.showDrawer(!self.showDrawer());
-                console.log(self.showDrawer());
                 if(self.showDrawer){
                     self.creatingPlace(false);
                 }
@@ -189,11 +188,14 @@ var module = (function(){
             }
         };
         this.toggleCreatingPlace = function(){
-            if(self.googleDefined && (self.places().length === 0 || !self.selectedPlace().draggable())){
+            if(self.googleDefined && (self.places().length === 0 || !self.selectedPlace() || !self.selectedPlace().draggable())){
                 self.creatingPlace(!self.creatingPlace());
                 if(self.creatingPlace){
                     self.showDrawer(false);
                     self.showLargeInfoWindow(false);
+                    // if the selectedPlace is in edit mode, then get out of it.
+                    if (self.selectedPlace())
+                        self.selectedPlace().editing(false);
                 }
             } else if(!self.googleDefined) {
                 alert("You can't create a new place at the moment, because the google API has trouble loading.");
@@ -476,6 +478,7 @@ var module = (function(){
         this.selectedFile = null;
         document.getElementById('previewImg').src = "";
         document.getElementById('image-caption').value = "";
+        document.getElementById('image-caption').classList.add("hidden");
         // hide progressbar after 1,5 sec
         setTimeout(function(){
             document.getElementById('progress-wrapper').classList.add("hidden");
@@ -486,7 +489,6 @@ var module = (function(){
     ViewModel.prototype.uploadImage = function() {
         var self = this;
         document.getElementById('images-upload-btn').classList.add("hidden");
-        document.getElementById('image-caption').classList.add("hidden");
 
         setProgressBar(0);
         document.getElementById('progress-wrapper').classList.remove("hidden");
@@ -723,10 +725,6 @@ var module = (function(){
             console.log("true");
         }
     };
-
-    methods.getShowDrawer = function() {
-        console.log(vm.showDrawer());
-    }
 
     //Init viewmodel without google maps (if the API Fails to load)
     methods.initWithoutMap = function(){

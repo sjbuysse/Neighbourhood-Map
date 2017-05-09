@@ -55,8 +55,8 @@ $headerHeight: 32px;
       appearance: none;
       /*display: none;*/
       position: absolute;
-      width: 40px;
-      height: 40px;
+      width: 1px;
+      height: 1px;
       margin: auto 0;
       font-size: 22px;
       color: #a88a8a;
@@ -334,6 +334,7 @@ header {
     @include fullHeight;
     width: 100%;
     overflow-y: scroll;
+    overflow-x: hidden;
     &::-webkit-scrollbar {
         width: 8px;
         right: 10px;
@@ -381,7 +382,7 @@ header {
     &__edit-btn{
         @include edit-and-delete-btn;
         top: 0;
-        right: 10px;
+        right: 20px;
     }
 }
 
@@ -397,11 +398,11 @@ header {
     flex-wrap: wrap;
     justify-content: space-between;
     position: relative;
-    width: 100%;
+    width: 95%;
+    margin: 10px 30px 0 0;
     &__pic{
         width: 47%;
         align-self: center;
-        margin-top: 0.7rem;
         cursor: pointer;
         transition: 0.3s;
         &:hover{
@@ -409,6 +410,7 @@ header {
         }
     }
     &__caption, &__caption--edit{
+        margin: 0;
         width: 47%;
     }
     &__destroy-btn:after {
@@ -417,8 +419,8 @@ header {
     }
     &__destroy-btn{
         @include edit-and-delete-btn;
-        top: 0;
-        right: 10px;
+        top: -4px;
+        right: -5px;
     }
 }
 
@@ -450,6 +452,7 @@ header {
     &__progress {
         width: 200px;
         border: 1px solid $mirage;
+        margin: 1rem 0;
         height: 20px;
         &__bar{
             overflow-x: visible;
