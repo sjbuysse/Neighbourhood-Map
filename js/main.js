@@ -177,8 +177,10 @@ var module = (function(){
 
         //Methods to toggle state of UI
         this.toggleShowDrawer = function(){
-            if(self.places.length === 0 || !self.selectedPlace().draggable()) {
+            // toggle should work if there are no places, if there is no selected place, or if the selected place is not in edit/drag-mode
+            if(self.places().length === 0 || !self.selectedPlace() || !(self.selectedPlace().draggable())) {
                 self.showDrawer(!self.showDrawer());
+                console.log(self.showDrawer());
                 if(self.showDrawer){
                     self.creatingPlace(false);
                 }
@@ -187,7 +189,7 @@ var module = (function(){
             }
         };
         this.toggleCreatingPlace = function(){
-            if(self.googleDefined && (self.places.length === 0 || !self.selectedPlace().draggable())){
+            if(self.googleDefined && (self.places().length === 0 || !self.selectedPlace().draggable())){
                 self.creatingPlace(!self.creatingPlace());
                 if(self.creatingPlace){
                     self.showDrawer(false);
@@ -212,13 +214,13 @@ var module = (function(){
             return place;
         };
 
-        //When we click on a list item, we want to open up the infowindow and set the selectedPlace
+        // when we click on a list item, we want to open up the infowindow and set the selectedPlace
         this.chooseListItem = function(place){
             self.toggleShowDrawer();
             //Check if marker exists (wouldn't be the case when google API failed to load)
-            if(place.marker){
+            if(place.marker) {
                 google.maps.event.trigger(place.marker, 'click');
-            } else{
+            } else {
                 self.setSelectedPlace(place);
                 self.showLargeInfoWindow(true);
             }
@@ -721,6 +723,10 @@ var module = (function(){
             console.log("true");
         }
     };
+
+    methods.getShowDrawer = function() {
+        console.log(vm.showDrawer());
+    }
 
     //Init viewmodel without google maps (if the API Fails to load)
     methods.initWithoutMap = function(){
