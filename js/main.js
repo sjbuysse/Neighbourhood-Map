@@ -455,7 +455,7 @@ var module = (function(){
                 return; 
         }
 
-        //preview images, show upload button, and start resizing image for upload
+        // preview images, show upload button, and start resizing image for upload
         var reader = new FileReader();
         reader.onload = function(event) {
             preview.src = event.target.result;
@@ -465,9 +465,8 @@ var module = (function(){
             if(self.resizedImage){
                 self.resizedImage = null;
             }
-            // start processing image in background (worker?)
+            // start resizing the image as soon as it is selected
             imageResizer.resizeImage(event.target.result, function(result){self.resizedImage = result;});
-            // if they click upload image before finished (processedImage = false), then it should wait
         };
         // Read in the image file as a data URL.
         reader.readAsDataURL(this.selectedFile);
@@ -485,7 +484,7 @@ var module = (function(){
         }, 1500);
     };
 
-    //upload selected images to firebase
+    // upload selected images to firebase
     ViewModel.prototype.uploadImage = function() {
         var self = this;
         document.getElementById('images-upload-btn').classList.add("hidden");
@@ -493,11 +492,17 @@ var module = (function(){
         setProgressBar(0);
         document.getElementById('progress-wrapper').classList.remove("hidden");
 
-        //if(this.resizedImage === null ){
-            //console.log("Image is still resizing, will try again in 1 sec");
-            //setTimeout(this.uploadImage, 1000);
-            //return;
-        //}
+        // make sure the image is resized, else try again in a second
+        if(this.resizedImage === null ){
+            console.log("Image is still resizing, will try again in 1 sec");
+            setTimeout((function(self){
+                return function(){
+                    self.uploadImage();
+                }
+            })(self), 1000);
+            return;
+        }
+
         var caption = document.getElementById('image-caption').value;
 
 
