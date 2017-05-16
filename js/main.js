@@ -477,20 +477,26 @@ var module = (function(){
         this.selectedFile = null;
         document.getElementById('previewImg').src = "";
         document.getElementById('image-caption').value = "";
-        document.getElementById('image-caption').classList.add("hidden");
-        // hide progressbar after 1,5 sec
+        tools.addClass('hidden', document.getElementById('image-caption'));
+
+        // hide progressbar and show select btn after 1,5 sec
         setTimeout(function(){
-            document.getElementById('progress-wrapper').classList.add("hidden");
+            tools.addClass('hidden', document.getElementById('progress-wrapper'));
+            tools.removeClass('hidden', document.getElementsByClassName('upload-image__select-btn')[0]);
         }, 1500);
     };
 
     // upload selected images to firebase
     ViewModel.prototype.uploadImage = function() {
         var self = this;
-        document.getElementById('images-upload-btn').classList.add("hidden");
+        var uploadBtn = document.getElementById('images-upload-btn');
+        var selectBtn = document.getElementsByClassName('upload-image__select-btn')[0];
+        var progressBar = document.getElementById('progress-wrapper');
+        tools.addClass('hidden', uploadBtn);
+        tools.addClass('hidden', selectBtn);
 
         setProgressBar(0);
-        document.getElementById('progress-wrapper').classList.remove("hidden");
+        tools.removeClass('hidden', progressBar);
 
         // make sure the image is resized, else try again in a second
         if(this.resizedImage === null ){
@@ -653,6 +659,7 @@ var module = (function(){
                         })(currentPlace));
                     });
                 });
+                // when a place is removed, remove also all related images
                 self.placesRef.on('child_removed', function(snap){
                     var placeKey = snap.key;
                     self.imagesRef.child(placeKey)
