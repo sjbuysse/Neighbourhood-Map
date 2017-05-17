@@ -674,34 +674,6 @@ var module = (function(){
             }
         });
 
-        function removePlaceImages(snap){
-            var placeKey = snap.key;
-            snap.forEach(removeSingleImage.bind({placeKey: placeKey}));
-        }
-
-        function removeSingleImage(snap){
-            //remove actual images from storage
-            self.storageRef.child('images/' + this.placeKey + "/" + snap.val().name).delete()
-            .then(removeMetaData(snap))
-            .catch(handleStorageRemovalError);
-        }
-
-        function removeMetaData(snap){
-            // if success
-            // remove images metadata in database
-            snap.ref.remove(handleMetaDataRemovalError);
-        }
-
-        function handleMetaDataRemovalError(err){
-            if(err){
-                console.log("Error when removing image metadata " + err);
-            }
-        }
-
-        function handleStorageRemovalError(err){
-            console.log("Error when removing image from cloud storage :" + err);
-        }
-
         //Variable to hold the temporary new place during the creation process
         if(self.googleDefined){
             self.newPlace = self.createPlace("", "", self.places().length);
