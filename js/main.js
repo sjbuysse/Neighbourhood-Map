@@ -211,6 +211,7 @@ var module = (function(){
         this.filterValue = ko.observable('');
 
         this.createPlace = function(name, info, id, latlng = {lat: map.getCenter().lat(),lng: map.getCenter().lng()}, draggable = false) {
+            console.log(id);
             var self = this;
             var place = new Place(name, info, id, latlng, draggable, self.user());
             return place;
@@ -281,7 +282,7 @@ var module = (function(){
         };
 
         //Remove place and associated marker from collection
-        this.removeLocation = function(place){
+        this.removeLocation = function(place) {
             place.placeRef.remove(function handleError(err){
                 if(err){
                     console.log("error: " + err);
@@ -375,7 +376,8 @@ var module = (function(){
         return Promise.all(removals);
     };
 
-    // Remove all images related to a place
+    // Remove all images related to a place, accepts a DataSnapshot of the node that stores the 
+    // image metadata of the place
     ViewModel.prototype.removePlaceImages = function(snap) {
         var self = this;
         var removals = [];
@@ -663,7 +665,7 @@ var module = (function(){
                 self.placesRef.on('child_removed', function(snap){
                     var placeKey = snap.key;
                     self.imagesRef.child(placeKey)
-                    .once('value').then(removePlaceImages);
+                    .once('value').then(function(snap){self.removePlaceImages(snap);});
                 });
             } else {
               // User not logged out, so show authorization modal. 
