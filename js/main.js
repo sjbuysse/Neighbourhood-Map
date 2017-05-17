@@ -506,7 +506,7 @@ var module = (function(){
             setTimeout((function(self){
                 return function(){
                     self.uploadImage();
-                }
+                };
             })(self), 1000);
             return;
         }
