@@ -1,2 +1,9 @@
-@media only screen and (min-width:496px){.info{width:400px;margin:0 auto}.image__pic{width:180px}}
+@media only screen and (min-width: 496px) {
+  .info {
+    width: 400px;
+    margin: 0 auto 0; }
+
+  .image__pic {
+    width: 180px; } }
+
 /*# sourceMappingURL=style-496px.css.map */

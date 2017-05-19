@@ -22,12 +22,23 @@ module.exports = function(grunt) {
                 map: true,
                 processors: [
                     require('pixrem')(), // add fallback for rem units
-                    require('autoprefixer')(), // add vendor prefixes
-                    require('cssnano')() // minify the result
+                    require('autoprefixer')() // add vendor prefixes
                 ]
             },
             dist: {
                 src: config.cssDir + '*.css'
+            }
+        },
+        critical: {
+            target: {
+                options: {
+                    minify: 'true',
+                    base: './',
+                    css: 'css/*.css',
+                },
+                // The source file
+                src: 'index.html', 
+                dest: 'index-critical.html'
             }
         },
         watch: {
@@ -52,5 +63,5 @@ module.exports = function(grunt) {
         } 
     });
     
-    grunt.registerTask('default', ['jshint', 'sass', 'postcss', 'watch']);
+    grunt.registerTask('default', ['jshint', 'sass', 'postcss', 'critical', 'watch']);
 };
