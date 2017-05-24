@@ -1,3 +1,4 @@
-scssDir: scss/
-jsDir: js/
-cssDir: css/
+scssDir: src/scss/
+jsSrcDir: src/js/
+jsDistDir: dist/js/
+cssDir: dist/css/

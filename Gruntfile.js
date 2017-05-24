@@ -14,8 +14,43 @@ module.exports = function(grunt) {
                 }]
             }
         },
+        uglify: {
+            options: {
+                // don't change variable names
+                //mangle: false
+            },
+            target: {
+                files: [{
+                    expand: true,    // allow dynamic building
+                    cwd: config.jsSrcDir,
+                    src: ['*.js', '!*.min.js'],  // source files mask
+                    dest: config.jsSrcDir,    // destination folder
+                    ext: '.min.js'   // replace .js to .min.js
+                }]
+            }
+        },
+        concat: {
+            helperJS: {
+                src: [config.jsSrcDir + '*.min.js', '!' + config.jsSrcDir + 'main.min.js'],
+                dest: config.jsDistDir + 'built.js'
+            }
+        },
+        copy: {
+            vendorJs: {
+                files:[{
+                    expand: true, 
+                    cwd: config.jsSrcDir + 'vendor/', 
+                    src: ['*.js'], 
+                    dest: config.jsDistDir + 'vendor/'
+                }]
+            },
+            mainJs: {
+                src: config.jsSrcDir + 'main.min.js', 
+                dest: config.jsDistDir + 'main.min.js'
+            }
+        },
         jshint: {
-            all: ['Gruntfile.js', config.jsDir + '*.js']
+            beforeUglify: ['Gruntfile.js', config.jsSrcDir + '*.js', '!' + config.jsSrcDir + '*.min.js']
         },
         postcss: {
             options: {
@@ -32,13 +67,13 @@ module.exports = function(grunt) {
         critical: {
             target: {
                 options: {
-                    minify: 'true',
-                    base: './',
+                    minify: true,
+                    base: 'dist/',
                     css: 'css/*.css',
                 },
                 // The source file
-                src: 'index.html', 
-                dest: 'index-critical.html'
+                src: 'src/index.html', 
+                dest: 'dist/index.html'
             }
         },
         watch: {
@@ -63,5 +98,5 @@ module.exports = function(grunt) {
         } 
     });
     
-    grunt.registerTask('default', ['jshint', 'sass', 'postcss', 'critical', 'watch']);
+    grunt.registerTask('default', ['jshint', 'uglify', 'concat','copy', 'sass', 'postcss', 'critical', 'watch']);
 };
