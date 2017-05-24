@@ -1,0 +1,186 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Sessions</title>
+        <style type="text/css">
+
+        </style>
+        <link rel="preload" href="css/normalize.css" as="style" onload="this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="css/normalize.css"></noscript>
+        <link rel="preload" href="css/main.css" as="style" onload="this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="css/main.css"></noscript>
+        <link rel="preload" href="css/style.css" as="style" onload="this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="css/style.css"></noscript>
+        <link rel="preload" href="css/style-496px.css" as="style" onload="this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="css/style-496px.css"></noscript>
+        <link type="text/css" rel="preload" href="bower_components/firebaseui/dist/firebaseui.css" as="style" onload="this.rel='stylesheet'">
+        <noscript><link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css"></noscript>
+        <script>!function(e){"use strict";var t=function(t,n,r){function o(e){return i.body?e():void setTimeout(function(){o(e)})}function a(){d.addEventListener&&d.removeEventListener("load",a),d.media=r||"all"}var l,i=e.document,d=i.createElement("link");if(n)l=n;else{var s=(i.body||i.getElementsByTagName("head")[0]).childNodes;l=s[s.length-1]}var u=i.styleSheets;d.rel="stylesheet",d.href=t,d.media="only x",o(function(){l.parentNode.insertBefore(d,n?l:l.nextSibling)});var f=function(e){for(var t=d.href,n=u.length;n--;)if(u[n].href===t)return e();setTimeout(function(){f(e)})};return d.addEventListener&&d.addEventListener("load",a),d.onloadcssdefined=f,f(a),d};"undefined"!=typeof exports?exports.loadCSS=t:e.loadCSS=t}("undefined"!=typeof global?global:this),function(e){if(e.loadCSS){var t=loadCSS.relpreload={};if(t.support=function(){try{return e.document.createElement("link").relList.supports("preload")}catch(e){return!1}},t.poly=function(){for(var t=e.document.getElementsByTagName("link"),n=0;n<t.length;n++){var r=t[n];"preload"===r.rel&&"style"===r.getAttribute("as")&&(e.loadCSS(r.href,r,r.getAttribute("media")),r.rel=null)}},!t.support()){t.poly();var n=e.setInterval(t.poly,300);e.addEventListener&&e.addEventListener("load",function(){t.poly(),e.clearInterval(n)}),e.attachEvent&&e.attachEvent("onload",function(){e.clearInterval(n)})}}}(this);</script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <!-- Place favicon.ico in the root directory -->
+
+        <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+
+        <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+        <symbol id="icon-filter" viewbox="0 0 32 32">
+        <title>filter</title>
+        <path d="M16 0c-8.837 0-16 2.239-16 5v3l12 12v10c0 1.105 1.791 2 4 2s4-0.895 4-2v-10l12-12v-3c0-2.761-7.163-5-16-5zM2.95 4.338c0.748-0.427 1.799-0.832 3.040-1.171 2.748-0.752 6.303-1.167 10.011-1.167s7.262 0.414 10.011 1.167c1.241 0.34 2.292 0.745 3.040 1.171 0.494 0.281 0.76 0.519 0.884 0.662-0.124 0.142-0.391 0.38-0.884 0.662-0.748 0.427-1.8 0.832-3.040 1.171-2.748 0.752-6.303 1.167-10.011 1.167s-7.262-0.414-10.011-1.167c-1.24-0.34-2.292-0.745-3.040-1.171-0.494-0.282-0.76-0.519-0.884-0.662 0.124-0.142 0.391-0.38 0.884-0.662z"/>
+        </symbol>
+        </defs>
+        </svg>
+
+
+        <header>
+            <button data-bind="visible: (user() && !showDrawer() && !creatingPlace()), click: signOut" class="log-out-btn">Log Out</button>
+        </header>
+        <div id="map"></div>
+        <div id="auth-modal" class="auth-modal hidden">
+            <div class="auth-modal__content">
+                <div id="firebaseui-auth-container"></div>
+            </div>  
+        </div>
+        <div id="filter-drawer" class="filter-drawer" data-bind="css:{'filter-drawer--open': showDrawer()}">
+            <span class="filter-drawer__toggle" data-bind="click: toggleShowDrawer">
+                <svg class="filter-drawer__toggle-icon"><use xlink:href="#icon-filter"/></svg>
+            </span>
+            <input class="filter-drawer__searchbox" placeholder="Search for a place" data-bind="value: filterValue, valueUpdate: 'afterkeydown', event: {keypress: closeInfoWindow}">
+            <ul class="filter-drawer__list" id="filter-list" data-bind="foreach: places">
+                <li data-bind="text: name(), visible: visible(), click: $root.chooseListItem" class="filter-drawer__list-item"></li>
+            </ul>
+            <button class="filter-drawer__export-btn" data-bind="click: exportLocations">Export locations</button>
+            <input type="file" name="file" id="file" class="filter-drawer__import-input" data-bind="visible: supportFileAPI, confirmChange: {message: 'Are you sure you want to load this file? \n This will replace all your current data.', change: $root.handleJSONSelect}">
+            <label for="file" class="filter-drawer__import-btn" data-bind="visible: supportFileAPI">Import locations</label>
+        </div>
+<div id="create-drawer" class="create-drawer" data-bind="css:{'create-drawer--open': creatingPlace()}">
+    <span class="create-drawer__toggle" data-bind="click: toggleCreatingPlace">
+    </span>
+    <span class="create-drawer__title">Add Location</span>
+    <form class="create-drawer__form location-form" data-bind="submit: $root.addLocation,  with: $root.newPlace">
+        <input class="location-form__name" placeholder="Name" data-bind="textInput: name">
+        <textarea class="location-form__info" data-bind="textInput: info" placeholder="Write down some information about your session at this spot"></textarea>
+        <button type="submit" class="location-form__submit">Pin to center</button>
+        <p>When you submit this form, a green pin will be added to the center of the map. You can then drag it to its correct location.</p>
+    </form>
+</div>
+<div class="popup" id="popup" data-bind="with: selectedPlace, css:{'popup--open': $root.showLargeInfoWindow()}">
+    <div class="popup__toggle popup__toggle-up" data-bind="click: $root.toggleShowLargeInfoWindow">Pop Up!</div>
+    <div class="popup__toggle popup__toggle-down" data-bind="click: $root.toggleShowLargeInfoWindow">Pop Down!</div>
+        <div class="info-wrapper">
+            <div class="popup__info info" id="info-wrapper">
+                <button class="info__edit-btn" data-bind="visible: !editing(), click: setEditing"></button>
+                <label class="info__name" data-bind="text: name, visible: !editing(),event: { dblclick: setEditing }, doubleTap: setEditing">info__name</label> 
+                <input class="info__name--edit" data-bind="value: name, visible: editing,  valueUpdate: 'afterkeydown', enterKey: saveEditing, escapeKey: undoEditing">
+                <label class="info__latlng">lat: <span data-bind="text: latlng().lat"></span></label> 
+                <label class="info__latlng">lng: <span data-bind="text: latlng().lng"></span> </label>
+                <p class="info__details" data-bind="text: info, visible: !editing(),event: { dblclick: setEditing }, doubleTap: setEditing"></p> 
+                <textarea class="info__details--edit" data-bind="value: info, visible: editing,  valueUpdate: 'afterkeydown', escapeKey: undoEditing"></textarea>
+                <div class="info__images images" id="image-wrapper">
+                    <h3 data-bind="visible: (images().length > 0)">Images</h3>
+                    <div class="line-break"></div>
+                    <!-- ko foreach: images -->
+                        <div class="images__image image">
+                            <img data-bind="attr: {src: url}, click: $root.openImgModal" class="image__pic">
+                            <p class="image__caption" data-bind="text: caption, 
+                            visible: !($parent.editing()), event: { dblclick: $parent.setEditing.bind($parent) }, 
+                            doubleTap: $parent.setEditing.bind($parent)"></p>
+                            <input class="image__caption--edit" data-bind="value: caption, visible: $parent.editing,  valueUpdate: 'afterkeydown', enterKey: $parent.saveEditing.bind($parent), escapeKey: $parent.undoEditing.bind($parent)">
+                            <button class="image__destroy-btn" data-bind="visible: !($parent.editing()), 
+                                confirmClick: {message: 'Are you sure you want to delete this image?', 
+                                click: $root.removeImage.bind($root, $parent, $data)}"></button>
+                        </div>
+                    <!-- /ko -->
+                </div>
+                <div data-bind="visible: !editing()" class="info__upload-image upload-image">
+                    <h3>Add Image</h3>
+                    <div class="line-break"></div>
+                    <div class="upload-image__progress hidden" id="progress-wrapper">
+                        <div class="upload-image__progress__bar" id="progress-bar">
+                            <span class="upload-image__progress__caption" id="progress-caption"></span>
+                        </div>
+                    </div>
+                    <div class="line-break"></div>
+                    <img src="" id="previewImg" class="upload-image__image">
+                    <textarea name="caption" id="image-caption" placeholder="Write some infomation about this image" class="upload-image__caption hidden"></textarea>
+                    <div class="line-break"></div>
+                    <input type="file" name="imageFile" id="imageFile" class="upload-image__input" accepts="image/jpeg, image/jpg, image/png, image/bmp" data-bind="visible: $root.supportFileAPI, event: {change: $root.handleImageSelect.bind($root)}">
+                    <label for="imageFile" data-bind="visible: $root.supportFileAPI" class="upload-image__select-btn">Select image</label> 
+                    <div class="line-break"></div>
+                    <button id="images-upload-btn" class="upload-image__upload-btn hidden" data-bind="click: $root.uploadImage.bind($root)">Submit</button>
+                </div>
+                <button data-bind="click: saveEditing, visible: (editing())" class="info__update-btn">
+                    Update
+                </button>
+                <button data-bind="click: undoEditing, visible: (editing())" class="info__cancel-btn">
+                    Cancel
+                </button>
+            </div>
+        </div>
+</div>
+<div id="img-modal" class="img-modal hidden">
+    <!-- The Close Button -->
+    <span class="img-modal__close" data-bind="click: closeImgModal">&times;</span>
+    <!-- Modal Content (The Image) -->
+    <img id="img-modal__image" class="img-modal__image">
+    <!-- Modal Caption (Image Text) -->
+    <div id="img-modal__caption" class="img-modal__caption"></div>
+</div>
+
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+    <script src="bower_components/knockout/dist/knockout.js"></script>
+    <script src="bower_components/promise-polyfill/promise.min.js"></script>
+    <!--concatnated scripts-->
+    <script src="js/built.js"></script>
+    <!--main MVC script-->
+    <script src="js/main.min.js"></script>
+    <!--script to set the height of the popup screen and the filter drawer-->
+    <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.7.3/firebase-auth.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDCYpUjurtGKHJ3mIpMik5_mLhRrVgM33E",
+        authDomain: "surf-sessions-7accd.firebaseapp.com",
+        databaseURL: "https://surf-sessions-7accd.firebaseio.com",
+        storageBucket: "surf-sessions-7accd.appspot.com",
+        messagingSenderId: "246363609320"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <!--module for handling OAuth-->
+    <script src="bower_components/firebaseui/dist/firebaseui.js"></script>
+    <script type="text/javascript">
+        // FirebaseUI config.
+        var uiConfig = {
+            signInFlow: 'popup',
+            signInOptions: [
+                // Leave the lines as is for the providers you want to offer your users.
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+                firebase.auth.EmailAuthProvider.PROVIDER_ID
+            ]
+        };
+
+        // Initialize the FirebaseUI Widget using Firebase.
+        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+        // The start method will wait until the DOM is loaded.
+        ui.start('#firebaseui-auth-container', uiConfig);
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDatOjMfgbYIs1bJy8oF90D-fmjZF-jIVQ&callback=module.initMap" onerror="module.initWithoutMap()" async defer></script>
+    </body>
+</html>
