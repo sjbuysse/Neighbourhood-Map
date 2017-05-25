@@ -757,6 +757,7 @@ var module = (function(){
                 console.info('Prevented Roboto from loading!');
                 return;
             }
+            console.log(newElement);
 
             insertBefore.call(head, newElement, referenceElement);
         };
