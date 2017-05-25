@@ -742,6 +742,24 @@ var module = (function(){
                 position: google.maps.ControlPosition.RIGHT_CENTER
             },
         };
+    
+        // we're going to replace to insertBefore method of the head element, to avoid that google maps loads the roboto font
+        var head = document.getElementsByTagName('head')[0];
+
+        // Save the original method
+        var insertBefore = head.insertBefore;
+
+        // Replace it!
+        head.insertBefore = function (newElement, referenceElement) {
+
+            if (newElement.href && newElement.href.indexOf('https://fonts.googleapis.com/css?family=Roboto') === 0) {
+
+                console.info('Prevented Roboto from loading!');
+                return;
+            }
+
+            insertBefore.call(head, newElement, referenceElement);
+        };
         map = new google.maps.Map(document.getElementById('map'), mapOptions);
         infoWindow = new google.maps.InfoWindow();
 
