@@ -40,12 +40,6 @@ header {
 .hidden {
   display: none; }
 
-.background {
-  height: 100%;
-  width: 100%;
-  background-color: green;
-  padding-top: 32px; }
-
 .auth-modal {
   position: fixed;
   /* Stay in place */
