@@ -47,6 +47,10 @@ module.exports = function(grunt) {
             mainJs: {
                 src: config.jsSrcDir + 'main.min.js', 
                 dest: config.jsDistDir + 'main.min.js'
+            //},
+            //html: {
+                //src: config.srcDir + 'index.html', 
+                //dest: config.distDir + 'index.html'
             }
         },
         jshint: {
@@ -57,7 +61,8 @@ module.exports = function(grunt) {
                 map: true,
                 processors: [
                     require('pixrem')(), // add fallback for rem units
-                    require('autoprefixer')() // add vendor prefixes
+                    require('autoprefixer')(), // add vendor prefixes
+                    require('cssnano')() // minify the result
                 ]
             },
             dist: {
@@ -67,10 +72,11 @@ module.exports = function(grunt) {
         critical: {
             target: {
                 options: {
-                    minify: true,
+                    //minify: true,
                     //inline: true,
-                    base: 'dist/',
-                    css: ['dist/css/normalize.css','dist/css/non-critical-style.css','dist/css/critical-style.css','dist/css/critical-style.css'],
+                    //base: 'dist/'
+                    //css: ['dist/css/normalize.css','dist/css/non-critical-style.css','dist/css/critical-style.css'],
+                    css: ['dist/css/style.css'],
                 },
                 // The source file
                 src: 'src/index.html', 
@@ -99,5 +105,5 @@ module.exports = function(grunt) {
         } 
     });
     
-    grunt.registerTask('default', ['jshint', 'uglify', 'concat','copy', 'sass', 'postcss', 'critical', 'watch']);
+    grunt.registerTask('default', ['jshint', 'uglify', 'concat', 'copy', 'sass', 'postcss', 'watch']);
 };
