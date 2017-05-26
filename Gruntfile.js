@@ -68,12 +68,13 @@ module.exports = function(grunt) {
             target: {
                 options: {
                     minify: true,
+                    //inline: true,
                     base: 'dist/',
-                    css: 'css/*.css',
+                    css: ['dist/css/*.css'],
                 },
                 // The source file
                 src: 'src/index.html', 
-                dest: 'dist/index.html'
+                dest: 'dist/critical.css'
             }
         },
         watch: {
