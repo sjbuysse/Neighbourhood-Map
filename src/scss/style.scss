@@ -143,13 +143,6 @@ header {
     display: none;
 }
 
-.background {
-    @include fullHeight;
-    width: 100%;
-    background-color: green;
-    padding-top: $headerHeight;
-}
-
 .auth-modal {
     @include modal;
     &__content {
