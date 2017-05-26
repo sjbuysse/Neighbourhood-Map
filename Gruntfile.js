@@ -70,7 +70,7 @@ module.exports = function(grunt) {
                     minify: true,
                     //inline: true,
                     base: 'dist/',
-                    css: ['dist/css/*.css'],
+                    css: ['dist/css/normalize.css','dist/css/non-critical-style.css','dist/css/critical-style.css','dist/css/critical-style.css'],
                 },
                 // The source file
                 src: 'src/index.html', 
