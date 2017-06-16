@@ -47,10 +47,10 @@ module.exports = function(grunt) {
             mainJs: {
                 src: config.jsSrcDir + 'main.min.js', 
                 dest: config.jsDistDir + 'main.min.js'
-            //},
-            //html: {
-                //src: config.srcDir + 'index.html', 
-                //dest: config.distDir + 'index.html'
+            },
+            html: {
+                src: config.srcDir + 'index.html', 
+                dest: config.distDir + 'index.html'
             }
         },
         jshint: {
