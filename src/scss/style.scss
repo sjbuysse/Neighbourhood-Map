@@ -116,6 +116,7 @@ html, body {
     height: 100%;
     position: relative;
     overflow: hidden;
+    font-family: 'Roboto', sans-serif
 }
 
 header {
@@ -161,7 +162,8 @@ header {
     box-sizing: border-box;
     transform: translate(-200px,0);
     // bottom padding is where the export and import btn rest
-    padding: 6px 6px (2 * $headerHeight + 4);
+    // top padding is where the searchbox rests
+    padding: ($headerHeight + 5px) 6px (2 * $headerHeight + 5px);
     // move drawer to right
     &--open {
         transform: translate(0, 0);
@@ -169,6 +171,9 @@ header {
     }
     &__searchbox {
         @include form-fields;
+        position: absolute;
+        top: 6px;
+        left: 6px;
     }
     // list of places that can be filterd
     &__list{
@@ -176,7 +181,8 @@ header {
         overflow-y: scroll;
         list-style: none;
         text-transform: uppercase;
-        padding: 6px 0 0;
+        padding: 0;
+        margin: 0;
         // customize scrollbar
         &::-webkit-scrollbar {
             width: 10px;
@@ -522,5 +528,4 @@ header {
 #map {
     width: 100%;
     @include fullHeight;
-    margin-top: $headerHeight;
 }
